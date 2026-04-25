@@ -7,13 +7,14 @@ services:
     container_name: chorwacki-api
     environment:
       - DB_PATH=/data/chorwacki.db
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY:-dev-secret-change-me-please-1234567890abcdef}
     volumes:
       - db-data:/data
     ports:
       - "8000:8000"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/rooms')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -1,7 +1,53 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import date, datetime
 
+
+# ─── AUTH ────────────────────────────────────────────────────────────────────
+
+class RegisterIn(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+    @field_validator("username")
+    @classmethod
+    def username_rules(cls, v: str) -> str:
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("Nazwa użytkownika musi mieć min. 3 znaki")
+        if len(v) > 32:
+            raise ValueError("Nazwa użytkownika max 32 znaki")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def password_rules(cls, v: str) -> str:
+        if len(v) < 4:
+            raise ValueError("Hasło musi mieć min. 4 znaki")
+        return v
+
+
+class LoginIn(BaseModel):
+    # Logowanie po username albo email — jedno z tych pól musi być podane.
+    identifier: str  # username lub email
+    password: str
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    created_at: Optional[datetime]
+    class Config: from_attributes = True
+
+
+# ─── DATA ────────────────────────────────────────────────────────────────────
 
 class RoomOut(BaseModel):
     id: int
@@ -75,8 +121,8 @@ class ProgressOut(BaseModel):
 class SentenceIn(BaseModel):
     room_id: int
     text_hr: str
-    text_pl: Optional[str]
-    note: Optional[str]
+    text_pl: Optional[str] = None
+    note: Optional[str] = None
     status: Optional[str] = "do sprawdzenia"
 
 

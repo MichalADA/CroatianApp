@@ -3,6 +3,15 @@ from sqlalchemy.sql import func
 from database import Base
 
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    password_hash = Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+
+
 class Room(Base):
     __tablename__ = "rooms"
     id = Column(Integer, primary_key=True, index=True)
@@ -43,6 +52,7 @@ class Verb(Base):
 class Progress(Base):
     __tablename__ = "progress"
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     item_type = Column(String, nullable=False)  # "word" | "verb"
     item_id = Column(Integer, nullable=False)
     room_id = Column(Integer, ForeignKey("rooms.id"))
@@ -55,6 +65,7 @@ class Progress(Base):
 class Sentence(Base):
     __tablename__ = "sentences"
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"))
     text_hr = Column(Text, nullable=False)
     text_pl = Column(Text)

@@ -1,11 +1,16 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text, inspect
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from typing import Optional, List
-import models, schemas, database
 
-app = FastAPI(title="Chorwacki od podstaw API", version="1.0.0")
+import models, schemas, database
+from auth import (
+    hash_password, verify_password, create_token, get_current_user,
+)
+
+app = FastAPI(title="Chorwacki od podstaw API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,64 +30,125 @@ def get_db():
         db.close()
 
 
+# ─── STARTUP: migracja, seed danych, seed konta testowego ──────────────────
+
+def _migrate_user_id_columns():
+    """SQLite ALTER TABLE — dodaj user_id do tabel, jeśli go jeszcze nie ma.
+    Idempotentne, bezpieczne na istniejących bazach."""
+    inspector = inspect(database.engine)
+    for table in ("progress", "sentences"):
+        if not inspector.has_table(table):
+            continue
+        cols = {c["name"] for c in inspector.get_columns(table)}
+        if "user_id" not in cols:
+            with database.engine.begin() as conn:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN user_id INTEGER"))
+
+
+def _ensure_test_user(db: Session) -> models.User:
+    """Tworzy konto testowe (test/test) jeśli nie istnieje. Zwraca usera."""
+    user = db.query(models.User).filter(models.User.username == "test").first()
+    if user:
+        return user
+    user = models.User(
+        username="test",
+        email="test@test.com",
+        password_hash=hash_password("test"),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def _backfill_user_id(db: Session, default_user_id: int):
+    """Wszystkie wiersze progress/sentences bez user_id przypisz do konta testowego."""
+    db.execute(
+        text("UPDATE progress SET user_id = :uid WHERE user_id IS NULL"),
+        {"uid": default_user_id},
+    )
+    db.execute(
+        text("UPDATE sentences SET user_id = :uid WHERE user_id IS NULL"),
+        {"uid": default_user_id},
+    )
+    db.commit()
+
+
 @app.on_event("startup")
 def startup():
+    _migrate_user_id_columns()
     db = database.SessionLocal()
     try:
         if db.query(models.Room).count() == 0:
             import seed
             seed.run(db)
+        test_user = _ensure_test_user(db)
+        _backfill_user_id(db, test_user.id)
     finally:
         db.close()
 
 
+# ─── HEALTH ─────────────────────────────────────────────────────────────────
+
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+
+# ─── AUTH ───────────────────────────────────────────────────────────────────
+
+@app.post("/auth/register", response_model=schemas.TokenOut)
+def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
+    username = payload.username.strip()
+    email = payload.email.lower().strip()
+
+    if db.query(models.User).filter(models.User.username == username).first():
+        raise HTTPException(400, "Nazwa użytkownika jest już zajęta")
+    if db.query(models.User).filter(models.User.email == email).first():
+        raise HTTPException(400, "Konto z tym e-mailem już istnieje")
+
+    user = models.User(
+        username=username,
+        email=email,
+        password_hash=hash_password(payload.password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return schemas.TokenOut(access_token=create_token(user.id))
+
+
+@app.post("/auth/login", response_model=schemas.TokenOut)
+def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
+    ident = payload.identifier.strip()
+    user = db.query(models.User).filter(
+        (models.User.email == ident.lower()) | (models.User.username == ident)
+    ).first()
+    if not user or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(401, "Nieprawidłowy login lub hasło")
+    return schemas.TokenOut(access_token=create_token(user.id))
+
+
+@app.get("/auth/me", response_model=schemas.UserOut)
+def me(user: models.User = Depends(get_current_user)):
+    return user
+
+
 # ─── ROOMS ──────────────────────────────────────────────────────────────────
 
-@app.get("/rooms", response_model=List[schemas.RoomOut])
-def get_rooms(db: Session = Depends(get_db)):
-    rooms = db.query(models.Room).order_by(models.Room.id).all()
-    result = []
-    for room in rooms:
-        word_count = db.query(models.Word).filter(models.Word.room_id == room.id).count()
-        verb_count = db.query(models.Verb).filter(models.Verb.room_id == room.id).count()
-        known = db.query(models.Progress).filter(
-            models.Progress.room_id == room.id,
-            models.Progress.status == "znam"
-        ).count()
-        due_today = db.query(models.Progress).filter(
-            models.Progress.room_id == room.id,
-            models.Progress.next_review <= date.today(),
-            models.Progress.status != "nowe"
-        ).count()
-        result.append(schemas.RoomOut(
-            id=room.id,
-            name=room.name,
-            description=room.description,
-            emoji=room.emoji,
-            color=room.color,
-            word_count=word_count,
-            verb_count=verb_count,
-            known_count=known,
-            due_today=due_today,
-        ))
-    return result
-
-
-@app.get("/rooms/{room_id}", response_model=schemas.RoomOut)
-def get_room(room_id: int, db: Session = Depends(get_db)):
-    room = db.query(models.Room).filter(models.Room.id == room_id).first()
-    if not room:
-        raise HTTPException(404, "Room not found")
-    word_count = db.query(models.Word).filter(models.Word.room_id == room_id).count()
-    verb_count = db.query(models.Verb).filter(models.Verb.room_id == room_id).count()
+def _room_stats(db: Session, room: models.Room, user_id: int) -> schemas.RoomOut:
+    word_count = db.query(models.Word).filter(models.Word.room_id == room.id).count()
+    verb_count = db.query(models.Verb).filter(models.Verb.room_id == room.id).count()
     known = db.query(models.Progress).filter(
-        models.Progress.room_id == room_id,
-        models.Progress.status == "znam"
+        models.Progress.user_id == user_id,
+        models.Progress.room_id == room.id,
+        models.Progress.status == "znam",
     ).count()
     due_today = db.query(models.Progress).filter(
-        models.Progress.room_id == room_id,
+        models.Progress.user_id == user_id,
+        models.Progress.room_id == room.id,
         models.Progress.next_review <= date.today(),
-        models.Progress.status != "nowe"
+        models.Progress.status != "nowe",
     ).count()
     return schemas.RoomOut(
         id=room.id, name=room.name, description=room.description,
@@ -92,11 +158,28 @@ def get_room(room_id: int, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/rooms", response_model=List[schemas.RoomOut])
+def get_rooms(db: Session = Depends(get_db),
+              user: models.User = Depends(get_current_user)):
+    rooms = db.query(models.Room).order_by(models.Room.id).all()
+    return [_room_stats(db, r, user.id) for r in rooms]
+
+
+@app.get("/rooms/{room_id}", response_model=schemas.RoomOut)
+def get_room(room_id: int, db: Session = Depends(get_db),
+             user: models.User = Depends(get_current_user)):
+    room = db.query(models.Room).filter(models.Room.id == room_id).first()
+    if not room:
+        raise HTTPException(404, "Room not found")
+    return _room_stats(db, room, user.id)
+
+
 # ─── WORDS ──────────────────────────────────────────────────────────────────
 
 @app.get("/rooms/{room_id}/words", response_model=List[schemas.WordOut])
 def get_words(room_id: int, q: Optional[str] = None, category: Optional[str] = None,
-              db: Session = Depends(get_db)):
+              db: Session = Depends(get_db),
+              user: models.User = Depends(get_current_user)):
     query = db.query(models.Word).filter(models.Word.room_id == room_id)
     if q:
         like = f"%{q}%"
@@ -109,8 +192,9 @@ def get_words(room_id: int, q: Optional[str] = None, category: Optional[str] = N
     result = []
     for w in words:
         prog = db.query(models.Progress).filter(
+            models.Progress.user_id == user.id,
             models.Progress.item_type == "word",
-            models.Progress.item_id == w.id
+            models.Progress.item_id == w.id,
         ).first()
         result.append(schemas.WordOut(
             id=w.id, room_id=w.room_id, croatian=w.croatian, polish=w.polish,
@@ -123,7 +207,8 @@ def get_words(room_id: int, q: Optional[str] = None, category: Optional[str] = N
 
 
 @app.get("/rooms/{room_id}/words/categories")
-def get_word_categories(room_id: int, db: Session = Depends(get_db)):
+def get_word_categories(room_id: int, db: Session = Depends(get_db),
+                        user: models.User = Depends(get_current_user)):
     cats = db.query(models.Word.category).filter(
         models.Word.room_id == room_id
     ).distinct().all()
@@ -133,7 +218,8 @@ def get_word_categories(room_id: int, db: Session = Depends(get_db)):
 # ─── VERBS ──────────────────────────────────────────────────────────────────
 
 @app.get("/rooms/{room_id}/verbs", response_model=List[schemas.VerbOut])
-def get_verbs(room_id: int, q: Optional[str] = None, db: Session = Depends(get_db)):
+def get_verbs(room_id: int, q: Optional[str] = None, db: Session = Depends(get_db),
+              user: models.User = Depends(get_current_user)):
     query = db.query(models.Verb).filter(models.Verb.room_id == room_id)
     if q:
         like = f"%{q}%"
@@ -144,8 +230,9 @@ def get_verbs(room_id: int, q: Optional[str] = None, db: Session = Depends(get_d
     result = []
     for v in verbs:
         prog = db.query(models.Progress).filter(
+            models.Progress.user_id == user.id,
             models.Progress.item_type == "verb",
-            models.Progress.item_id == v.id
+            models.Progress.item_id == v.id,
         ).first()
         result.append(schemas.VerbOut(
             id=v.id, room_id=v.room_id, infinitive=v.infinitive, polish=v.polish,
@@ -161,9 +248,11 @@ def get_verbs(room_id: int, q: Optional[str] = None, db: Session = Depends(get_d
 # ─── REVIEWS ────────────────────────────────────────────────────────────────
 
 @app.get("/rooms/{room_id}/reviews")
-def get_reviews(room_id: int, db: Session = Depends(get_db)):
+def get_reviews(room_id: int, db: Session = Depends(get_db),
+                user: models.User = Depends(get_current_user)):
     today = date.today()
     progs = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.room_id == room_id,
         models.Progress.next_review <= today,
         models.Progress.status != "nowe",
@@ -191,14 +280,15 @@ def get_reviews(room_id: int, db: Session = Depends(get_db)):
 
 @app.get("/rooms/{room_id}/learning-session")
 def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
-                         db: Session = Depends(get_db)):
+                         db: Session = Depends(get_db),
+                         user: models.User = Depends(get_current_user)):
     """
     Buduje kolejkę kart na sesję nauki w priorytecie:
       1. słowa do powtórki na dziś (status != nowe, next_review <= dziś)
       2. słowa trudne (status = trudne, jeszcze nie w kolejce)
       3. słowa w trakcie nauki (status = uczę się, jeszcze nie w kolejce)
       4. nowe słowa / czasowniki (brak progresu lub status = nowe)
-    Bez duplikowania logiki powtórek — używa tych samych modeli i statusów.
+    Per-user — filtruje po user_id zalogowanego użytkownika.
     """
     today = date.today()
 
@@ -227,6 +317,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
 
     # 1) do powtórki na dziś
     due = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.room_id == room_id,
         models.Progress.next_review <= today,
         models.Progress.status != "nowe",
@@ -242,6 +333,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
 
     # 2) trudne (jeszcze nie dodane)
     hard = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.room_id == room_id,
         models.Progress.status == "trudne",
     ).all()
@@ -256,6 +348,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
 
     # 3) uczę się (jeszcze nie dodane)
     learning = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.room_id == room_id,
         models.Progress.status == "uczę się",
     ).all()
@@ -269,9 +362,9 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
             items.append(s)
 
     # 4) nowe słowa (i czasowniki) — bez progresu LUB ze statusem "nowe"
-    # Wykluczamy wszystko, co ma już aktywny progres (znam/uczę się/trudne) — niezależnie od daty.
     if len(items) < limit:
         all_progress = db.query(models.Progress).filter(
+            models.Progress.user_id == user.id,
             models.Progress.room_id == room_id,
             models.Progress.status != "nowe",
         ).all()
@@ -312,7 +405,8 @@ STATUS_MAP = {"nie wiem": "uczę się", "prawie": "uczę się", "wiem": "znam"}
 
 
 @app.post("/progress", response_model=schemas.ProgressOut)
-def update_progress(payload: schemas.ProgressIn, db: Session = Depends(get_db)):
+def update_progress(payload: schemas.ProgressIn, db: Session = Depends(get_db),
+                    user: models.User = Depends(get_current_user)):
     today = date.today()
     days = REVIEW_DAYS.get(payload.answer, 1)
     new_status = STATUS_MAP.get(payload.answer, "uczę się")
@@ -320,6 +414,7 @@ def update_progress(payload: schemas.ProgressIn, db: Session = Depends(get_db)):
         new_status = "trudne"
 
     prog = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.item_type == payload.item_type,
         models.Progress.item_id == payload.item_id,
     ).first()
@@ -331,6 +426,7 @@ def update_progress(payload: schemas.ProgressIn, db: Session = Depends(get_db)):
         prog.review_count += 1
     else:
         prog = models.Progress(
+            user_id=user.id,
             item_type=payload.item_type,
             item_id=payload.item_id,
             room_id=payload.room_id,
@@ -346,14 +442,17 @@ def update_progress(payload: schemas.ProgressIn, db: Session = Depends(get_db)):
 
 
 @app.post("/progress/start")
-def start_learning(payload: schemas.StartLearning, db: Session = Depends(get_db)):
+def start_learning(payload: schemas.StartLearning, db: Session = Depends(get_db),
+                   user: models.User = Depends(get_current_user)):
     today = date.today()
     existing = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.item_type == payload.item_type,
         models.Progress.item_id == payload.item_id,
     ).first()
     if not existing:
         prog = models.Progress(
+            user_id=user.id,
             item_type=payload.item_type,
             item_id=payload.item_id,
             room_id=payload.room_id,
@@ -370,16 +469,20 @@ def start_learning(payload: schemas.StartLearning, db: Session = Depends(get_db)
 # ─── SENTENCES ──────────────────────────────────────────────────────────────
 
 @app.get("/rooms/{room_id}/sentences", response_model=List[schemas.SentenceOut])
-def get_sentences(room_id: int, db: Session = Depends(get_db)):
+def get_sentences(room_id: int, db: Session = Depends(get_db),
+                  user: models.User = Depends(get_current_user)):
     sentences = db.query(models.Sentence).filter(
-        models.Sentence.room_id == room_id
+        models.Sentence.user_id == user.id,
+        models.Sentence.room_id == room_id,
     ).order_by(models.Sentence.created_at.desc()).all()
     return sentences
 
 
 @app.post("/sentences", response_model=schemas.SentenceOut)
-def create_sentence(payload: schemas.SentenceIn, db: Session = Depends(get_db)):
+def create_sentence(payload: schemas.SentenceIn, db: Session = Depends(get_db),
+                    user: models.User = Depends(get_current_user)):
     s = models.Sentence(
+        user_id=user.id,
         room_id=payload.room_id,
         text_hr=payload.text_hr,
         text_pl=payload.text_pl,
@@ -393,8 +496,12 @@ def create_sentence(payload: schemas.SentenceIn, db: Session = Depends(get_db)):
 
 
 @app.delete("/sentences/{sentence_id}")
-def delete_sentence(sentence_id: int, db: Session = Depends(get_db)):
-    s = db.query(models.Sentence).filter(models.Sentence.id == sentence_id).first()
+def delete_sentence(sentence_id: int, db: Session = Depends(get_db),
+                    user: models.User = Depends(get_current_user)):
+    s = db.query(models.Sentence).filter(
+        models.Sentence.id == sentence_id,
+        models.Sentence.user_id == user.id,
+    ).first()
     if not s:
         raise HTTPException(404)
     db.delete(s)
@@ -405,19 +512,30 @@ def delete_sentence(sentence_id: int, db: Session = Depends(get_db)):
 # ─── DASHBOARD ──────────────────────────────────────────────────────────────
 
 @app.get("/dashboard")
-def get_dashboard(db: Session = Depends(get_db)):
+def get_dashboard(db: Session = Depends(get_db),
+                  user: models.User = Depends(get_current_user)):
     total_words = db.query(models.Word).count()
     total_verbs = db.query(models.Verb).count()
-    known = db.query(models.Progress).filter(models.Progress.status == "znam").count()
-    learning = db.query(models.Progress).filter(models.Progress.status == "uczę się").count()
-    hard = db.query(models.Progress).filter(models.Progress.status == "trudne").count()
+    known = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
+        models.Progress.status == "znam",
+    ).count()
+    learning = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
+        models.Progress.status == "uczę się",
+    ).count()
+    hard = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
+        models.Progress.status == "trudne",
+    ).count()
     due = db.query(models.Progress).filter(
+        models.Progress.user_id == user.id,
         models.Progress.next_review <= date.today(),
         models.Progress.status != "nowe",
     ).count()
-    recent_sentences = db.query(models.Sentence).order_by(
-        models.Sentence.created_at.desc()
-    ).limit(5).all()
+    recent_sentences = db.query(models.Sentence).filter(
+        models.Sentence.user_id == user.id,
+    ).order_by(models.Sentence.created_at.desc()).limit(5).all()
     return {
         "total_words": total_words,
         "total_verbs": total_verbs,
@@ -426,5 +544,5 @@ def get_dashboard(db: Session = Depends(get_db)):
         "hard": hard,
         "due_today": due,
         "recent_sentences": [{"id": s.id, "text_hr": s.text_hr, "text_pl": s.text_pl,
-                               "room_id": s.room_id} for s in recent_sentences],
+                              "room_id": s.room_id} for s in recent_sentences],
     }
