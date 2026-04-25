@@ -43,8 +43,33 @@ class UserOut(BaseModel):
     id: int
     username: str
     email: EmailStr
+    selected_language: str = "hr"
+    theme: str = "dark"
+    avatar: Optional[str] = None
     created_at: Optional[datetime]
     class Config: from_attributes = True
+
+
+# ─── LANGUAGES ───────────────────────────────────────────────────────────────
+
+class LanguageOut(BaseModel):
+    code: str
+    name: str
+    title: str
+    flag: str
+    has_content: bool = False
+    is_current: bool = False
+
+
+class LanguageSelectIn(BaseModel):
+    language: str
+
+
+# ─── USER SETTINGS ───────────────────────────────────────────────────────────
+
+class SettingsIn(BaseModel):
+    theme: Optional[str] = None   # "dark" | "light"
+    avatar: Optional[str] = None  # emoji / krótki tekst; "" = wyczyść
 
 
 # ─── DATA ────────────────────────────────────────────────────────────────────

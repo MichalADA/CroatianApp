@@ -1,5 +1,16 @@
 const API = window.API_URL || 'http://localhost:8000';
 const TOKEN_KEY = 'chorwacki_token';
+const THEME_KEY = 'chorwacki_theme';
+
+// ─── Theme ──────────────────────────────────────────────────────────────────
+// Stosowane ZARAZ przy ładowaniu skryptu — dzięki temu motyw nie miga
+// na chwilę domyślnym ciemnym, gdy user ma jasny.
+function applyTheme(theme) {
+  const t = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.classList.toggle('theme-light', t === 'light');
+  localStorage.setItem(THEME_KEY, t);
+}
+applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
 
 // ─── Token helpers ──────────────────────────────────────────────────────────
 const auth = {
@@ -69,6 +80,13 @@ const api = {
   },
   async me() { return request('/auth/me'); },
 
+  // ─── languages ───────────────────────────────────────────────────────────
+  async getLanguages() { return request('/languages'); },
+  async getMyLanguage() { return request('/me/language'); },
+  async setMyLanguage(code) {
+    return request('/me/language', { method: 'POST', body: JSON.stringify({ language: code }) });
+  },
+
   // ─── rooms / words / verbs ───────────────────────────────────────────────
   async getRooms() { return request('/rooms'); },
   async getRoom(id) { return request(`/rooms/${id}`); },
@@ -108,7 +126,140 @@ const api = {
 
   // ─── dashboard ───────────────────────────────────────────────────────────
   async getDashboard() { return request('/dashboard'); },
+
+  // ─── settings (theme, avatar) ────────────────────────────────────────────
+  async updateSettings(data) {
+    return request('/me/settings', { method: 'PATCH', body: JSON.stringify(data) });
+  },
 };
+
+// ─── Avatar helper ─────────────────────────────────────────────────────────
+function avatarFor(user) {
+  if (user && user.avatar && user.avatar.trim()) return user.avatar.trim();
+  return ((user && user.username && user.username[0]) || '?').toUpperCase();
+}
+
+// ─── Settings modal ────────────────────────────────────────────────────────
+// Wstrzykiwany dynamicznie — dostępny z każdej strony, która ładuje api.js.
+function openSettingsModal(user) {
+  // Usuń poprzedni, jeśli był otwarty
+  const existing = document.getElementById('settings-modal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'settings-modal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:480px">
+      <h3>Ustawienia</h3>
+
+      <div class="form-group">
+        <label>Motyw</label>
+        <div class="theme-toggle">
+          <button type="button" class="theme-opt" data-theme="dark">🌙 Ciemny</button>
+          <button type="button" class="theme-opt" data-theme="light">☀️ Jasny</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Twój avatar</label>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="user-avatar" id="set-avatar-preview" style="width:42px;height:42px;font-size:18px">?</span>
+          <input type="text" id="set-avatar-input" maxlength="16"
+                 placeholder="np. 🐉  albo  M  albo  PL"
+                 style="flex:1">
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">
+          Emoji albo 1–3 znaki. Puste = inicjał z nicku (${(user.username[0] || '?').toUpperCase()}).
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Konto</label>
+        <div style="background:var(--surface2);padding:10px 12px;border-radius:8px;font-size:13px;color:var(--text2)">
+          <div><strong style="color:var(--text)">${user.username}</strong></div>
+          <div style="font-size:12px">${user.email}</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="set-cancel">Anuluj</button>
+        <button class="btn primary" id="set-save">Zapisz</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.style.display = 'flex';
+
+  // Stan
+  let chosenTheme = user.theme === 'light' ? 'light' : 'dark';
+  let chosenAvatar = user.avatar || '';
+
+  const previewEl = overlay.querySelector('#set-avatar-preview');
+  const inputEl = overlay.querySelector('#set-avatar-input');
+  inputEl.value = chosenAvatar;
+  previewEl.textContent = avatarFor(user);
+
+  function updatePreview() {
+    previewEl.textContent = avatarFor({
+      username: user.username,
+      avatar: chosenAvatar,
+    });
+  }
+
+  function setActiveTheme() {
+    overlay.querySelectorAll('.theme-opt').forEach(b => {
+      b.classList.toggle('active', b.dataset.theme === chosenTheme);
+    });
+    // Live preview motywu
+    applyTheme(chosenTheme);
+  }
+  setActiveTheme();
+
+  overlay.querySelectorAll('.theme-opt').forEach(b => {
+    b.addEventListener('click', () => { chosenTheme = b.dataset.theme; setActiveTheme(); });
+  });
+
+  inputEl.addEventListener('input', e => {
+    chosenAvatar = e.target.value;
+    updatePreview();
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(true);
+  });
+
+  function closeModal(revert) {
+    if (revert) {
+      // przywróć motyw zapisany na serwerze, jeśli user anulował
+      applyTheme(user.theme || 'dark');
+    }
+    overlay.remove();
+  }
+
+  overlay.querySelector('#set-cancel').onclick = () => closeModal(true);
+  overlay.querySelector('#set-save').onclick = async () => {
+    const btn = overlay.querySelector('#set-save');
+    btn.disabled = true;
+    try {
+      const updated = await api.updateSettings({
+        theme: chosenTheme,
+        avatar: chosenAvatar,
+      });
+      applyTheme(updated.theme);
+      // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu
+      const avEls = document.querySelectorAll('[data-user-avatar]');
+      avEls.forEach(el => { el.textContent = avatarFor(updated); });
+      toast('Zapisano ustawienia');
+      // Zaktualizuj cache obiektu user — tak by kolejne otwarcie miało świeże dane
+      Object.assign(user, updated);
+      overlay.remove();
+    } catch (e) {
+      toast(e.message || 'Nie udało się zapisać');
+      btn.disabled = false;
+    }
+  };
+}
 
 // ─── Bramka: jeśli brak tokena → na login (oprócz samej strony login) ──────
 function requireAuth() {

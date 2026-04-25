@@ -192,17 +192,27 @@
   text-transform:uppercase;
 }
 .user-name { font-weight:500; color:var(--text); }
+.lang-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:100px;
+  background:var(--surface); border:1px solid var(--border);
+  font-size:12px; color:var(--text2);
+  font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.05em;
+}
+.lang-pill .flag { font-size:14px; }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="topbar-room">
     <a href="/static/index.html" class="back-link" style="padding:0">← Pałac pamięci</a>
-    <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <span class="user-chip" id="user-chip" style="display:none">
         <span class="user-avatar" id="user-avatar">?</span>
         <span class="user-name" id="user-name">…</span>
       </span>
+      <span class="lang-pill" id="lang-pill" style="display:none"></span>
+      <button class="settings-cog" id="settings-cog" title="Ustawienia">⚙</button>
       <button class="btn" onclick="auth.logout()">Wyloguj</button>
     </div>
   </div>
@@ -417,11 +427,18 @@ let learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
 async function init() {
   if (!requireAuth()) return;
 
-  // Wczytaj dane usera w tle (do topbara)
-  api.me().then(u => {
+  // Wczytaj dane usera + język w tle (do topbara)
+  Promise.all([api.me(), api.getMyLanguage()]).then(([u, lang]) => {
+    applyTheme(u.theme || 'dark');
     document.getElementById('user-name').textContent = u.username;
-    document.getElementById('user-avatar').textContent = (u.username[0] || '?').toUpperCase();
+    const avEl = document.getElementById('user-avatar');
+    avEl.textContent = avatarFor(u);
+    avEl.dataset.userAvatar = '1';
     document.getElementById('user-chip').style.display = 'inline-flex';
+    const pill = document.getElementById('lang-pill');
+    pill.innerHTML = `<span class="flag">${lang.flag}</span><span>${lang.code.toUpperCase()}</span>`;
+    pill.style.display = 'inline-flex';
+    document.getElementById('settings-cog').onclick = () => openSettingsModal(u);
   }).catch(() => {});
 
   const room = await api.getRoom(ROOM_ID);

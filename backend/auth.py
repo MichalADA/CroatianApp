@@ -87,7 +87,7 @@ def _decode(token: str) -> Optional[int]:
 # ─── current_user dependency ─────────────────────────────────────────────────
 
 def _get_db():
-    db = database.SessionLocal()
+    db = database.AppSessionLocal()
     try:
         yield db
     finally:
