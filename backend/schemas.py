@@ -43,8 +43,50 @@ class UserOut(BaseModel):
     id: int
     username: str
     email: EmailStr
+    display_name: Optional[str]
+    avatar_color: Optional[str]
+    theme: Optional[str]
     created_at: Optional[datetime]
     class Config: from_attributes = True
+
+
+class UserUpdateIn(BaseModel):
+    display_name: Optional[str] = None
+    avatar_color: Optional[str] = None
+    theme: Optional[str] = None
+
+    @field_validator("display_name")
+    @classmethod
+    def display_name_rules(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        v = v.strip()
+        if not v:
+            return None
+        if len(v) > 48:
+            raise ValueError("Wyświetlana nazwa max 48 znaków")
+        return v
+
+    @field_validator("avatar_color")
+    @classmethod
+    def avatar_color_rules(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        v = v.strip()
+        if not v:
+            return None
+        if len(v) != 7 or not v.startswith("#"):
+            raise ValueError("Kolor avatara musi mieć format #RRGGBB")
+        return v
+
+    @field_validator("theme")
+    @classmethod
+    def theme_rules(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        if v not in ("dark", "light"):
+            raise ValueError("Motyw musi mieć wartość dark lub light")
+        return v
 
 
 # ─── DATA ────────────────────────────────────────────────────────────────────

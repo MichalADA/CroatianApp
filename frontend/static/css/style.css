@@ -17,6 +17,30 @@
   --tag-text: #e8c07d;
 }
 
+[data-theme="light"] {
+  --bg: #f3f1eb;
+  --surface: #ffffff;
+  --surface2: #f7f4ee;
+  --border: rgba(15,14,13,0.12);
+  --border2: rgba(15,14,13,0.28);
+  --accent: #c28f38;
+  --accent2: #ab7a2b;
+  --text: #171513;
+  --text2: #454039;
+  --text3: #5f584f;
+  --tag-bg: rgba(194,143,56,0.14);
+  --tag-text: #8f651f;
+}
+
+[data-theme="light"] .profile-card,
+[data-theme="light"] .word-card,
+[data-theme="light"] .verb-card,
+[data-theme="light"] .sentence-card,
+[data-theme="light"] .learn-card,
+[data-theme="light"] .review-card {
+  box-shadow: 0 2px 10px rgba(23, 21, 19, 0.04);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 

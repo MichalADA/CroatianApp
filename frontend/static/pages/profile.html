@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — Chorwacki od podstaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.profile-wrap { max-width: 760px; margin: 0 auto; }
+.profile-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:1.2rem 0 1.5rem; }
+.profile-card { background: var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px; }
+.profile-card h3 { font-size:1.1rem; margin-bottom:1rem; }
+.profile-avatar-row { display:flex; align-items:center; gap:14px; margin-bottom:1rem; }
+.profile-avatar { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:22px; color:#0f0e0d; background:var(--accent); }
+.color-pills { display:flex; gap:8px; flex-wrap:wrap; }
+.color-pill { width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
+.color-pill.active { border-color: var(--text); box-shadow:0 0 0 2px var(--surface2); }
+.muted { color: var(--text3); font-size:13px; }
+.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:1rem; }
+</style>
+</head>
+<body>
+<div class="container profile-wrap">
+  <a href="/static/index.html" class="back-link">← Wróć do pałacu</a>
+
+  <div class="profile-head">
+    <h2>Moje konto</h2>
+    <button class="btn" onclick="auth.logout()">Wyloguj</button>
+  </div>
+
+  <div class="profile-card" id="profile">
+    <h3>Profil</h3>
+    <div class="profile-avatar-row">
+      <div class="profile-avatar" id="avatar-preview">?</div>
+      <div>
+        <div id="profile-username" style="font-weight:600">@user</div>
+        <div class="muted" id="profile-created">—</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Nazwa wyświetlana</label>
+      <input type="text" id="display-name" placeholder="Np. Tomek">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="text" id="email" readonly>
+    </div>
+  </div>
+
+  <div class="profile-card" id="settings">
+    <h3>Ustawienia</h3>
+
+    <div class="form-group">
+      <label>Kolor avatara</label>
+      <div class="color-pills" id="color-pills"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Motyw</label>
+      <select id="theme">
+        <option value="dark">Ciemny</option>
+        <option value="light">Jasny</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" onclick="saveProfile()">Zapisz zmiany</button>
+      <a class="btn" href="/static/pages/room.html?id=1">Przejdź do pokoju 1</a>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+const AVATAR_COLORS = ['#e8c07d', '#7db8e8', '#6bcf8a', '#b87de8', '#e87d7d', '#f39c6b'];
+let selectedColor = AVATAR_COLORS[0];
+let meData = null;
+
+async function initProfile() {
+  if (!requireAuth()) return;
+  meData = await api.me();
+
+  const displayName = meData.display_name || '';
+  const label = displayName || meData.username;
+  selectedColor = meData.avatar_color || AVATAR_COLORS[0];
+
+  document.getElementById('profile-username').textContent = '@' + meData.username;
+  document.getElementById('display-name').value = displayName;
+  document.getElementById('email').value = meData.email;
+  document.getElementById('avatar-preview').textContent = (label[0] || '?').toUpperCase();
+  document.getElementById('avatar-preview').style.background = selectedColor;
+  const startTheme = meData.theme || getSavedTheme() || 'dark';
+  document.getElementById('theme').value = startTheme;
+  setAppTheme(startTheme);
+
+  if (meData.created_at) {
+    const dt = new Date(meData.created_at);
+    document.getElementById('profile-created').textContent = 'Konto od: ' + dt.toLocaleDateString('pl-PL');
+  }
+
+  renderColorPills();
+  document.getElementById('theme').addEventListener('change', (e) => {
+    setAppTheme(e.target.value);
+  });
+}
+
+function renderColorPills() {
+  const box = document.getElementById('color-pills');
+  box.innerHTML = AVATAR_COLORS.map(c =>
+    `<button type="button" class="color-pill${c===selectedColor ? ' active' : ''}" style="background:${c}" onclick="pickColor('${c}')" title="${c}"></button>`
+  ).join('');
+}
+
+function pickColor(color) {
+  selectedColor = color;
+  document.getElementById('avatar-preview').style.background = color;
+  renderColorPills();
+}
+
+async function saveProfile() {
+  const display_name = document.getElementById('display-name').value.trim();
+  const theme = document.getElementById('theme').value;
+
+  try {
+    const updated = await api.updateMe({
+      display_name: display_name || null,
+      avatar_color: selectedColor,
+      theme,
+    });
+    setAppTheme(updated.theme || theme || 'dark');
+    toast('Zapisano ustawienia konta.');
+  } catch (err) {
+    toast('Nie udało się zapisać: ' + (err.message || 'spróbuj ponownie'), 3500);
+  }
+}
+
+initProfile();
+</script>
+</body>
+</html>
