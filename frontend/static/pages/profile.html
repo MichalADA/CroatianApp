@@ -91,8 +91,9 @@ async function initProfile() {
   document.getElementById('email').value = meData.email;
   document.getElementById('avatar-preview').textContent = (label[0] || '?').toUpperCase();
   document.getElementById('avatar-preview').style.background = selectedColor;
-  document.getElementById('theme').value = meData.theme || 'dark';
-  if (meData.theme) document.documentElement.setAttribute('data-theme', meData.theme);
+  const startTheme = meData.theme || getSavedTheme() || 'dark';
+  document.getElementById('theme').value = startTheme;
+  setAppTheme(startTheme);
 
   if (meData.created_at) {
     const dt = new Date(meData.created_at);
@@ -100,6 +101,9 @@ async function initProfile() {
   }
 
   renderColorPills();
+  document.getElementById('theme').addEventListener('change', (e) => {
+    setAppTheme(e.target.value);
+  });
 }
 
 function renderColorPills() {
@@ -119,14 +123,17 @@ async function saveProfile() {
   const display_name = document.getElementById('display-name').value.trim();
   const theme = document.getElementById('theme').value;
 
-  const updated = await api.updateMe({
-    display_name: display_name || null,
-    avatar_color: selectedColor,
-    theme,
-  });
-
-  document.documentElement.setAttribute('data-theme', updated.theme || 'dark');
-  toast('Zapisano ustawienia konta.');
+  try {
+    const updated = await api.updateMe({
+      display_name: display_name || null,
+      avatar_color: selectedColor,
+      theme,
+    });
+    setAppTheme(updated.theme || theme || 'dark');
+    toast('Zapisano ustawienia konta.');
+  } catch (err) {
+    toast('Nie udało się zapisać: ' + (err.message || 'spróbuj ponownie'), 3500);
+  }
 }
 
 initProfile();

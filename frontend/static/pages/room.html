@@ -473,7 +473,7 @@ async function init() {
 }
 
 function applyUserPrefs(u) {
-  if (u.theme) document.documentElement.setAttribute('data-theme', u.theme);
+  if (u.theme) setAppTheme(u.theme);
   if (u.avatar_color) document.getElementById('user-avatar').style.background = u.avatar_color;
 }
 
