@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokój — Chorwacki od podstaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+/* ─── Progres tab ─── */
+.progress-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:10px; margin-bottom:2rem; }
+.prog-card { background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+.prog-num { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; line-height:1; }
+.prog-lbl { font-size:11px; color:var(--text3); margin-top:4px; text-transform:uppercase; letter-spacing:.05em; }
+
+.prog-breakdown { margin-top:1.5rem; }
+.prog-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.prog-row-label { font-size:13px; color:var(--text2); min-width:90px; }
+.prog-row-bar { flex:1; background:var(--surface2); border-radius:4px; height:8px; overflow:hidden; }
+.prog-row-fill { height:100%; border-radius:4px; transition:width .5s; }
+.prog-row-count { font-size:12px; color:var(--text3); min-width:30px; text-align:right; }
+
+/* ─── Review ─── */
+.review-queue-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px; }
+.queue-info { font-size:13px; color:var(--text2); }
+.review-conj { margin:1rem 0; background:var(--surface2); border-radius:10px; padding:14px; }
+.review-conj .conj-table { max-width:320px; margin:0 auto; }
+
+#review-complete { display:none; text-align:center; padding:3rem; }
+#review-complete .big-emoji { font-size:3rem; margin-bottom:1rem; }
+#review-complete h3 { font-size:1.5rem; margin-bottom:.5rem; }
+#review-complete p { color:var(--text2); font-size:14px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="/static/index.html" class="back-link">← Pałac pamięci</a>
+
+  <!-- Room header -->
+  <div class="room-header" id="room-header">
+    <div class="room-header-top">
+      <span class="room-emoji-lg" id="r-emoji">🚪</span>
+      <div>
+        <h2 id="r-name">Ładowanie…</h2>
+        <div class="room-meta-row" id="r-meta"></div>
+      </div>
+    </div>
+    <p id="r-desc" style="color:var(--text2);font-size:14px;"></p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="showTab('slownik',this)">📖 Słownik</button>
+    <button class="tab-btn" onclick="showTab('czasowniki',this)">🔤 Czasowniki</button>
+    <button class="tab-btn" onclick="showTab('powtorki',this)">⏰ Powtórki</button>
+    <button class="tab-btn" onclick="showTab('zdania',this)">✏️ Zdania</button>
+    <button class="tab-btn" onclick="showTab('progres',this)">📊 Progres</button>
+  </div>
+
+  <!-- ─── SŁOWNIK ─── -->
+  <div id="tab-slownik" class="tab-panel active">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="word-search" placeholder="Szukaj słowa…" oninput="filterWords()">
+    </div>
+    <div class="pills" id="cat-pills"></div>
+    <div class="result-count" id="word-count"></div>
+    <div class="word-grid" id="word-grid"></div>
+  </div>
+
+  <!-- ─── CZASOWNIKI ─── -->
+  <div id="tab-czasowniki" class="tab-panel">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="verb-search" placeholder="Szukaj czasownika…" oninput="filterVerbs()">
+    </div>
+    <div class="result-count" id="verb-count"></div>
+    <div class="verb-grid" id="verb-grid"></div>
+  </div>
+
+  <!-- ─── POWTÓRKI ─── -->
+  <div id="tab-powtorki" class="tab-panel">
+    <div class="review-queue-header">
+      <div>
+        <h3 style="font-size:1.1rem">Powtórki</h3>
+        <div class="queue-info" id="queue-info">Ładowanie…</div>
+      </div>
+      <button class="btn" onclick="loadReviews()">↺ Odśwież</button>
+    </div>
+
+    <!-- Active review card -->
+    <div id="review-area">
+      <div class="review-card" id="review-card" style="display:none">
+        <div id="rv-type" class="q-type"></div>
+        <div id="rv-q" class="q"></div>
+        <div id="rv-conj" class="review-conj" style="display:none"></div>
+        <div id="rv-a" class="answer-reveal hidden" onclick="revealAnswer()">Kliknij, aby zobaczyć odpowiedź</div>
+        <div class="review-actions" id="rv-actions" style="display:none">
+          <button class="btn btn-nie-wiem" onclick="answer('nie wiem')">✗ Nie wiem</button>
+          <button class="btn btn-prawie" onclick="answer('prawie')">~ Prawie</button>
+          <button class="btn btn-wiem" onclick="answer('wiem')">✓ Wiem</button>
+        </div>
+        <div style="margin-top:1.5rem;color:var(--text3);font-size:12px" id="rv-progress-label"></div>
+      </div>
+      <div id="review-complete">
+        <div class="big-emoji">🎉</div>
+        <h3>Powtórka zakończona!</h3>
+        <p id="review-complete-msg">Wszystkie słowa na dziś powtórzone.</p>
+        <button class="btn primary" style="margin-top:1.5rem" onclick="loadReviews()">Sprawdź ponownie</button>
+      </div>
+      <div class="empty-state" id="review-empty">
+        <div class="empty-icon">😌</div>
+        <p>Brak słów do powtórki na dziś.<br>Naucz się nowych słów ze słownika!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ZDANIA ─── -->
+  <div id="tab-zdania" class="tab-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px">
+      <h3 style="font-size:1.1rem">Twoje zdania</h3>
+      <button class="btn primary" onclick="openSentenceModal()">+ Dodaj zdanie</button>
+    </div>
+    <div id="sentence-list"><div class="empty-state"><div class="empty-icon">✏️</div><p>Brak zdań. Dodaj pierwsze!</p></div></div>
+  </div>
+
+  <!-- ─── PROGRES ─── -->
+  <div id="tab-progres" class="tab-panel">
+    <h3 style="font-size:1.1rem;margin-bottom:1.5rem">Twój postęp</h3>
+    <div class="progress-overview" id="prog-overview"></div>
+    <div class="prog-breakdown" id="prog-breakdown"></div>
+  </div>
+</div>
+
+<!-- ─── SENTENCE MODAL ─── -->
+<div class="modal-overlay" id="sentence-modal" style="display:none" onclick="if(event.target===this)closeSentenceModal()">
+  <div class="modal">
+    <h3>Dodaj zdanie</h3>
+    <div class="form-group">
+      <label>Zdanie po chorwacku *</label>
+      <input type="text" id="s-hr" placeholder="Npr. Dobar dan, kako si?">
+    </div>
+    <div class="form-group">
+      <label>Tłumaczenie na polski</label>
+      <input type="text" id="s-pl" placeholder="Dzień dobry, jak się masz?">
+    </div>
+    <div class="form-group">
+      <label>Notatka (opcjonalnie)</label>
+      <textarea id="s-note" placeholder="Kontekst, skojarzenia…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="s-status">
+        <option value="do sprawdzenia">Do sprawdzenia</option>
+        <option value="poprawne">Poprawne</option>
+        <option value="trudne">Trudne</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeSentenceModal()">Anuluj</button>
+      <button class="btn primary" onclick="saveSentence()">Zapisz</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const ROOM_ID = parseInt(params.get('id') || '1');
+let allWords = [], allVerbs = [], activeCat = 'wszystkie';
+let reviewQueue = [], reviewIndex = 0, reviewRevealed = false;
+let reviewDoneCount = 0;
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  const room = await api.getRoom(ROOM_ID);
+  document.title = `${room.name} — Chorwacki od podstaw`;
+
+  document.getElementById('r-emoji').textContent = room.emoji;
+  document.getElementById('r-name').textContent = room.name;
+  document.getElementById('r-desc').textContent = room.description || '';
+
+  const meta = document.getElementById('r-meta');
+  meta.innerHTML = `
+    <span class="meta-chip">${room.word_count} słów</span>
+    <span class="meta-chip">${room.verb_count} czasowników</span>
+    ${room.due_today > 0 ? `<span class="meta-chip accent">⏰ ${room.due_today} do powtórki</span>` : ''}
+    ${room.known_count > 0 ? `<span class="meta-chip" style="border-color:${room.color};color:${room.color}">✓ ${room.known_count} znam</span>` : ''}
+  `;
+
+  document.getElementById('room-header').style.borderBottomColor = room.color;
+
+  await Promise.all([loadWords(), loadVerbs()]);
+  loadReviews();
+  loadSentences();
+  loadProgres();
+}
+
+// ─── Tab switching ───────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'powtorki') loadReviews();
+  if (name === 'progres') loadProgres();
+}
+
+// ─── SŁOWNIK ─────────────────────────────────────────────────────────────────
+async function loadWords() {
+  allWords = await api.getWords(ROOM_ID);
+  const cats = await api.getWordCategories(ROOM_ID);
+  buildCatPills(cats);
+  renderWords(allWords);
+}
+
+function buildCatPills(cats) {
+  const all = ['wszystkie', ...cats];
+  document.getElementById('cat-pills').innerHTML = all.map(c =>
+    `<button class="pill${c === 'wszystkie' ? ' active' : ''}" onclick="setCat('${c}',this)">${c}</button>`
+  ).join('');
+}
+
+function setCat(cat, el) {
+  activeCat = cat;
+  document.querySelectorAll('#cat-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  filterWords();
+}
+
+function filterWords() {
+  const q = document.getElementById('word-search').value.toLowerCase();
+  const filtered = allWords.filter(w => {
+    const mQ = !q || w.croatian.toLowerCase().includes(q) || w.polish.toLowerCase().includes(q);
+    const mC = activeCat === 'wszystkie' || w.category === activeCat;
+    return mQ && mC;
+  });
+  renderWords(filtered);
+}
+
+function renderWords(words) {
+  document.getElementById('word-count').textContent = words.length + ' słów';
+  if (!words.length) {
+    document.getElementById('word-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>Brak wyników</p></div>';
+    return;
+  }
+  document.getElementById('word-grid').innerHTML = words.map((w, i) => `
+    <div class="word-card" style="animation-delay:${Math.min(i * 0.025, 0.5)}s">
+      <span class="word-status"><span class="status-dot ${statusDotClass(w.status)}" title="${w.status}"></span></span>
+      <div class="word-hr">${w.croatian}</div>
+      <div class="word-pl">${w.polish}</div>
+      <span class="word-cat">${w.category || ''}</span>
+      <div class="word-actions">
+        <button class="btn sm" onclick="startWord(${w.id})">Uczę się</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function startWord(id) {
+  await api.startLearning({ item_type: 'word', item_id: id, room_id: ROOM_ID });
+  toast('Dodano do powtórek!');
+  allWords = await api.getWords(ROOM_ID);
+  filterWords();
+}
+
+// ─── CZASOWNIKI ──────────────────────────────────────────────────────────────
+async function loadVerbs() {
+  allVerbs = await api.getVerbs(ROOM_ID);
+  renderVerbs(allVerbs);
+}
+
+function filterVerbs() {
+  const q = document.getElementById('verb-search').value.toLowerCase();
+  const filtered = allVerbs.filter(v =>
+    !q || v.infinitive.toLowerCase().includes(q) || v.polish.toLowerCase().includes(q)
+  );
+  renderVerbs(filtered);
+}
+
+function renderVerbs(verbs) {
+  document.getElementById('verb-count').textContent = verbs.length + ' czasowników';
+  if (!verbs.length) {
+    document.getElementById('verb-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>Brak wyników</p></div>';
+    return;
+  }
+  document.getElementById('verb-grid').innerHTML = verbs.map((v, i) => `
+    <div class="verb-card" style="animation-delay:${Math.min(i * 0.02, 0.5)}s">
+      <span class="verb-status"><span class="status-dot ${statusDotClass(v.status)}" title="${v.status}"></span></span>
+      <div class="verb-head">${v.infinitive}</div>
+      <div class="verb-pl">${v.polish}</div>
+      <div class="conj-table">
+        <div class="conj-row"><span class="pron">ja</span><span class="form">${v.conj_ja || '—'}</span></div>
+        <div class="conj-row"><span class="pron">mi</span><span class="form">${v.conj_mi || '—'}</span></div>
+        <div class="conj-row"><span class="pron">ti</span><span class="form">${v.conj_ti || '—'}</span></div>
+        <div class="conj-row"><span class="pron">vi</span><span class="form">${v.conj_vi || '—'}</span></div>
+        <div class="conj-row"><span class="pron">on/ona</span><span class="form">${v.conj_on || '—'}</span></div>
+        <div class="conj-row"><span class="pron">oni</span><span class="form">${v.conj_oni || '—'}</span></div>
+      </div>
+      <div class="verb-actions">
+        <button class="btn sm" onclick="startVerb(${v.id})">Uczę się</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function startVerb(id) {
+  await api.startLearning({ item_type: 'verb', item_id: id, room_id: ROOM_ID });
+  toast('Dodano do powtórek!');
+  allVerbs = await api.getVerbs(ROOM_ID);
+  renderVerbs(allVerbs);
+}
+
+// ─── POWTÓRKI ────────────────────────────────────────────────────────────────
+async function loadReviews() {
+  const data = await api.getReviews(ROOM_ID);
+  reviewQueue = data.items || [];
+  reviewIndex = 0;
+  reviewDoneCount = 0;
+  reviewRevealed = false;
+
+  document.getElementById('review-complete').style.display = 'none';
+  document.getElementById('review-empty').style.display = 'none';
+  document.getElementById('review-card').style.display = 'none';
+
+  if (!reviewQueue.length) {
+    document.getElementById('review-empty').style.display = 'block';
+    document.getElementById('queue-info').textContent = 'Brak słów do powtórki na dziś.';
+    return;
+  }
+
+  document.getElementById('queue-info').textContent = `${reviewQueue.length} elementów do powtórzenia`;
+  showCurrentCard();
+}
+
+function showCurrentCard() {
+  if (reviewIndex >= reviewQueue.length) {
+    document.getElementById('review-card').style.display = 'none';
+    document.getElementById('review-complete').style.display = 'block';
+    document.getElementById('review-complete-msg').textContent =
+      `Powtórzyłeś/aś ${reviewDoneCount} elementów. Świetna robota!`;
+    return;
+  }
+
+  const item = reviewQueue[reviewIndex];
+  reviewRevealed = false;
+
+  document.getElementById('review-card').style.display = 'block';
+  document.getElementById('rv-type').textContent = item.type === 'word' ? '📖 Słowo' : '🔤 Czasownik';
+  document.getElementById('rv-q').textContent = item.croatian;
+
+  const rvA = document.getElementById('rv-a');
+  rvA.textContent = 'Kliknij, aby zobaczyć odpowiedź';
+  rvA.classList.add('hidden');
+  rvA.style.fontSize = '1.2rem';
+
+  const rvConj = document.getElementById('rv-conj');
+  if (item.type === 'verb' && item.conj_ja) {
+    rvConj.style.display = 'none'; // shown after reveal
+    rvConj.innerHTML = `<div class="conj-table" style="max-width:320px;margin:0 auto">
+      <div class="conj-row"><span class="pron">ja</span><span class="form">${item.conj_ja}</span></div>
+      <div class="conj-row"><span class="pron">mi</span><span class="form">${item.conj_mi}</span></div>
+      <div class="conj-row"><span class="pron">ti</span><span class="form">${item.conj_ti}</span></div>
+      <div class="conj-row"><span class="pron">vi</span><span class="form">${item.conj_vi}</span></div>
+      <div class="conj-row"><span class="pron">on/ona</span><span class="form">${item.conj_on}</span></div>
+      <div class="conj-row"><span class="pron">oni</span><span class="form">${item.conj_oni}</span></div>
+    </div>`;
+  } else {
+    rvConj.style.display = 'none';
+  }
+
+  document.getElementById('rv-actions').style.display = 'none';
+  document.getElementById('rv-progress-label').textContent =
+    `${reviewIndex + 1} / ${reviewQueue.length}`;
+}
+
+function revealAnswer() {
+  if (reviewRevealed) return;
+  reviewRevealed = true;
+  const item = reviewQueue[reviewIndex];
+  const rvA = document.getElementById('rv-a');
+  rvA.textContent = item.polish;
+  rvA.classList.remove('hidden');
+  if (item.type === 'verb') {
+    document.getElementById('rv-conj').style.display = 'block';
+  }
+  document.getElementById('rv-actions').style.display = 'flex';
+}
+
+async function answer(choice) {
+  const item = reviewQueue[reviewIndex];
+  await api.postProgress({ item_type: item.type, item_id: item.id, room_id: ROOM_ID, answer: choice });
+  reviewDoneCount++;
+  reviewIndex++;
+  showCurrentCard();
+}
+
+// ─── ZDANIA ──────────────────────────────────────────────────────────────────
+async function loadSentences() {
+  const sentences = await api.getSentences(ROOM_ID);
+  const el = document.getElementById('sentence-list');
+  if (!sentences.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">✏️</div><p>Brak zdań. Dodaj pierwsze!</p></div>';
+    return;
+  }
+  el.innerHTML = '<div class="sentence-list">' + sentences.map(s => `
+    <div class="sentence-card">
+      <div>
+        <div class="s-hr">${s.text_hr}</div>
+        <div class="s-pl">${s.text_pl || ''}</div>
+        ${s.note ? `<div class="s-note">${s.note}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+        <span class="s-status ${s.status.replace(/\s/g,'-')}">${s.status}</span>
+        <button class="btn sm danger" onclick="deleteSentence(${s.id})">✕</button>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function openSentenceModal() {
+  document.getElementById('s-hr').value = '';
+  document.getElementById('s-pl').value = '';
+  document.getElementById('s-note').value = '';
+  document.getElementById('s-status').value = 'do sprawdzenia';
+  document.getElementById('sentence-modal').style.display = 'flex';
+}
+function closeSentenceModal() {
+  document.getElementById('sentence-modal').style.display = 'none';
+}
+async function saveSentence() {
+  const hr = document.getElementById('s-hr').value.trim();
+  if (!hr) { toast('Wpisz zdanie po chorwacku!'); return; }
+  await api.postSentence({
+    room_id: ROOM_ID,
+    text_hr: hr,
+    text_pl: document.getElementById('s-pl').value.trim(),
+    note: document.getElementById('s-note').value.trim(),
+    status: document.getElementById('s-status').value,
+  });
+  closeSentenceModal();
+  toast('Zdanie zapisane!');
+  loadSentences();
+}
+async function deleteSentence(id) {
+  if (!confirm('Usunąć to zdanie?')) return;
+  await api.deleteSentence(id);
+  toast('Usunięto.');
+  loadSentences();
+}
+
+// ─── PROGRES ─────────────────────────────────────────────────────────────────
+async function loadProgres() {
+  const [words, verbs, room] = await Promise.all([
+    api.getWords(ROOM_ID),
+    api.getVerbs(ROOM_ID),
+    api.getRoom(ROOM_ID),
+  ]);
+
+  const all = [...words, ...verbs];
+  const counts = { 'nowe': 0, 'uczę się': 0, 'znam': 0, 'trudne': 0, 'do powtórki': 0 };
+  all.forEach(x => { counts[x.status] = (counts[x.status] || 0) + 1; });
+  const total = all.length;
+
+  document.getElementById('prog-overview').innerHTML = `
+    <div class="prog-card"><div class="prog-num" style="color:var(--text3)">${total}</div><div class="prog-lbl">łącznie</div></div>
+    <div class="prog-card"><div class="prog-num" style="color:var(--green)">${counts['znam']}</div><div class="prog-lbl">znam</div></div>
+    <div class="prog-card"><div class="prog-num" style="color:var(--blue)">${counts['uczę się']}</div><div class="prog-lbl">uczę się</div></div>
+    <div class="prog-card"><div class="prog-num" style="color:var(--red)">${counts['trudne']}</div><div class="prog-lbl">trudne</div></div>
+    <div class="prog-card"><div class="prog-num" style="color:var(--accent)">${room.due_today}</div><div class="prog-lbl">do powtórki dziś</div></div>
+  `;
+
+  const bars = [
+    { label: '✓ Znam', count: counts['znam'], color: 'var(--green)' },
+    { label: '~ Uczę się', count: counts['uczę się'], color: 'var(--blue)' },
+    { label: '✗ Trudne', count: counts['trudne'], color: 'var(--red)' },
+    { label: '⏰ Powtórka', count: counts['do powtórki'], color: 'var(--accent)' },
+    { label: '○ Nowe', count: counts['nowe'], color: 'var(--text3)' },
+  ];
+
+  document.getElementById('prog-breakdown').innerHTML = `
+    <div style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
+        <span>Ogólny postęp</span>
+        <span>${total ? Math.round(counts['znam']/total*100) : 0}%</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width:${total ? counts['znam']/total*100 : 0}%"></div>
+      </div>
+    </div>
+    ${bars.map(b => `
+      <div class="prog-row">
+        <span class="prog-row-label">${b.label}</span>
+        <div class="prog-row-bar">
+          <div class="prog-row-fill" style="width:${total ? b.count/total*100 : 0}%;background:${b.color}"></div>
+        </div>
+        <span class="prog-row-count">${b.count}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

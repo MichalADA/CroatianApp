@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build: ./backend
+    container_name: chorwacki-api
+    environment:
+      - DB_PATH=/data/chorwacki.db
+    volumes:
+      - db-data:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/rooms')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    container_name: chorwacki-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db-data:
+    driver: local
