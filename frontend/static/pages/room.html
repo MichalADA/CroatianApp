@@ -30,6 +30,149 @@
 #review-complete .big-emoji { font-size:3rem; margin-bottom:1rem; }
 #review-complete h3 { font-size:1.5rem; margin-bottom:.5rem; }
 #review-complete p { color:var(--text2); font-size:14px; }
+
+/* ─── Nauka (flashcards) ─── */
+.learn-wrap { display:flex; flex-direction:column; align-items:center; padding:1rem 0 2rem; }
+.learn-active-wrap { display:none; width:100%; flex-direction:column; align-items:center; }
+.learn-active-wrap.is-active { display:flex; }
+.learn-counter {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--text3);
+  margin-bottom:1rem;
+}
+.learn-counter .lc-num { color:var(--accent); }
+.learn-direction {
+  font-size:11px; color:var(--text3); letter-spacing:.08em;
+  text-transform:uppercase; margin-bottom:1.5rem;
+}
+.learn-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  width: 100%;
+  max-width: 620px;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+}
+.learn-type { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; margin-bottom:1.25rem; }
+.learn-type .lt-cat {
+  display:inline-block; margin-left:8px; padding:2px 9px; border-radius:100px;
+  background:var(--tag-bg); color:var(--tag-text); font-weight:500;
+}
+.learn-pl {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--text);
+  line-height:1.15;
+  margin-bottom: 2rem;
+  letter-spacing:-0.01em;
+}
+.learn-hr {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size: clamp(1.8rem, 4.5vw, 2.4rem);
+  color: var(--accent);
+  line-height:1.15;
+  margin: 0.25rem 0 1.5rem;
+  letter-spacing:-0.01em;
+  animation: fadeUp .25s ease;
+}
+.learn-hr.hidden { display:none; }
+.learn-conj {
+  margin: 0 0 1.25rem;
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  width: 100%;
+  max-width: 360px;
+  animation: fadeUp .25s ease;
+}
+.learn-conj.hidden { display:none; }
+.learn-reveal-btn {
+  margin-top: .5rem;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: .04em;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #0f0e0d;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: background .15s;
+}
+.learn-reveal-btn:hover { background: var(--accent2); }
+.learn-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: .5rem;
+  width: 100%;
+}
+.learn-actions.hidden, .learn-actions[hidden] { display:none !important; }
+.learn-actions .btn { padding: 11px 22px; font-size: 14px; flex: 1 1 auto; min-width: 110px; max-width: 180px; }
+
+.learn-progress-wrap {
+  width: 100%; max-width: 620px;
+  margin-top: 1.25rem;
+}
+.learn-progress-bar {
+  background: var(--surface2);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+.learn-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width .35s ease;
+}
+
+.learn-summary {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  max-width: 540px;
+  margin: 0 auto;
+}
+.learn-summary .big-emoji { font-size: 3.2rem; margin-bottom: 1rem; }
+.learn-summary h3 { font-size: 1.6rem; margin-bottom: .5rem; }
+.learn-summary p { color: var(--text2); font-size: 14px; margin-bottom: 1.5rem; }
+.learn-summary-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin: 1.5rem 0 2rem;
+}
+.learn-summary-stats .ls-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 8px;
+}
+.learn-summary-stats .ls-num {
+  font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; line-height: 1;
+}
+.learn-summary-stats .ls-lbl {
+  font-size: 11px; color: var(--text3); margin-top: 4px;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.learn-summary-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+
+.learn-empty {
+  text-align: center; padding: 3.5rem 2rem; color: var(--text3); font-size: 14px;
+}
+.learn-empty .big-emoji { font-size: 2.8rem; margin-bottom: .9rem; }
+.learn-empty h3 { font-size: 1.2rem; color: var(--text); margin-bottom: .5rem; }
+
+@media (max-width: 600px) {
+  .learn-card { padding: 2rem 1.25rem; min-height: 300px; }
+  .learn-actions { flex-direction: column; }
+  .learn-actions .btn { max-width: none; }
+}
 </style>
 </head>
 <body>
@@ -50,15 +193,79 @@
 
   <!-- Tabs -->
   <div class="tabs-nav">
-    <button class="tab-btn active" onclick="showTab('slownik',this)">📖 Słownik</button>
+    <button class="tab-btn active" onclick="showTab('nauka',this)">🧠 Nauka</button>
+    <button class="tab-btn" onclick="showTab('slownik',this)">📚 Słownik</button>
     <button class="tab-btn" onclick="showTab('czasowniki',this)">🔤 Czasowniki</button>
-    <button class="tab-btn" onclick="showTab('powtorki',this)">⏰ Powtórki</button>
-    <button class="tab-btn" onclick="showTab('zdania',this)">✏️ Zdania</button>
+    <button class="tab-btn" onclick="showTab('powtorki',this)">🔁 Powtórki</button>
+    <button class="tab-btn" onclick="showTab('zdania',this)">✍️ Zdania</button>
     <button class="tab-btn" onclick="showTab('progres',this)">📊 Progres</button>
   </div>
 
+  <!-- ─── NAUKA (flashcards, default) ─── -->
+  <div id="tab-nauka" class="tab-panel active">
+    <div class="learn-wrap">
+      <!-- Active flashcard -->
+      <div id="learn-active" class="learn-active-wrap">
+        <div class="learn-counter">
+          Karta <span class="lc-num" id="lc-current">1</span> / <span id="lc-total">1</span>
+        </div>
+        <div class="learn-direction">🇵🇱 polski → 🇭🇷 chorwacki</div>
+        <div class="learn-card">
+          <div class="learn-type" id="learn-type">📖 Słowo</div>
+          <div class="learn-pl" id="learn-pl">—</div>
+          <div class="learn-hr hidden" id="learn-hr">—</div>
+          <div class="learn-conj hidden" id="learn-conj"></div>
+          <button class="learn-reveal-btn" id="learn-reveal-btn" onclick="learnReveal()">Pokaż po chorwacku</button>
+          <div class="learn-actions hidden" id="learn-actions">
+            <button class="btn btn-nie-wiem" onclick="learnAnswer('nie wiem')">✗ Nie wiem</button>
+            <button class="btn btn-prawie" onclick="learnAnswer('prawie')">~ Prawie</button>
+            <button class="btn btn-wiem" onclick="learnAnswer('wiem')">✓ Wiem</button>
+          </div>
+        </div>
+        <div class="learn-progress-wrap">
+          <div class="learn-progress-bar"><div class="learn-progress-fill" id="learn-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- End-of-session summary -->
+      <div id="learn-summary" class="learn-summary" style="display:none">
+        <div class="big-emoji">🎉</div>
+        <h3>Koniec sesji</h3>
+        <p>Świetna robota! Oto podsumowanie:</p>
+        <div class="learn-summary-stats">
+          <div class="ls-card"><div class="ls-num" id="ls-total" style="color:var(--text)">0</div><div class="ls-lbl">przerobionych</div></div>
+          <div class="ls-card"><div class="ls-num" id="ls-wiem" style="color:var(--green)">0</div><div class="ls-lbl">✓ Wiem</div></div>
+          <div class="ls-card"><div class="ls-num" id="ls-prawie" style="color:var(--accent)">0</div><div class="ls-lbl">~ Prawie</div></div>
+        </div>
+        <div class="learn-summary-stats" style="grid-template-columns:1fr;max-width:240px;margin:0 auto 2rem">
+          <div class="ls-card"><div class="ls-num" id="ls-niewiem" style="color:var(--red)">0</div><div class="ls-lbl">✗ Nie wiem</div></div>
+        </div>
+        <div class="learn-summary-actions">
+          <button class="btn primary" onclick="startLearningSession()">↻ Zacznij kolejną sesję</button>
+          <button class="btn" onclick="goToSlownik()">📚 Przejdź do słownika</button>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="learn-empty" class="learn-empty" style="display:none">
+        <div class="big-emoji">😌</div>
+        <h3>Brak kart na teraz</h3>
+        <p>Nie ma słów do nauki ani powtórek w tym pokoju.<br>
+        Dodaj nowe słowa lub wróć tu jutro.</p>
+        <div class="learn-summary-actions" style="margin-top:1.5rem">
+          <button class="btn primary" onclick="goToSlownik()">📚 Przejdź do słownika</button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="learn-loading" class="learn-empty">
+        <p>Ładowanie sesji nauki…</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── SŁOWNIK ─── -->
-  <div id="tab-slownik" class="tab-panel active">
+  <div id="tab-slownik" class="tab-panel">
     <div class="search-wrap">
       <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="word-search" placeholder="Szukaj słowa…" oninput="filterWords()">
@@ -172,6 +379,12 @@ let allWords = [], allVerbs = [], activeCat = 'wszystkie';
 let reviewQueue = [], reviewIndex = 0, reviewRevealed = false;
 let reviewDoneCount = 0;
 
+// ─── Nauka (flashcards) state ────────────────────────────────────────────────
+let learnQueue = [];
+let learnIndex = 0;
+let learnRevealed = false;
+let learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   const room = await api.getRoom(ROOM_ID);
@@ -192,9 +405,9 @@ async function init() {
   document.getElementById('room-header').style.borderBottomColor = room.color;
 
   await Promise.all([loadWords(), loadVerbs()]);
-  loadReviews();
   loadSentences();
-  loadProgres();
+  // Domyślny widok = Nauka. Powtórki / progres ładujemy leniwie po wejściu w zakładkę.
+  startLearningSession();
 }
 
 // ─── Tab switching ───────────────────────────────────────────────────────────
@@ -203,8 +416,130 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab-${name}`).classList.add('active');
   btn.classList.add('active');
+  if (name === 'nauka' && !learnQueue.length) startLearningSession();
   if (name === 'powtorki') loadReviews();
   if (name === 'progres') loadProgres();
+}
+
+function goToSlownik() {
+  const btn = document.querySelector('.tabs-nav .tab-btn:nth-child(2)');
+  if (btn) showTab('slownik', btn);
+}
+
+// ─── NAUKA (flashcards) ──────────────────────────────────────────────────────
+async function startLearningSession() {
+  document.getElementById('learn-loading').style.display = 'block';
+  document.getElementById('learn-active').classList.remove('is-active');
+  document.getElementById('learn-summary').style.display = 'none';
+  document.getElementById('learn-empty').style.display = 'none';
+
+  const data = await api.getLearningSession(ROOM_ID, 20);
+  learnQueue = data.items || [];
+  learnIndex = 0;
+  learnRevealed = false;
+  learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
+
+  document.getElementById('learn-loading').style.display = 'none';
+
+  if (!learnQueue.length) {
+    document.getElementById('learn-empty').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('learn-active').classList.add('is-active');
+  document.getElementById('lc-total').textContent = learnQueue.length;
+  showLearnCard();
+}
+
+function showLearnCard() {
+  if (learnIndex >= learnQueue.length) {
+    showLearnSummary();
+    return;
+  }
+
+  const item = learnQueue[learnIndex];
+  learnRevealed = false;
+
+  document.getElementById('lc-current').textContent = learnIndex + 1;
+  document.getElementById('lc-total').textContent = learnQueue.length;
+
+  // Type label + status / category
+  const typeLabel = item.type === 'word' ? '📖 Słowo' : '🔤 Czasownik';
+  const cat = item.type === 'word' && item.category ? `<span class="lt-cat">${item.category}</span>` : '';
+  const statusBadge = item.status && item.status !== 'nowe'
+    ? ` <span class="lt-cat" style="background:transparent;border:1px solid var(--border2);color:var(--text3)">${item.status}</span>`
+    : (item.status === 'nowe' ? ' <span class="lt-cat" style="background:transparent;border:1px solid var(--border2);color:var(--text3)">nowe</span>' : '');
+  document.getElementById('learn-type').innerHTML = typeLabel + cat + statusBadge;
+
+  // Front: polski
+  document.getElementById('learn-pl').textContent = item.polish;
+
+  // Back: chorwacki (ukryty)
+  document.getElementById('learn-hr').textContent = item.croatian;
+  document.getElementById('learn-hr').classList.add('hidden');
+
+  // Koniugacja (tylko czasowniki, po odsłonięciu)
+  const conj = document.getElementById('learn-conj');
+  if (item.type === 'verb' && item.conj_ja) {
+    conj.innerHTML = `<div class="conj-table">
+      <div class="conj-row"><span class="pron">ja</span><span class="form">${item.conj_ja || '—'}</span></div>
+      <div class="conj-row"><span class="pron">mi</span><span class="form">${item.conj_mi || '—'}</span></div>
+      <div class="conj-row"><span class="pron">ti</span><span class="form">${item.conj_ti || '—'}</span></div>
+      <div class="conj-row"><span class="pron">vi</span><span class="form">${item.conj_vi || '—'}</span></div>
+      <div class="conj-row"><span class="pron">on/ona</span><span class="form">${item.conj_on || '—'}</span></div>
+      <div class="conj-row"><span class="pron">oni</span><span class="form">${item.conj_oni || '—'}</span></div>
+    </div>`;
+  } else {
+    conj.innerHTML = '';
+  }
+  conj.classList.add('hidden');
+
+  document.getElementById('learn-reveal-btn').style.display = 'inline-flex';
+  document.getElementById('learn-actions').classList.add('hidden');
+
+  // Pasek postępu
+  const pct = (learnIndex / learnQueue.length) * 100;
+  document.getElementById('learn-bar').style.width = pct + '%';
+}
+
+function learnReveal() {
+  if (learnRevealed) return;
+  learnRevealed = true;
+  const item = learnQueue[learnIndex];
+  document.getElementById('learn-hr').classList.remove('hidden');
+  if (item.type === 'verb' && item.conj_ja) {
+    document.getElementById('learn-conj').classList.remove('hidden');
+  }
+  document.getElementById('learn-reveal-btn').style.display = 'none';
+  document.getElementById('learn-actions').classList.remove('hidden');
+}
+
+async function learnAnswer(choice) {
+  if (!learnRevealed) return;
+  const item = learnQueue[learnIndex];
+  // Ten sam endpoint co istniejący system powtórek — bez duplikowania logiki.
+  await api.postProgress({
+    item_type: item.type,
+    item_id: item.id,
+    room_id: ROOM_ID,
+    answer: choice,
+  });
+  learnStats[choice] = (learnStats[choice] || 0) + 1;
+  learnIndex++;
+  // Pasek do końca
+  const pct = (learnIndex / learnQueue.length) * 100;
+  document.getElementById('learn-bar').style.width = pct + '%';
+  showLearnCard();
+}
+
+function showLearnSummary() {
+  document.getElementById('learn-active').classList.remove('is-active');
+  document.getElementById('learn-summary').style.display = 'block';
+  const total = learnStats['nie wiem'] + learnStats['prawie'] + learnStats['wiem'];
+  document.getElementById('ls-total').textContent = total;
+  document.getElementById('ls-wiem').textContent = learnStats['wiem'];
+  document.getElementById('ls-prawie').textContent = learnStats['prawie'];
+  document.getElementById('ls-niewiem').textContent = learnStats['nie wiem'];
 }
 
 // ─── SŁOWNIK ─────────────────────────────────────────────────────────────────

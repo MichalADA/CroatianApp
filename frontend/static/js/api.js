@@ -30,6 +30,10 @@ const api = {
     const r = await fetch(`${API}/rooms/${roomId}/reviews`);
     return r.json();
   },
+  async getLearningSession(roomId, limit = 20) {
+    const r = await fetch(`${API}/rooms/${roomId}/learning-session?limit=${limit}`);
+    return r.json();
+  },
   async postProgress(data) {
     const r = await fetch(`${API}/progress`, {
       method: 'POST',
