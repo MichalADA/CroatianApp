@@ -45,6 +45,23 @@ def _migrate_user_id_columns():
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN user_id INTEGER"))
 
 
+def _migrate_user_profile_columns():
+    """Dodaj kolumny personalizacji użytkownika na istniejących bazach."""
+    inspector = inspect(database.engine)
+    if not inspector.has_table("users"):
+        return
+    cols = {c["name"] for c in inspector.get_columns("users")}
+    with database.engine.begin() as conn:
+        if "display_name" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN display_name VARCHAR"))
+        if "avatar_color" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN avatar_color VARCHAR DEFAULT '#e8c07d'"))
+            conn.execute(text("UPDATE users SET avatar_color = '#e8c07d' WHERE avatar_color IS NULL"))
+        if "theme" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN theme VARCHAR DEFAULT 'dark'"))
+            conn.execute(text("UPDATE users SET theme = 'dark' WHERE theme IS NULL"))
+
+
 def _ensure_test_user(db: Session) -> models.User:
     """Tworzy konto testowe (test/test) jeśli nie istnieje. Zwraca usera."""
     user = db.query(models.User).filter(models.User.username == "test").first()
@@ -77,6 +94,7 @@ def _backfill_user_id(db: Session, default_user_id: int):
 @app.on_event("startup")
 def startup():
     _migrate_user_id_columns()
+    _migrate_user_profile_columns()
     db = database.SessionLocal()
     try:
         if db.query(models.Room).count() == 0:
@@ -131,6 +149,22 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
 
 @app.get("/auth/me", response_model=schemas.UserOut)
 def me(user: models.User = Depends(get_current_user)):
+    return user
+
+
+@app.patch("/auth/me", response_model=schemas.UserOut)
+def update_me(payload: schemas.UserUpdateIn,
+              db: Session = Depends(get_db),
+              user: models.User = Depends(get_current_user)):
+    if payload.display_name is not None:
+        user.display_name = payload.display_name
+    if payload.avatar_color is not None:
+        user.avatar_color = payload.avatar_color
+    if payload.theme is not None:
+        user.theme = payload.theme
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return user
 
 

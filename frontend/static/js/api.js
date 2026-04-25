@@ -68,6 +68,9 @@ const api = {
     return r;
   },
   async me() { return request('/auth/me'); },
+  async updateMe(data) {
+    return request('/auth/me', { method: 'PATCH', body: JSON.stringify(data) });
+  },
 
   // ─── rooms / words / verbs ───────────────────────────────────────────────
   async getRooms() { return request('/rooms'); },

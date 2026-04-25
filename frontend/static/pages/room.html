@@ -178,12 +178,15 @@
   display:flex; align-items:center; justify-content:space-between;
   padding:1.25rem 0 .25rem; gap:10px;
 }
+.user-menu { position:relative; }
 .user-chip {
   display:inline-flex; align-items:center; gap:10px;
   padding:5px 14px 5px 5px;
   background:var(--surface); border:1px solid var(--border);
   border-radius:100px; font-size:13px; color:var(--text2);
+  cursor:pointer;
 }
+.user-chip:hover { border-color: var(--accent); color: var(--text); }
 .user-avatar {
   width:26px; height:26px; border-radius:50%;
   background:var(--accent); color:#0f0e0d;
@@ -192,18 +195,38 @@
   text-transform:uppercase;
 }
 .user-name { font-weight:500; color:var(--text); }
+.user-dropdown {
+  position:absolute; top:calc(100% + 8px); right:0;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  min-width:180px;
+  padding:6px;
+  display:none;
+  z-index:30;
+}
+.user-dropdown.open { display:block; }
+.user-dropdown button {
+  width:100%; text-align:left; padding:9px 10px; border:none;
+  background:transparent; color:var(--text2); border-radius:8px; cursor:pointer;
+}
+.user-dropdown button:hover { background:var(--surface2); color:var(--text); }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="topbar-room">
     <a href="/static/index.html" class="back-link" style="padding:0">← Pałac pamięci</a>
-    <div style="display:flex;align-items:center;gap:10px">
-      <span class="user-chip" id="user-chip" style="display:none">
+    <div class="user-menu">
+      <button type="button" class="user-chip" id="user-chip" style="display:none" onclick="toggleUserMenu(event)">
         <span class="user-avatar" id="user-avatar">?</span>
         <span class="user-name" id="user-name">…</span>
-      </span>
-      <button class="btn" onclick="auth.logout()">Wyloguj</button>
+      </button>
+      <div class="user-dropdown" id="user-dropdown">
+        <button onclick="location.href='/static/pages/profile.html'">👤 Profil</button>
+        <button onclick="location.href='/static/pages/profile.html#settings'">⚙️ Ustawienia</button>
+        <button onclick="auth.logout()">🚪 Wyloguj</button>
+      </div>
     </div>
   </div>
 
@@ -419,8 +442,10 @@ async function init() {
 
   // Wczytaj dane usera w tle (do topbara)
   api.me().then(u => {
-    document.getElementById('user-name').textContent = u.username;
-    document.getElementById('user-avatar').textContent = (u.username[0] || '?').toUpperCase();
+    applyUserPrefs(u);
+    const label = u.display_name || u.username;
+    document.getElementById('user-name').textContent = label;
+    document.getElementById('user-avatar').textContent = (label[0] || '?').toUpperCase();
     document.getElementById('user-chip').style.display = 'inline-flex';
   }).catch(() => {});
 
@@ -446,6 +471,20 @@ async function init() {
   // Domyślny widok = Nauka. Powtórki / progres ładujemy leniwie po wejściu w zakładkę.
   startLearningSession();
 }
+
+function applyUserPrefs(u) {
+  if (u.theme) document.documentElement.setAttribute('data-theme', u.theme);
+  if (u.avatar_color) document.getElementById('user-avatar').style.background = u.avatar_color;
+}
+
+function toggleUserMenu(ev) {
+  ev.stopPropagation();
+  document.getElementById('user-dropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('user-dropdown')?.classList.remove('open');
+});
 
 // ─── Tab switching ───────────────────────────────────────────────────────────
 function showTab(name, btn) {

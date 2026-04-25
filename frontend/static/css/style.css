@@ -17,6 +17,21 @@
   --tag-text: #e8c07d;
 }
 
+[data-theme="light"] {
+  --bg: #f3efe7;
+  --surface: #ffffff;
+  --surface2: #f6f1e8;
+  --border: rgba(15,14,13,0.12);
+  --border2: rgba(15,14,13,0.2);
+  --accent: #c28f38;
+  --accent2: #ab7a2b;
+  --text: #171513;
+  --text2: #4f4a43;
+  --text3: #746d64;
+  --tag-bg: rgba(194,143,56,0.14);
+  --tag-text: #8f651f;
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
