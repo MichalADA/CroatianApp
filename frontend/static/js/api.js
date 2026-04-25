@@ -1,4 +1,12 @@
-const API = window.API_URL || '';
+const API = (() => {
+  if (window.API_URL) return String(window.API_URL).replace(/\/$/, '');
+  const { protocol, hostname, port } = window.location;
+  if (protocol === 'file:') return 'http://localhost:8000';
+  if ((hostname === 'localhost' || hostname === '127.0.0.1') && port && port !== '8000') {
+    return `${protocol}//${hostname}:8000`;
+  }
+  return '';
+})();
 const TOKEN_KEY = 'chorwacki_token';
 const THEME_KEY = 'chorwacki_theme';
 
@@ -36,8 +44,19 @@ async function request(path, opts = {}) {
   const token = auth.getToken();
   if (token) headers['Authorization'] = 'Bearer ' + token;
   if (opts.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
-
-  const r = await fetch(API + path, Object.assign({}, opts, { headers }));
+  const fetchOpts = Object.assign({}, opts, { headers });
+  let r;
+  try {
+    r = await fetch(API + path, fetchOpts);
+  } catch (err) {
+    // Fallback dla setupu: frontend na innym porcie, backend lokalnie na 8000.
+    const localApi = `${window.location.protocol}//localhost:8000`;
+    if (!API && window.location.hostname === 'localhost') {
+      r = await fetch(localApi + path, fetchOpts);
+    } else {
+      throw err;
+    }
+  }
 
   // 401 → token wygasł lub brak — wywal na ekran logowania
   if (r.status === 401) {
