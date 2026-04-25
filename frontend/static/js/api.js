@@ -33,7 +33,21 @@ async function request(path, opts = {}) {
 
   if (!r.ok) {
     let msg = 'Błąd ' + r.status;
-    try { const j = await r.json(); if (j.detail) msg = j.detail; } catch {}
+    try {
+      const j = await r.json();
+      if (typeof j.detail === 'string') {
+        msg = j.detail;
+      } else if (Array.isArray(j.detail)) {
+        // Pydantic validation: [{ loc: [...], msg: '...', type: '...' }, ...]
+        msg = j.detail.map(d => {
+          const field = Array.isArray(d.loc) ? d.loc[d.loc.length - 1] : '';
+          const txt = d.msg || d.type || 'błąd';
+          return field ? `${field}: ${txt}` : txt;
+        }).join(' • ');
+      } else if (j.detail) {
+        msg = JSON.stringify(j.detail);
+      }
+    } catch {}
     throw new Error(msg);
   }
 
