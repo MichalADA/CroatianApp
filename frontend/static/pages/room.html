@@ -232,11 +232,13 @@
   <!-- Tabs -->
   <div class="tabs-nav">
     <button class="tab-btn active" onclick="showTab('nauka',this)">🧠 Nauka</button>
+    <button class="tab-btn" id="alphabet-tab-btn" onclick="showTab('alfabet',this)" style="display:none">🔤 Alfabet</button>
     <button class="tab-btn" onclick="showTab('slownik',this)">📚 Słownik</button>
     <button class="tab-btn" onclick="showTab('czasowniki',this)">🔤 Czasowniki</button>
     <button class="tab-btn" onclick="showTab('powtorki',this)">🔁 Powtórki</button>
     <button class="tab-btn" onclick="showTab('zdania',this)">✍️ Zdania</button>
     <button class="tab-btn" onclick="showTab('progres',this)">📊 Progres</button>
+    
   </div>
 
   <!-- ─── NAUKA (flashcards, default) ─── -->
@@ -301,7 +303,90 @@
       </div>
     </div>
   </div>
+   <!-- ─── ALFABET ─── -->
+  <div id="tab-alfabet" class="tab-panel">
+    <h3 style="font-size:1.1rem;margin-bottom:1rem">Alfabet chorwacki</h3>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:1.5rem">
+      Chorwacki czyta się bardzo regularnie — prawie zawsze tak, jak jest napisany.
+    </p>
 
+    <div class="alphabet-grid">
+      <div class="letter">A<span>a — auto</span></div>
+      <div class="letter">B<span>b — brat</span></div>
+      <div class="letter">C<span>c — cesta</span></div>
+      <div class="letter">Č<span>cz — čaj</span></div>
+      <div class="letter">Ć<span>miękkie ć — kuća</span></div>
+      <div class="letter">D<span>d — dan</span></div>
+      <div class="letter">Dž<span>dż — džep</span></div>
+      <div class="letter">Đ<span>dź/dż — dođem</span></div>
+      <div class="letter">E<span>e — euro</span></div>
+      <div class="letter">F<span>f — film</span></div>
+      <div class="letter">G<span>g — grad</span></div>
+      <div class="letter">H<span>h — hotel</span></div>
+      <div class="letter">I<span>i — ime</span></div>
+      <div class="letter">J<span>j — ja</span></div>
+      <div class="letter">K<span>k — kava</span></div>
+      <div class="letter">L<span>l — ljubav</span></div>
+      <div class="letter">Lj<span>lj — ljudi</span></div>
+      <div class="letter">M<span>m — more</span></div>
+      <div class="letter">N<span>n — noć</span></div>
+      <div class="letter">Nj<span>ń — konj</span></div>
+      <div class="letter">O<span>o — otac</span></div>
+      <div class="letter">P<span>p — posao</span></div>
+      <div class="letter">R<span>r — ruka</span></div>
+      <div class="letter">S<span>s — soba</span></div>
+      <div class="letter">Š<span>sz — škola</span></div>
+      <div class="letter">T<span>t — tjedan</span></div>
+      <div class="letter">U<span>u — ulica</span></div>
+      <div class="letter">V<span>w — voda</span></div>
+      <div class="letter">Z<span>z — zima</span></div>
+      <div class="letter">Ž<span>ż/rz — žena</span></div>
+    </div>
+    <div class="alphabet-rules">
+      <h3>Jak czytać chorwacki?</h3>
+
+      <div class="rule">
+        <b>1. Czytasz tak jak widzisz</b><br>
+        Chorwacki jest bardzo fonetyczny — prawie każda litera ma jeden dźwięk.
+      </div>
+
+      <div class="rule">
+        <b>2. J = jak polskie "j"</b><br>
+        np. ja, ljubav → czytasz normalnie jak w polskim
+      </div>
+
+      <div class="rule">
+        <b>3. C = „c”, Č = „cz”, Ć = miękkie „ć”</b><br>
+        cesta = cesta<br>
+        čaj = czaj<br>
+        kuća = kuća (miękkie ć)
+      </div>
+
+      <div class="rule">
+        <b>4. Š = sz, Ž = ż/rz</b><br>
+        škola = szkoła<br>
+        žena = żena
+      </div>
+
+      <div class="rule">
+        <b>5. Dž i Đ</b><br>
+        dž = dż (jak „dżem”)<br>
+        đ = coś między „dź” a „dż” (trzeba się osłuchać)
+      </div>
+
+      <div class="rule">
+        <b>6. Lj i Nj to pojedyncze dźwięki</b><br>
+        ljubav = „lubav” (jednym dźwiękiem)<br>
+        konj = „koń”
+      </div>
+
+      <div class="rule">
+        <b>7. Akcent zwykle na pierwszą sylabę</b><br>
+        DO-bar, KU-ća, ŠKO-la
+      </div>
+    </div>
+  </div>
+  
   <!-- ─── SŁOWNIK ─── -->
   <div id="tab-slownik" class="tab-panel">
     <div class="search-wrap">
@@ -442,6 +527,10 @@ async function init() {
   }).catch(() => {});
 
   const room = await api.getRoom(ROOM_ID);
+  const alphabetBtn = document.getElementById('alphabet-tab-btn');
+  if (alphabetBtn && room.id === 1) {
+  alphabetBtn.style.display = '';
+  }
   document.title = `${room.name} — Chorwacki od podstaw`;
 
   document.getElementById('r-emoji').textContent = room.emoji;
