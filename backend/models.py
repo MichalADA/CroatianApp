@@ -1,18 +1,28 @@
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text
 from sqlalchemy.sql import func
-from database import Base
+from database import AppBase, ContentBase
 
 
-class User(Base):
+# ═══════════════════════════════════════════════════════════════════════════
+# APP DB (jedna globalna): users, auth, ustawienia użytkownika
+# ═══════════════════════════════════════════════════════════════════════════
+
+class User(AppBase):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     password_hash = Column(String, nullable=False)
+    # kod języka z languages.SUPPORTED — wybiera bazę contentową
+    selected_language = Column(String(8), nullable=False, default="hr")
     created_at = Column(DateTime, server_default=func.now())
 
 
-class Room(Base):
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTENT DB (per język): rooms, words, verbs, progress, sentences
+# ═══════════════════════════════════════════════════════════════════════════
+
+class Room(ContentBase):
     __tablename__ = "rooms"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -21,11 +31,11 @@ class Room(Base):
     color = Column(String, default="#e8c07d")
 
 
-class Word(Base):
+class Word(ContentBase):
     __tablename__ = "words"
     id = Column(Integer, primary_key=True, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"))
-    croatian = Column(String, nullable=False)
+    croatian = Column(String, nullable=False)   # nazwa kolumny zostaje dla zgodności wstecz
     polish = Column(String, nullable=False)
     category = Column(String)
     difficulty = Column(Integer, default=1)
@@ -33,7 +43,7 @@ class Word(Base):
     example_pl = Column(Text)
 
 
-class Verb(Base):
+class Verb(ContentBase):
     __tablename__ = "verbs"
     id = Column(Integer, primary_key=True, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"))
@@ -49,10 +59,12 @@ class Verb(Base):
     example_pl = Column(Text)
 
 
-class Progress(Base):
+class Progress(ContentBase):
+    """Postęp nauki. user_id wskazuje na User w app.db — bez FK, bo to
+    osobna baza SQLite. Spójność pilnujemy w aplikacji."""
     __tablename__ = "progress"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
     item_type = Column(String, nullable=False)  # "word" | "verb"
     item_id = Column(Integer, nullable=False)
     room_id = Column(Integer, ForeignKey("rooms.id"))
@@ -62,19 +74,19 @@ class Progress(Base):
     review_count = Column(Integer, default=0)
 
 
-class Sentence(Base):
+class Sentence(ContentBase):
     __tablename__ = "sentences"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"))
     text_hr = Column(Text, nullable=False)
     text_pl = Column(Text)
     note = Column(Text)
-    status = Column(String, default="do sprawdzenia")  # poprawne|do sprawdzenia|trudne
+    status = Column(String, default="do sprawdzenia")
     created_at = Column(DateTime, server_default=func.now())
 
 
-class SentenceWord(Base):
+class SentenceWord(ContentBase):
     __tablename__ = "sentence_words"
     id = Column(Integer, primary_key=True)
     sentence_id = Column(Integer, ForeignKey("sentences.id"))

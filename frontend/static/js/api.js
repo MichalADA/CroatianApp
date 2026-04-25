@@ -69,6 +69,13 @@ const api = {
   },
   async me() { return request('/auth/me'); },
 
+  // ─── languages ───────────────────────────────────────────────────────────
+  async getLanguages() { return request('/languages'); },
+  async getMyLanguage() { return request('/me/language'); },
+  async setMyLanguage(code) {
+    return request('/me/language', { method: 'POST', body: JSON.stringify({ language: code }) });
+  },
+
   // ─── rooms / words / verbs ───────────────────────────────────────────────
   async getRooms() { return request('/rooms'); },
   async getRoom(id) { return request(`/rooms/${id}`); },

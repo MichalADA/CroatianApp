@@ -130,6 +130,25 @@
   text-transform:uppercase;
 }
 .user-name { font-weight:500; color:var(--text); }
+
+/* ─── Language switcher ─── */
+.lang-switcher {
+  display:inline-flex; align-items:center; gap:4px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:100px; padding:4px;
+}
+.lang-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  background:none; border:none; color:var(--text2);
+  font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.05em; padding:5px 10px; border-radius:100px;
+  cursor:pointer; transition:all .15s;
+}
+.lang-btn:hover { color:var(--text); }
+.lang-btn.active { background:var(--surface2); color:var(--accent); }
+.lang-btn .flag { font-size:14px; }
+.lang-btn[data-empty="true"] { opacity:.55; }
+.topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -139,13 +158,16 @@
       <span class="user-avatar" id="user-avatar">?</span>
       <span class="user-name" id="user-name">…</span>
     </div>
-    <button class="btn" onclick="auth.logout()">Wyloguj</button>
+    <div class="topbar-right">
+      <div class="lang-switcher" id="lang-switcher"></div>
+      <button class="btn" onclick="auth.logout()">Wyloguj</button>
+    </div>
   </div>
 
   <div class="hero">
-    <div class="hero-sub">🇭🇷 pałac pamięci</div>
-    <h1>Chorwacki<br><em>od podstaw</em></h1>
-    <p class="hero-desc">Ucz się chorwackiego pokój po pokoju — metodą skojarzeń i powtórek.</p>
+    <div class="hero-sub" id="hero-sub">🇭🇷 pałac pamięci</div>
+    <h1 id="hero-h1">Chorwacki<br><em>od podstaw</em></h1>
+    <p class="hero-desc" id="hero-desc">Ucz się pokój po pokoju — metodą skojarzeń i powtórek.</p>
   </div>
 
   <div class="dashboard-strip" id="dash-strip">
@@ -170,20 +192,82 @@
 <script>
 const roomNames = {1:'Pokój 1', 2:'Pokój 2', 3:'Pokój 3', 4:'Pokój 4'};
 
+function applyLanguageTitle(lang) {
+  // lang = obiekt z {code, name, title, flag}
+  document.getElementById('hero-sub').textContent = `${lang.flag} pałac pamięci`;
+  // Tytuł rozbity na 2 linie: "<Język>" + "od podstaw"
+  const parts = (lang.title || lang.name || '').split(' od podstaw');
+  const head = parts[0] || lang.name;
+  document.getElementById('hero-h1').innerHTML = `${head}<br><em>od podstaw</em>`;
+  document.title = lang.title || lang.name;
+}
+
+function renderLangSwitcher(langs, currentCode) {
+  const el = document.getElementById('lang-switcher');
+  el.innerHTML = langs.map(l => `
+    <button class="lang-btn ${l.code === currentCode ? 'active' : ''}"
+            data-empty="${!l.has_content}"
+            title="${l.has_content ? l.title : l.title + ' (jeszcze pusty)'}"
+            onclick="changeLanguage('${l.code}')">
+      <span class="flag">${l.flag}</span>
+      <span>${l.code.toUpperCase()}</span>
+    </button>
+  `).join('');
+}
+
+async function changeLanguage(code) {
+  try {
+    await api.setMyLanguage(code);
+    location.reload();
+  } catch (e) {
+    toast(e.message || 'Nie udało się zmienić języka');
+  }
+}
+
+function renderEmptyLanguageState(lang) {
+  document.getElementById('rooms-grid').innerHTML = `
+    <div class="empty-state" style="grid-column:1/-1;padding:3.5rem 2rem;background:var(--surface);border:1px dashed var(--border2);border-radius:16px">
+      <div style="font-size:3rem;margin-bottom:1rem">${lang.flag}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text);margin-bottom:.5rem">
+        ${lang.title}
+      </div>
+      <p style="color:var(--text2);font-size:14px;max-width:420px;margin:0 auto">
+        Ten język nie ma jeszcze dodanych pokojów.<br>
+        Wróć tu, gdy content zostanie wypełniony — albo przełącz się na inny język w prawym górnym rogu.
+      </p>
+    </div>
+  `;
+}
+
 async function init() {
   if (!requireAuth()) return;
 
-  // Pobierz dane usera + dashboard + pokoje równolegle
-  let user;
+  let user, langs;
   try {
-    [user] = await Promise.all([api.me()]);
+    [user, langs] = await Promise.all([api.me(), api.getLanguages()]);
   } catch (e) {
-    return; // requireAuth/401 already redirected
+    return; // 401 → redirect
   }
 
+  // Topbar
   document.getElementById('user-name').textContent = user.username;
   document.getElementById('user-avatar').textContent = (user.username[0] || '?').toUpperCase();
+  renderLangSwitcher(langs, user.selected_language);
   document.getElementById('topbar').style.display = 'flex';
+
+  // Tytuł hero zgodnie z aktywnym językiem
+  const current = langs.find(l => l.code === user.selected_language) || langs[0];
+  applyLanguageTitle(current);
+
+  // Empty state — gdy aktualny język nie ma contentu, nie męcz API o pokoje
+  if (!current.has_content) {
+    document.getElementById('d-words').textContent = '0';
+    document.getElementById('d-verbs').textContent = '0';
+    document.getElementById('d-known').textContent = '0';
+    document.getElementById('d-due').textContent = '0';
+    renderEmptyLanguageState(current);
+    return;
+  }
 
   const [rooms, dash] = await Promise.all([api.getRooms(), api.getDashboard()]);
 

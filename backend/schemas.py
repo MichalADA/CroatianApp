@@ -43,8 +43,24 @@ class UserOut(BaseModel):
     id: int
     username: str
     email: EmailStr
+    selected_language: str = "hr"
     created_at: Optional[datetime]
     class Config: from_attributes = True
+
+
+# ─── LANGUAGES ───────────────────────────────────────────────────────────────
+
+class LanguageOut(BaseModel):
+    code: str
+    name: str
+    title: str
+    flag: str
+    has_content: bool = False
+    is_current: bool = False
+
+
+class LanguageSelectIn(BaseModel):
+    language: str
 
 
 # ─── DATA ────────────────────────────────────────────────────────────────────
