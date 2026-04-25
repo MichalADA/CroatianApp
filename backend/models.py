@@ -9,6 +9,9 @@ class User(Base):
     username = Column(String, unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     password_hash = Column(String, nullable=False)
+    display_name = Column(String, nullable=True)
+    avatar_color = Column(String, nullable=False, server_default="#e8c07d")
+    theme = Column(String, nullable=False, server_default="dark")
     created_at = Column(DateTime, server_default=func.now())
 
 

@@ -1,5 +1,32 @@
-const API = window.API_URL || 'http://localhost:8000';
+const API = (() => {
+  if (window.API_URL) return String(window.API_URL).replace(/\/$/, '');
+  // Docker-compose UI (localhost:3000) korzysta z reverse-proxy /api -> backend.
+  if (window.location.port === '3000') return '/api';
+  const { protocol, hostname, port } = window.location;
+  if (protocol === 'file:') return 'http://localhost:8000';
+  if ((hostname === 'localhost' || hostname === '127.0.0.1') && port && port !== '8000') {
+    return `${protocol}//${hostname}:8000`;
+  }
+  return '';
+})();
 const TOKEN_KEY = 'chorwacki_token';
+const THEME_KEY = 'chorwacki_theme';
+
+function setAppTheme(theme) {
+  const safeTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', safeTheme);
+  if (document.body) document.body.setAttribute('data-theme', safeTheme);
+  localStorage.setItem(THEME_KEY, safeTheme);
+  return safeTheme;
+}
+
+function getSavedTheme() {
+  return localStorage.getItem(THEME_KEY);
+}
+
+// Włącz motyw od razu po załadowaniu skryptu (zanim dojdzie odpowiedź z API).
+const initialTheme = getSavedTheme();
+if (initialTheme) setAppTheme(initialTheme);
 
 // ─── Token helpers ──────────────────────────────────────────────────────────
 const auth = {
@@ -19,8 +46,19 @@ async function request(path, opts = {}) {
   const token = auth.getToken();
   if (token) headers['Authorization'] = 'Bearer ' + token;
   if (opts.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
-
-  const r = await fetch(API + path, Object.assign({}, opts, { headers }));
+  const fetchOpts = Object.assign({}, opts, { headers });
+  let r;
+  try {
+    r = await fetch(API + path, fetchOpts);
+  } catch (err) {
+    // Fallback dla setupu: frontend na innym porcie, backend lokalnie na 8000.
+    const localApi = `${window.location.protocol}//localhost:8000`;
+    if (!API && window.location.hostname === 'localhost') {
+      r = await fetch(localApi + path, fetchOpts);
+    } else {
+      throw err;
+    }
+  }
 
   // 401 → token wygasł lub brak — wywal na ekran logowania
   if (r.status === 401) {
@@ -68,6 +106,25 @@ const api = {
     return r;
   },
   async me() { return request('/auth/me'); },
+  async updateMe(data) {
+    try {
+      return await request('/auth/me', { method: 'PATCH', body: JSON.stringify(data) });
+    } catch (err) {
+      // Fallback dla środowisk/proxy, które nie przepuszczają PATCH.
+      const msg = (err && err.message) || '';
+      if (msg.includes('Failed to fetch') || msg.includes('Błąd 405')) {
+        try {
+          return await request('/auth/me', { method: 'PUT', body: JSON.stringify(data) });
+        } catch (err2) {
+          if (((err2 && err2.message) || '').includes('Błąd 405')) {
+            return request('/auth/me/update', { method: 'POST', body: JSON.stringify(data) });
+          }
+          throw err2;
+        }
+      }
+      throw err;
+    }
+  },
 
   // ─── rooms / words / verbs ───────────────────────────────────────────────
   async getRooms() { return request('/rooms'); },
@@ -126,6 +183,9 @@ function toast(msg, duration = 2500) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), duration);
 }
+
+window.setAppTheme = setAppTheme;
+window.getSavedTheme = getSavedTheme;
 
 function statusDotClass(s) {
   return (s || 'nowe').replace(/\s/g, '-').replace(/ę/g, 'ę');
