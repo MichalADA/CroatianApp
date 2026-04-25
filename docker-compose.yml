@@ -1,9 +1,10 @@
-version: "3.9"
-
 services:
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      provenance: false
+      sbom: false
     container_name: chorwacki-api
     environment:
       - DB_PATH=/data/chorwacki.db
@@ -20,7 +21,10 @@ services:
       retries: 5
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      provenance: false
+      sbom: false
     container_name: chorwacki-ui
     ports:
       - "3000:80"
