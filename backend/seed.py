@@ -4,7 +4,9 @@ ROOMS = [
     {"id": 1, "name": "Korytarz", "description": "Pierwszy krok w nauce. 100 słów i 100 czasowników — fundament języka chorwackiego.", "emoji": "🚪", "color": "#e8c07d"},
     {"id": 2, "name": "Kuchnia", "description": "Kolejny etap nauki. 200 nowych słów związanych z codziennym życiem.", "emoji": "🍳", "color": "#7dc5e8"},
     {"id": 3, "name": "Salon", "description": "Zaawansowane słownictwo. 300 słów do swobodnej rozmowy.", "emoji": "🛋️", "color": "#7de8a8"},
-    {"id": 4, "name": "Biblioteka", "description": "Mistrzostwo języka. 400 słów na najwyższym poziomie.", "emoji": "📚", "color": "#c07de8"},
+    {"id": 4, "name": "Sypialnia", "description": "Emocje, relacje i życie prywatne. 300 słów.", "emoji": "🛏️", "color": "#e89f7d"},
+    {"id": 5, "name": "Biblioteka", "description": "Mistrzostwo języka. 400 słów na najwyższym poziomie.", "emoji": "📚", "color": "#c07de8"},
+    {"id": 6, "name": "Miasto", "description": "Język prawdziwego życia. 600 słów do poruszania się po świecie.", "emoji": "🏙️", "color": "#7d9fe8"},
 ]
 
 WORDS = [
