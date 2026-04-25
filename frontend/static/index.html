@@ -111,10 +111,37 @@
 .sentence-room { font-size: 11px; color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
 
 .empty-state { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
+
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.25rem 0 .25rem;
+}
+.user-chip {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:6px 14px 6px 6px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:100px; font-size:13px; color:var(--text2);
+}
+.user-avatar {
+  width:30px; height:30px; border-radius:50%;
+  background:var(--accent); color:#0f0e0d;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:13px;
+  text-transform:uppercase;
+}
+.user-name { font-weight:500; color:var(--text); }
 </style>
 </head>
 <body>
 <div class="container">
+  <div class="topbar" id="topbar" style="display:none">
+    <div class="user-chip">
+      <span class="user-avatar" id="user-avatar">?</span>
+      <span class="user-name" id="user-name">…</span>
+    </div>
+    <button class="btn" onclick="auth.logout()">Wyloguj</button>
+  </div>
+
   <div class="hero">
     <div class="hero-sub">🇭🇷 pałac pamięci</div>
     <h1>Chorwacki<br><em>od podstaw</em></h1>
@@ -144,6 +171,20 @@
 const roomNames = {1:'Pokój 1', 2:'Pokój 2', 3:'Pokój 3', 4:'Pokój 4'};
 
 async function init() {
+  if (!requireAuth()) return;
+
+  // Pobierz dane usera + dashboard + pokoje równolegle
+  let user;
+  try {
+    [user] = await Promise.all([api.me()]);
+  } catch (e) {
+    return; // requireAuth/401 already redirected
+  }
+
+  document.getElementById('user-name').textContent = user.username;
+  document.getElementById('user-avatar').textContent = (user.username[0] || '?').toUpperCase();
+  document.getElementById('topbar').style.display = 'flex';
+
   const [rooms, dash] = await Promise.all([api.getRooms(), api.getDashboard()]);
 
   document.getElementById('d-words').textContent = dash.total_words;

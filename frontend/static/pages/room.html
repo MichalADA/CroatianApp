@@ -173,11 +173,39 @@
   .learn-actions { flex-direction: column; }
   .learn-actions .btn { max-width: none; }
 }
+
+.topbar-room {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.25rem 0 .25rem; gap:10px;
+}
+.user-chip {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:5px 14px 5px 5px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:100px; font-size:13px; color:var(--text2);
+}
+.user-avatar {
+  width:26px; height:26px; border-radius:50%;
+  background:var(--accent); color:#0f0e0d;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:12px;
+  text-transform:uppercase;
+}
+.user-name { font-weight:500; color:var(--text); }
 </style>
 </head>
 <body>
 <div class="container">
-  <a href="/static/index.html" class="back-link">← Pałac pamięci</a>
+  <div class="topbar-room">
+    <a href="/static/index.html" class="back-link" style="padding:0">← Pałac pamięci</a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="user-chip" id="user-chip" style="display:none">
+        <span class="user-avatar" id="user-avatar">?</span>
+        <span class="user-name" id="user-name">…</span>
+      </span>
+      <button class="btn" onclick="auth.logout()">Wyloguj</button>
+    </div>
+  </div>
 
   <!-- Room header -->
   <div class="room-header" id="room-header">
@@ -387,6 +415,15 @@ let learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
+  if (!requireAuth()) return;
+
+  // Wczytaj dane usera w tle (do topbara)
+  api.me().then(u => {
+    document.getElementById('user-name').textContent = u.username;
+    document.getElementById('user-avatar').textContent = (u.username[0] || '?').toUpperCase();
+    document.getElementById('user-chip').style.display = 'inline-flex';
+  }).catch(() => {});
+
   const room = await api.getRoom(ROOM_ID);
   document.title = `${room.name} — Chorwacki od podstaw`;
 
