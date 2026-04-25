@@ -193,6 +193,16 @@
 <script>
 const roomNames = {1:'Pokój 1', 2:'Pokój 2', 3:'Pokój 3', 4:'Pokój 4'};
 
+const roomImages = {
+  1: "/static/img/rooms/korytarz.jpg",
+  2: "/static/img/rooms/kuchnia.jpg",
+  3: "/static/img/rooms/salon.jpg",
+  4: "/static/img/rooms/sypialnia.jpg",
+  5: "/static/img/rooms/biblioteka.jpg",
+  6: "/static/img/rooms/miasto.jpg",
+};
+
+
 function applyLanguageTitle(lang) {
   // lang = obiekt z {code, name, title, flag}
   document.getElementById('hero-sub').textContent = `${lang.flag} pałac pamięci`;
@@ -288,6 +298,7 @@ async function init() {
     const total = r.word_count + r.verb_count;
     const pct = total ? Math.round(r.known_count / total * 100) : 0;
     return `<a href="/static/pages/room.html?id=${r.id}" class="room-card" style="--room-color:${r.color}">
+      <img class="room-img" src="${roomImages[r.id]}" alt="${r.name}">
       <span class="room-emoji">${r.emoji}</span>
       <div class="room-name">${r.name}</div>
       <div class="room-desc">${r.description}</div>
