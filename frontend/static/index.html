@@ -160,6 +160,7 @@
     </div>
     <div class="topbar-right">
       <div class="lang-switcher" id="lang-switcher"></div>
+      <button class="settings-cog" id="settings-cog" title="Ustawienia">⚙</button>
       <button class="btn" onclick="auth.logout()">Wyloguj</button>
     </div>
   </div>
@@ -249,10 +250,16 @@ async function init() {
     return; // 401 → redirect
   }
 
+  // Apply user's saved theme (override localStorage cache jeśli się rozjechały)
+  applyTheme(user.theme || 'dark');
+
   // Topbar
   document.getElementById('user-name').textContent = user.username;
-  document.getElementById('user-avatar').textContent = (user.username[0] || '?').toUpperCase();
+  const avEl = document.getElementById('user-avatar');
+  avEl.textContent = avatarFor(user);
+  avEl.dataset.userAvatar = '1';
   renderLangSwitcher(langs, user.selected_language);
+  document.getElementById('settings-cog').onclick = () => openSettingsModal(user);
   document.getElementById('topbar').style.display = 'flex';
 
   // Tytuł hero zgodnie z aktywnym językiem

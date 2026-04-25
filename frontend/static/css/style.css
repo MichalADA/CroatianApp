@@ -17,6 +17,32 @@
   --tag-text: #e8c07d;
 }
 
+/* Motyw jasny — przełącznik kolorów przez klasę na <html>.
+   Akcent zostaje złoty (lekko ciemniejszy odcień dla kontrastu na białym). */
+html.theme-light {
+  --bg: #faf7f0;
+  --surface: #ffffff;
+  --surface2: #f3eee0;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.18);
+  --accent: #b88838;
+  --accent2: #9a7228;
+  --text: #1a1917;
+  --text2: #5a5854;
+  --text3: #8e8a82;
+  --green: #2c8048;
+  --red: #b73838;
+  --blue: #387db7;
+  --purple: #7d38b7;
+  --tag-bg: rgba(184,136,56,0.12);
+  --tag-text: #9a7228;
+}
+
+html.theme-light .btn.primary { color: #ffffff; }
+html.theme-light .learn-reveal-btn { color: #ffffff; }
+html.theme-light .auth-submit { color: #ffffff; }
+html.theme-light .user-avatar { color: #ffffff; }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -351,6 +377,41 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .modal h3 { font-size: 1.25rem; margin-bottom: 1.25rem; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; }
+
+/* ─── Settings modal: theme toggle ───────────────────────────── */
+.theme-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: var(--surface2);
+  padding: 4px;
+  border-radius: 10px;
+}
+.theme-opt {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.theme-opt:hover { color: var(--text); }
+.theme-opt.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+
+/* Settings cog button */
+.settings-cog {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text2); cursor: pointer; font-size: 16px;
+  transition: all .15s;
+}
+.settings-cog:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ─── Empty state ────────────────────────────────────────────── */
 .empty-state {

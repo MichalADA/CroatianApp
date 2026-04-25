@@ -61,6 +61,7 @@ def startup():
     # 2) Schemat app.db (gdyby świeża instalacja)
     database.AppBase.metadata.create_all(bind=database.app_engine)
     migration.ensure_selected_language_column()
+    migration.ensure_user_settings_columns()
 
     # 3) Bazy contentowe dla wszystkich obsługiwanych języków
     for code in languages.codes():
@@ -142,6 +143,37 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_app_db)):
 @app.get("/auth/me", response_model=schemas.UserOut)
 def me(user: models.User = Depends(get_current_user)):
     return user
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# USER SETTINGS (theme, avatar — drobne ustawienia per user)
+# ═══════════════════════════════════════════════════════════════════════════
+
+VALID_THEMES = {"dark", "light"}
+
+
+@app.patch("/me/settings", response_model=schemas.UserOut)
+def update_settings(payload: schemas.SettingsIn,
+                    db: Session = Depends(get_app_db),
+                    user: models.User = Depends(get_current_user)):
+    fresh = db.query(models.User).filter(models.User.id == user.id).first()
+    if not fresh:
+        raise HTTPException(404, "Użytkownik nie istnieje")
+
+    if payload.theme is not None:
+        if payload.theme not in VALID_THEMES:
+            raise HTTPException(400, f"Nieprawidłowy motyw — dozwolone: {sorted(VALID_THEMES)}")
+        fresh.theme = payload.theme
+
+    if payload.avatar is not None:
+        # Pusty string = usuń własny avatar (wróć do inicjału z username).
+        # Limit 16 znaków — wystarczy na pojedynczy emoji (max 4 bajty) albo kilka liter.
+        avatar = (payload.avatar or "").strip()[:16]
+        fresh.avatar = avatar or None
+
+    db.commit()
+    db.refresh(fresh)
+    return fresh
 
 
 # ═══════════════════════════════════════════════════════════════════════════

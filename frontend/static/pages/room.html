@@ -212,6 +212,7 @@
         <span class="user-name" id="user-name">…</span>
       </span>
       <span class="lang-pill" id="lang-pill" style="display:none"></span>
+      <button class="settings-cog" id="settings-cog" title="Ustawienia">⚙</button>
       <button class="btn" onclick="auth.logout()">Wyloguj</button>
     </div>
   </div>
@@ -428,12 +429,16 @@ async function init() {
 
   // Wczytaj dane usera + język w tle (do topbara)
   Promise.all([api.me(), api.getMyLanguage()]).then(([u, lang]) => {
+    applyTheme(u.theme || 'dark');
     document.getElementById('user-name').textContent = u.username;
-    document.getElementById('user-avatar').textContent = (u.username[0] || '?').toUpperCase();
+    const avEl = document.getElementById('user-avatar');
+    avEl.textContent = avatarFor(u);
+    avEl.dataset.userAvatar = '1';
     document.getElementById('user-chip').style.display = 'inline-flex';
     const pill = document.getElementById('lang-pill');
     pill.innerHTML = `<span class="flag">${lang.flag}</span><span>${lang.code.toUpperCase()}</span>`;
     pill.style.display = 'inline-flex';
+    document.getElementById('settings-cog').onclick = () => openSettingsModal(u);
   }).catch(() => {});
 
   const room = await api.getRoom(ROOM_ID);

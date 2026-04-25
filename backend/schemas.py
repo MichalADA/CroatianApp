@@ -44,6 +44,8 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     selected_language: str = "hr"
+    theme: str = "dark"
+    avatar: Optional[str] = None
     created_at: Optional[datetime]
     class Config: from_attributes = True
 
@@ -61,6 +63,13 @@ class LanguageOut(BaseModel):
 
 class LanguageSelectIn(BaseModel):
     language: str
+
+
+# ─── USER SETTINGS ───────────────────────────────────────────────────────────
+
+class SettingsIn(BaseModel):
+    theme: Optional[str] = None   # "dark" | "light"
+    avatar: Optional[str] = None  # emoji / krótki tekst; "" = wyczyść
 
 
 # ─── DATA ────────────────────────────────────────────────────────────────────

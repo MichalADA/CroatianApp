@@ -140,3 +140,19 @@ def ensure_selected_language_column() -> None:
             conn.execute(text(
                 "ALTER TABLE users ADD COLUMN selected_language VARCHAR(8) NOT NULL DEFAULT 'hr'"
             ))
+
+
+def ensure_user_settings_columns() -> None:
+    """ALTER TABLE users ADD COLUMN theme/avatar jeśli brak."""
+    from sqlalchemy import inspect, text
+    insp = inspect(database.app_engine)
+    if not insp.has_table("users"):
+        return
+    cols = {c["name"] for c in insp.get_columns("users")}
+    with database.app_engine.begin() as conn:
+        if "theme" not in cols:
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN theme VARCHAR(8) NOT NULL DEFAULT 'dark'"
+            ))
+        if "avatar" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN avatar VARCHAR(16)"))

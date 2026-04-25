@@ -15,6 +15,9 @@ class User(AppBase):
     password_hash = Column(String, nullable=False)
     # kod języka z languages.SUPPORTED — wybiera bazę contentową
     selected_language = Column(String(8), nullable=False, default="hr")
+    # personalizacja UI
+    theme = Column(String(8), nullable=False, default="dark")  # "dark" | "light"
+    avatar = Column(String(16), nullable=True, default=None)   # emoji albo krótki tekst
     created_at = Column(DateTime, server_default=func.now())
 
 
