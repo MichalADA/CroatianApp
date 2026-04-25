@@ -187,6 +187,124 @@ def get_reviews(room_id: int, db: Session = Depends(get_db)):
     return {"items": items, "count": len(items)}
 
 
+# ─── LEARNING SESSION (flashcards) ──────────────────────────────────────────
+
+@app.get("/rooms/{room_id}/learning-session")
+def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
+                         db: Session = Depends(get_db)):
+    """
+    Buduje kolejkę kart na sesję nauki w priorytecie:
+      1. słowa do powtórki na dziś (status != nowe, next_review <= dziś)
+      2. słowa trudne (status = trudne, jeszcze nie w kolejce)
+      3. słowa w trakcie nauki (status = uczę się, jeszcze nie w kolejce)
+      4. nowe słowa / czasowniki (brak progresu lub status = nowe)
+    Bez duplikowania logiki powtórek — używa tych samych modeli i statusów.
+    """
+    today = date.today()
+
+    def serialize(item_type, item_id, status):
+        if item_type == "word":
+            w = db.query(models.Word).filter(models.Word.id == item_id).first()
+            if not w:
+                return None
+            return {
+                "type": "word", "id": w.id, "croatian": w.croatian,
+                "polish": w.polish, "category": w.category, "status": status,
+            }
+        else:
+            v = db.query(models.Verb).filter(models.Verb.id == item_id).first()
+            if not v:
+                return None
+            return {
+                "type": "verb", "id": v.id, "croatian": v.infinitive,
+                "polish": v.polish, "status": status,
+                "conj_ja": v.conj_ja, "conj_ti": v.conj_ti, "conj_on": v.conj_on,
+                "conj_mi": v.conj_mi, "conj_vi": v.conj_vi, "conj_oni": v.conj_oni,
+            }
+
+    items = []
+    seen = set()  # (type, id)
+
+    # 1) do powtórki na dziś
+    due = db.query(models.Progress).filter(
+        models.Progress.room_id == room_id,
+        models.Progress.next_review <= today,
+        models.Progress.status != "nowe",
+    ).order_by(models.Progress.next_review).all()
+    for p in due:
+        key = (p.item_type, p.item_id)
+        if key in seen:
+            continue
+        s = serialize(p.item_type, p.item_id, p.status)
+        if s:
+            seen.add(key)
+            items.append(s)
+
+    # 2) trudne (jeszcze nie dodane)
+    hard = db.query(models.Progress).filter(
+        models.Progress.room_id == room_id,
+        models.Progress.status == "trudne",
+    ).all()
+    for p in hard:
+        key = (p.item_type, p.item_id)
+        if key in seen:
+            continue
+        s = serialize(p.item_type, p.item_id, p.status)
+        if s:
+            seen.add(key)
+            items.append(s)
+
+    # 3) uczę się (jeszcze nie dodane)
+    learning = db.query(models.Progress).filter(
+        models.Progress.room_id == room_id,
+        models.Progress.status == "uczę się",
+    ).all()
+    for p in learning:
+        key = (p.item_type, p.item_id)
+        if key in seen:
+            continue
+        s = serialize(p.item_type, p.item_id, p.status)
+        if s:
+            seen.add(key)
+            items.append(s)
+
+    # 4) nowe słowa (i czasowniki) — bez progresu LUB ze statusem "nowe"
+    # Wykluczamy wszystko, co ma już aktywny progres (znam/uczę się/trudne) — niezależnie od daty.
+    if len(items) < limit:
+        all_progress = db.query(models.Progress).filter(
+            models.Progress.room_id == room_id,
+            models.Progress.status != "nowe",
+        ).all()
+        excluded_word_ids = {p.item_id for p in all_progress if p.item_type == "word"}
+        excluded_verb_ids = {p.item_id for p in all_progress if p.item_type == "verb"}
+
+        new_words_q = db.query(models.Word).filter(models.Word.room_id == room_id)
+        if excluded_word_ids:
+            new_words_q = new_words_q.filter(~models.Word.id.in_(excluded_word_ids))
+        budget = min(new_limit, limit - len(items))
+        for w in new_words_q.order_by(models.Word.id).limit(budget).all():
+            items.append({
+                "type": "word", "id": w.id, "croatian": w.croatian,
+                "polish": w.polish, "category": w.category, "status": "nowe",
+            })
+
+        if len(items) < limit:
+            new_verbs_q = db.query(models.Verb).filter(models.Verb.room_id == room_id)
+            if excluded_verb_ids:
+                new_verbs_q = new_verbs_q.filter(~models.Verb.id.in_(excluded_verb_ids))
+            budget = min(new_limit, limit - len(items))
+            for v in new_verbs_q.order_by(models.Verb.id).limit(budget).all():
+                items.append({
+                    "type": "verb", "id": v.id, "croatian": v.infinitive,
+                    "polish": v.polish, "status": "nowe",
+                    "conj_ja": v.conj_ja, "conj_ti": v.conj_ti, "conj_on": v.conj_on,
+                    "conj_mi": v.conj_mi, "conj_vi": v.conj_vi, "conj_oni": v.conj_oni,
+                })
+
+    items = items[:limit]
+    return {"items": items, "count": len(items)}
+
+
 # ─── PROGRESS ───────────────────────────────────────────────────────────────
 
 REVIEW_DAYS = {"nie wiem": 1, "prawie": 3, "wiem": 7}
