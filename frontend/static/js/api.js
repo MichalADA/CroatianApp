@@ -1,6 +1,7 @@
 const API = window.API_URL || 'http://localhost:8000';
 const TOKEN_KEY = 'chorwacki_token';
 const THEME_KEY = 'chorwacki_theme';
+const FOCUS_KEY = 'focusModeEnabled';
 
 // ─── Theme ──────────────────────────────────────────────────────────────────
 // Stosowane ZARAZ przy ładowaniu skryptu — dzięki temu motyw nie miga
@@ -11,6 +12,25 @@ function applyTheme(theme) {
   localStorage.setItem(THEME_KEY, t);
 }
 applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
+// ─── Focus mode ─────────────────────────────────────────────────────────────
+// Tylko localStorage — backend nie wie nic o focus mode (świadoma decyzja:
+// to ustawienie urządzenia, nie konta).
+function isFocusModeEnabled() {
+  return localStorage.getItem(FOCUS_KEY) === '1';
+}
+function setFocusMode(enabled) {
+  if (enabled) localStorage.setItem(FOCUS_KEY, '1');
+  else localStorage.removeItem(FOCUS_KEY);
+  applyFocusModeClass();
+}
+function applyFocusModeClass() {
+  if (document.body) {
+    document.body.classList.toggle('focus-mode', isFocusModeEnabled());
+  }
+}
+// CSS reaguje na klasę na <body>, którą dorzucamy najwcześniej jak się da.
+document.addEventListener('DOMContentLoaded', applyFocusModeClass);
 
 // ─── Token helpers ──────────────────────────────────────────────────────────
 const auth = {
@@ -146,59 +166,89 @@ function openSettingsModal(user) {
   const existing = document.getElementById('settings-modal');
   if (existing) existing.remove();
 
+  const initials = (user.username[0] || '?').toUpperCase();
+
   const overlay = document.createElement('div');
   overlay.id = 'settings-modal';
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
-    <div class="modal" style="max-width:480px">
-      <h3>Ustawienia</h3>
+    <div class="modal settings-modal">
+      <header class="settings-header">
+        <h3>Ustawienia</h3>
+        <button type="button" class="settings-close" id="set-close" aria-label="Zamknij">×</button>
+      </header>
 
-      <div class="form-group">
-        <label>Motyw</label>
-        <div class="theme-toggle">
-          <button type="button" class="theme-opt" data-theme="dark">🌙 Ciemny</button>
-          <button type="button" class="theme-opt" data-theme="light">☀️ Jasny</button>
-        </div>
+      <div class="settings-body">
+
+        <section class="settings-section">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Motyw</div>
+            <div class="settings-section-desc">Kolorystyka interfejsu.</div>
+          </div>
+          <div class="theme-toggle">
+            <button type="button" class="theme-opt" data-theme="dark">🌙 Ciemny</button>
+            <button type="button" class="theme-opt" data-theme="light">☀️ Jasny</button>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Tryb skupienia</div>
+            <div class="settings-section-desc">Ukrywa elementy rozpraszające podczas nauki.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-focus-toggle">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </section>
+
+        <section class="settings-section settings-section--col">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Twój avatar</div>
+            <div class="settings-section-desc">Emoji albo 1–3 znaki. Puste = inicjał z nicku (${initials}).</div>
+          </div>
+          <div class="avatar-row">
+            <span class="user-avatar settings-avatar-preview" id="set-avatar-preview">?</span>
+            <input type="text" id="set-avatar-input" maxlength="16"
+                   placeholder="np. 🐉  albo  M  albo  PL">
+          </div>
+        </section>
+
+        <section class="settings-section settings-section--col">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Konto</div>
+          </div>
+          <div class="settings-account">
+            <div class="settings-account-name">${user.username}</div>
+            <div class="settings-account-email">${user.email}</div>
+          </div>
+        </section>
+
       </div>
 
-      <div class="form-group">
-        <label>Twój avatar</label>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span class="user-avatar" id="set-avatar-preview" style="width:42px;height:42px;font-size:18px">?</span>
-          <input type="text" id="set-avatar-input" maxlength="16"
-                 placeholder="np. 🐉  albo  M  albo  PL"
-                 style="flex:1">
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:6px">
-          Emoji albo 1–3 znaki. Puste = inicjał z nicku (${(user.username[0] || '?').toUpperCase()}).
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Konto</label>
-        <div style="background:var(--surface2);padding:10px 12px;border-radius:8px;font-size:13px;color:var(--text2)">
-          <div><strong style="color:var(--text)">${user.username}</strong></div>
-          <div style="font-size:12px">${user.email}</div>
-        </div>
-      </div>
-
-      <div class="modal-actions">
+      <footer class="settings-footer">
         <button class="btn" id="set-cancel">Anuluj</button>
-        <button class="btn primary" id="set-save">Zapisz</button>
-      </div>
+        <button class="btn primary" id="set-save">Zapisz zmiany</button>
+      </footer>
     </div>
   `;
   document.body.appendChild(overlay);
   overlay.style.display = 'flex';
 
-  // Stan
+  // ── Stan
   let chosenTheme = user.theme === 'light' ? 'light' : 'dark';
   let chosenAvatar = user.avatar || '';
+  let chosenFocus = isFocusModeEnabled();
+
+  // Snapshot startu — do cofnięcia, gdy user kliknie Anuluj.
+  const initialFocus = chosenFocus;
 
   const previewEl = overlay.querySelector('#set-avatar-preview');
   const inputEl = overlay.querySelector('#set-avatar-input');
+  const focusToggle = overlay.querySelector('#set-focus-toggle');
   inputEl.value = chosenAvatar;
   previewEl.textContent = avatarFor(user);
+  focusToggle.checked = chosenFocus;
 
   function updatePreview() {
     previewEl.textContent = avatarFor({
@@ -211,8 +261,7 @@ function openSettingsModal(user) {
     overlay.querySelectorAll('.theme-opt').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === chosenTheme);
     });
-    // Live preview motywu
-    applyTheme(chosenTheme);
+    applyTheme(chosenTheme); // live preview
   }
   setActiveTheme();
 
@@ -225,19 +274,24 @@ function openSettingsModal(user) {
     updatePreview();
   });
 
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) closeModal(true);
+  focusToggle.addEventListener('change', e => {
+    chosenFocus = e.target.checked;
+    // live preview — od razu pokaż jak strona wygląda w trybie skupienia
+    setFocusMode(chosenFocus);
   });
 
   function closeModal(revert) {
     if (revert) {
-      // przywróć motyw zapisany na serwerze, jeśli user anulował
       applyTheme(user.theme || 'dark');
+      setFocusMode(initialFocus);
     }
     overlay.remove();
   }
 
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(true); });
+  overlay.querySelector('#set-close').onclick = () => closeModal(true);
   overlay.querySelector('#set-cancel').onclick = () => closeModal(true);
+
   overlay.querySelector('#set-save').onclick = async () => {
     const btn = overlay.querySelector('#set-save');
     btn.disabled = true;
@@ -247,11 +301,10 @@ function openSettingsModal(user) {
         avatar: chosenAvatar,
       });
       applyTheme(updated.theme);
-      // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu
+      setFocusMode(chosenFocus); // utrwal w localStorage
       const avEls = document.querySelectorAll('[data-user-avatar]');
       avEls.forEach(el => { el.textContent = avatarFor(updated); });
       toast('Zapisano ustawienia');
-      // Zaktualizuj cache obiektu user — tak by kolejne otwarcie miało świeże dane
       Object.assign(user, updated);
       overlay.remove();
     } catch (e) {
