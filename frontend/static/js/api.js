@@ -133,7 +133,7 @@ const api = {
   },
 };
 
-// ─── Avatar helper ─────────────────────────────────────────────────────────
+// ─── Avatar helper (legacy fallback dla miejsc, które nadal renderują tekst) ─
 function avatarFor(user) {
   if (user && user.avatar && user.avatar.trim()) return user.avatar.trim();
   return ((user && user.username && user.username[0]) || '?').toUpperCase();
@@ -141,10 +141,17 @@ function avatarFor(user) {
 
 // ─── Settings modal ────────────────────────────────────────────────────────
 // Wstrzykiwany dynamicznie — dostępny z każdej strony, która ładuje api.js.
+// Zależy od ui.js (AVAILABLE_AVATARS, DEFAULT_AVATAR, avatarUrl, renderUserAvatar).
 function openSettingsModal(user) {
   // Usuń poprzedni, jeśli był otwarty
   const existing = document.getElementById('settings-modal');
   if (existing) existing.remove();
+
+  // Domyślnie podświetlamy default-1.png, jeśli user nie ma avatara
+  // albo ma starą wartość (emoji) niewystępującą na liście plików.
+  const startAvatar = (user && user.avatar && AVAILABLE_AVATARS.indexOf(user.avatar) !== -1)
+    ? user.avatar
+    : DEFAULT_AVATAR;
 
   const overlay = document.createElement('div');
   overlay.id = 'settings-modal';
@@ -163,14 +170,15 @@ function openSettingsModal(user) {
 
       <div class="form-group">
         <label>Twój avatar</label>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span class="user-avatar" id="set-avatar-preview" style="width:42px;height:42px;font-size:18px">?</span>
-          <input type="text" id="set-avatar-input" maxlength="16"
-                 placeholder="np. 🐉  albo  M  albo  PL"
-                 style="flex:1">
+        <div class="avatar-grid" id="set-avatar-grid">
+          ${AVAILABLE_AVATARS.map(name => `
+            <button type="button" class="avatar-option" data-avatar="${name}" title="${name}">
+              <img src="${avatarUrl(name)}" alt="${name}">
+            </button>
+          `).join('')}
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:6px">
-          Emoji albo 1–3 znaki. Puste = inicjał z nicku (${(user.username[0] || '?').toUpperCase()}).
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">
+          Wybierz z dostępnych obrazków. Brak wyboru = ${DEFAULT_AVATAR}.
         </div>
       </div>
 
@@ -193,19 +201,23 @@ function openSettingsModal(user) {
 
   // Stan
   let chosenTheme = user.theme === 'light' ? 'light' : 'dark';
-  let chosenAvatar = user.avatar || '';
+  let chosenAvatar = startAvatar;
 
-  const previewEl = overlay.querySelector('#set-avatar-preview');
-  const inputEl = overlay.querySelector('#set-avatar-input');
-  inputEl.value = chosenAvatar;
-  previewEl.textContent = avatarFor(user);
+  const grid = overlay.querySelector('#set-avatar-grid');
 
-  function updatePreview() {
-    previewEl.textContent = avatarFor({
-      username: user.username,
-      avatar: chosenAvatar,
+  function refreshAvatarGrid() {
+    grid.querySelectorAll('.avatar-option').forEach(b => {
+      b.classList.toggle('selected', b.dataset.avatar === chosenAvatar);
     });
   }
+  refreshAvatarGrid();
+
+  grid.querySelectorAll('.avatar-option').forEach(b => {
+    b.addEventListener('click', () => {
+      chosenAvatar = b.dataset.avatar;
+      refreshAvatarGrid();
+    });
+  });
 
   function setActiveTheme() {
     overlay.querySelectorAll('.theme-opt').forEach(b => {
@@ -218,11 +230,6 @@ function openSettingsModal(user) {
 
   overlay.querySelectorAll('.theme-opt').forEach(b => {
     b.addEventListener('click', () => { chosenTheme = b.dataset.theme; setActiveTheme(); });
-  });
-
-  inputEl.addEventListener('input', e => {
-    chosenAvatar = e.target.value;
-    updatePreview();
   });
 
   overlay.addEventListener('click', e => {
@@ -247,9 +254,11 @@ function openSettingsModal(user) {
         avatar: chosenAvatar,
       });
       applyTheme(updated.theme);
-      // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu
-      const avEls = document.querySelectorAll('[data-user-avatar]');
-      avEls.forEach(el => { el.textContent = avatarFor(updated); });
+      // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu — używamy
+      // wspólnego helpera z ui.js, więc jeden punkt prawdy.
+      document.querySelectorAll('[data-user-avatar]').forEach(el => {
+        renderUserAvatar(el, updated);
+      });
       toast('Zapisano ustawienia');
       // Zaktualizuj cache obiektu user — tak by kolejne otwarcie miało świeże dane
       Object.assign(user, updated);

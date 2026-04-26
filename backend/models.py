@@ -17,7 +17,7 @@ class User(AppBase):
     selected_language = Column(String(8), nullable=False, default="hr")
     # personalizacja UI
     theme = Column(String(8), nullable=False, default="dark")  # "dark" | "light"
-    avatar = Column(String(16), nullable=True, default=None)   # emoji albo krótki tekst
+    avatar = Column(String(64), nullable=True, default=None)   # nazwa pliku avatara albo emoji (back-compat)
     created_at = Column(DateTime, server_default=func.now())
 
 

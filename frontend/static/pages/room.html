@@ -493,6 +493,7 @@
   </div>
 </div>
 
+<script src="/static/js/ui.js"></script>
 <script src="/static/js/api.js"></script>
 <script>
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -517,7 +518,7 @@ async function init() {
     applyTheme(u.theme || 'dark');
     document.getElementById('user-name').textContent = u.username;
     const avEl = document.getElementById('user-avatar');
-    avEl.textContent = avatarFor(u);
+    renderUserAvatar(avEl, u);
     avEl.dataset.userAvatar = '1';
     document.getElementById('user-chip').style.display = 'inline-flex';
     const pill = document.getElementById('lang-pill');

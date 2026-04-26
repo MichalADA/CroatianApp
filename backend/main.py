@@ -168,7 +168,7 @@ def update_settings(payload: schemas.SettingsIn,
     if payload.avatar is not None:
         # Pusty string = usuń własny avatar (wróć do inicjału z username).
         # Limit 16 znaków — wystarczy na pojedynczy emoji (max 4 bajty) albo kilka liter.
-        avatar = (payload.avatar or "").strip()[:16]
+        avatar = (payload.avatar or "").strip()[:64]
         fresh.avatar = avatar or None
 
     db.commit()
