@@ -189,6 +189,7 @@
   </div>
 </div>
 
+<script src="/static/js/ui.js"></script>
 <script src="/static/js/api.js"></script>
 <script>
 const roomNames = {1:'Pokój 1', 2:'Pokój 2', 3:'Pokój 3', 4:'Pokój 4'};
@@ -266,7 +267,7 @@ async function init() {
   // Topbar
   document.getElementById('user-name').textContent = user.username;
   const avEl = document.getElementById('user-avatar');
-  avEl.textContent = avatarFor(user);
+  renderUserAvatar(avEl, user);
   avEl.dataset.userAvatar = '1';
   renderLangSwitcher(langs, user.selected_language);
   document.getElementById('settings-cog').onclick = () => openSettingsModal(user);
