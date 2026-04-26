@@ -437,6 +437,56 @@ textarea::placeholder {
   animation: fadeUp 0.2s ease both;
 }
 
+.alphabet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.letter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.letter span {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text2);
+  margin-top: 6px;
+}
+
+.alphabet-rules {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alphabet-rules h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.rule {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .form-row { grid-template-columns: 1fr; }
