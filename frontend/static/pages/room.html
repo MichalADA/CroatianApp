@@ -200,6 +200,71 @@
   font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.05em;
 }
 .lang-pill .flag { font-size:14px; }
+
+/* ─── Gry ─── */
+.games-controls { display:flex; flex-direction:column; gap:.9rem; margin-bottom:1.5rem; }
+.games-control-group { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.games-control-label {
+  font-family:'Syne',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--text3);
+  min-width:60px;
+}
+.games-pills { display:flex; flex-wrap:wrap; gap:6px; }
+.games-pill {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.04em; padding:6px 14px; border-radius:100px;
+  border:1px solid var(--border2); background:none; color:var(--text2);
+  cursor:pointer; transition:border-color .12s, color .12s, background .12s;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.games-pill:hover:not(:disabled) { border-color:var(--accent2); color:var(--text); }
+.games-pill.active { background:var(--tag-bg); border-color:var(--accent); color:var(--accent); }
+.games-pill:disabled { opacity:.4; cursor:not-allowed; }
+.games-soon {
+  font-size:9px; font-weight:600; letter-spacing:.06em;
+  padding:1px 6px; border-radius:100px;
+  background:var(--surface2); color:var(--text3);
+}
+
+.games-render { min-height:240px; }
+
+/* Matching */
+.match-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;
+}
+.match-progress {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--text2);
+}
+.match-progress strong { color:var(--accent); }
+.match-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px 16px;
+  max-width:640px; margin:0 auto;
+}
+.match-col { display:flex; flex-direction:column; gap:8px; }
+.match-item {
+  background:var(--surface); border:1px solid var(--border2);
+  color:var(--text); padding:12px 14px; border-radius:10px;
+  cursor:pointer; font-family:'Syne',sans-serif; font-weight:600;
+  font-size:14px; text-align:center;
+  transition:border-color .12s, background .12s, color .12s;
+}
+.match-item:hover:not(:disabled) { border-color:var(--accent2); }
+.match-item.picked { border-color:var(--accent); color:var(--accent); background:var(--tag-bg); }
+.match-item.wrong { border-color:var(--red); color:var(--red); background:rgba(232,125,125,0.08); }
+.match-item.solved { opacity:.35; cursor:default; }
+.match-item:disabled { cursor:default; }
+.match-done {
+  text-align:center; padding:1.25rem; margin-top:1.5rem;
+  background:rgba(107,207,138,0.08); border:1px solid var(--green);
+  border-radius:12px; color:var(--green);
+  font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.04em;
+}
+
+@media (max-width:480px) {
+  .match-grid { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
@@ -235,6 +300,7 @@
     <button class="tab-btn" id="alphabet-tab-btn" onclick="showTab('alfabet',this)" style="display:none">🔤 Alfabet</button>
     <button class="tab-btn" onclick="showTab('slownik',this)">📚 Słownik</button>
     <button class="tab-btn" onclick="showTab('czasowniki',this)">🔤 Czasowniki</button>
+    <button class="tab-btn" onclick="showTab('gry',this)">🎮 Gry</button>
     <button class="tab-btn" onclick="showTab('powtorki',this)">🔁 Powtórki</button>
     <button class="tab-btn" onclick="showTab('zdania',this)">✍️ Zdania</button>
     <button class="tab-btn" onclick="showTab('progres',this)">📊 Progres</button>
@@ -408,6 +474,25 @@
     <div class="verb-grid" id="verb-grid"></div>
   </div>
 
+  <!-- ─── GRY ─── -->
+  <div id="tab-gry" class="tab-panel">
+    <h3 style="font-size:1.1rem;margin-bottom:1rem">Gry</h3>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:1.5rem">
+      Krótkie ćwiczenia oparte o słowa z aktualnego pokoju.
+    </p>
+    <div class="games-controls">
+      <div class="games-control-group">
+        <div class="games-control-label">Gra</div>
+        <div class="games-pills" id="game-type-pills"></div>
+      </div>
+      <div class="games-control-group">
+        <div class="games-control-label">Zakres</div>
+        <div class="games-pills" id="game-scope-pills"></div>
+      </div>
+    </div>
+    <div class="games-render" id="games-render"></div>
+  </div>
+
   <!-- ─── POWTÓRKI ─── -->
   <div id="tab-powtorki" class="tab-panel">
     <div class="review-queue-header">
@@ -495,6 +580,7 @@
 
 <script src="/static/js/ui.js"></script>
 <script src="/static/js/api.js"></script>
+<script src="/static/js/games.js"></script>
 <script>
 // ─── State ───────────────────────────────────────────────────────────────────
 const params = new URLSearchParams(location.search);
@@ -509,12 +595,17 @@ let learnIndex = 0;
 let learnRevealed = false;
 let learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
 
+// Cache aktualnego języka — wykorzystywany przez moduł gier (games.js).
+let currentLang = null;
+let gamesInitialized = false;
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   if (!requireAuth()) return;
 
   // Wczytaj dane usera + język w tle (do topbara)
   Promise.all([api.me(), api.getMyLanguage()]).then(([u, lang]) => {
+    currentLang = lang;
     applyTheme(u.theme || 'dark');
     document.getElementById('user-name').textContent = u.username;
     const avEl = document.getElementById('user-avatar');
@@ -563,6 +654,20 @@ function showTab(name, btn) {
   if (name === 'nauka' && !learnQueue.length) startLearningSession();
   if (name === 'powtorki') loadReviews();
   if (name === 'progres') loadProgres();
+  if (name === 'gry') openGamesTab();
+}
+
+// Pierwsze wejście w zakładkę Gry — pobierz język (jeśli jeszcze nie ma)
+// i odpal moduł gier. Kolejne wejścia wracają do tego samego stanu rundy.
+async function openGamesTab() {
+  if (gamesInitialized) return;
+  // Język jest pobierany asynchronicznie w init(); jak jeszcze nie ma — dociągnij.
+  if (!currentLang) {
+    try { currentLang = await api.getMyLanguage(); } catch { currentLang = { code: 'hr', name: 'Chorwacki' }; }
+  }
+  if (typeof initGamesPanel !== 'function') return;
+  await initGamesPanel({ roomId: ROOM_ID, lang: currentLang });
+  gamesInitialized = true;
 }
 
 function goToSlownik() {
