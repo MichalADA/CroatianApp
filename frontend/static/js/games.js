@@ -46,8 +46,8 @@ function shuffle(arr) {
 // Dodanie nowej gry = dopisanie wpisu z `start: function(container, items)`.
 const GAME_TYPES = [
   { id: 'matching', label: 'Dopasowanie', start: startMatchingGame },
-  { id: 'scramble', label: 'Rozsypanka', start: null /* TODO */ },
-  { id: 'hangman',  label: 'Wisielec',   start: null /* TODO */ },
+  { id: 'scramble', label: 'Rozsypanka', start: startScrambleGame },
+  { id: 'hangman',  label: 'Wisielec',   start: startHangmanGame },
 ];
 
 // Rejestr zakresów. `fetch(ctx)` ma zwrócić tablicę game items.
@@ -269,19 +269,284 @@ function startMatchingGame(container, items) {
   render();
 }
 
-// ─── TODO: Scramble ──────────────────────────────────────────────────────────
-// function startScrambleGame(container, items) { ... }
-// Pomysł:
-//   - wybierz losowe słowo
-//   - rozsyp litery item.targetText
-//   - user składa litery klikając kafle
-//   - sprawdzaj wynik, daj podpowiedź item.sourceText
-// Dopisz do GAME_TYPES: { id:'scramble', label:'Rozsypanka', start: startScrambleGame }
+// ─── SCRAMBLE (Rozsypanka) ───────────────────────────────────────────────────
+//
+// Gra: pokaż słowo źródłowe (np. "kawa") + rozsypane litery slowa docelowego.
+// User klika litery, wskoczą do najbliższego pustego slotu. Po wypełnieniu
+// wszystkich slotów następuje auto-sprawdzenie. Runda = 5 słów.
+//
+// Filtrujemy jedno-wyrazowe słowa o sensownej długości (3-10 znaków),
+// żeby gra była grywalna i niezależna od języka — dla każdego języka
+// to są zwykle te same kryteria.
 
-// ─── TODO: Hangman ───────────────────────────────────────────────────────────
-// function startHangmanGame(container, items) { ... }
-// Pomysł:
-//   - wybierz losowe słowo, ukryj item.targetText jako _ _ _ _
-//   - user zgaduje litery z klawiatury ekranowej
-//   - po N błędach koniec
-// Dopisz do GAME_TYPES: { id:'hangman', label:'Wisielec', start: startHangmanGame }
+function startScrambleGame(container, items) {
+  const ROUND_SIZE = 5;
+  const candidates = items.filter(i =>
+    i.targetText &&
+    i.targetText.length >= 3 &&
+    i.targetText.length <= 10 &&
+    !/\s/.test(i.targetText)
+  );
+
+  if (!candidates.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>Brak słów odpowiednich do rozsypanki w tym zakresie<br>
+        (potrzebne pojedyncze wyrazy długości 3–10 znaków).</p>
+      </div>`;
+    return;
+  }
+
+  const round = shuffle(candidates).slice(0, Math.min(ROUND_SIZE, candidates.length));
+
+  const state = {
+    idx: 0,         // który aktualnie rozwiązujemy
+    score: 0,       // ile poprawnie ułożonych
+    tiles: [],      // [{char, used}]
+    placed: [],     // sloty: indeks tile'a albo null
+    locked: false,
+    wrong: false,
+  };
+
+  function startWord() {
+    const word = round[state.idx].targetText;
+    state.tiles = shuffle(word.split('')).map(ch => ({ char: ch, used: false }));
+    state.placed = new Array(word.length).fill(null);
+    state.locked = false;
+    state.wrong = false;
+    render();
+  }
+
+  function currentBuiltWord() {
+    return state.placed.map(ti => (ti == null ? '' : state.tiles[ti].char)).join('');
+  }
+
+  function render() {
+    const item = round[state.idx];
+    const total = round.length;
+    const tilesHtml = state.tiles.map((t, i) =>
+      `<button class="scr-tile" data-tile="${i}" ${t.used || state.locked ? 'disabled' : ''}>${t.char}</button>`
+    ).join('');
+    const slotsHtml = state.placed.map((ti, i) => {
+      const ch = ti == null ? '' : state.tiles[ti].char;
+      const cls = 'scr-slot' + (ti == null ? ' empty' : '') + (state.wrong ? ' wrong' : '');
+      return `<button class="${cls}" data-slot="${i}" ${ti == null || state.locked ? 'disabled' : ''}>${ch || '·'}</button>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="scr-header">
+        <div class="match-progress">Słowo <strong>${state.idx + 1}</strong> / ${total} · Wynik: <strong>${state.score}</strong></div>
+        <button class="btn" id="scr-restart">↻ Nowa runda</button>
+      </div>
+      <div class="scr-card">
+        <div class="scr-source-label">Polski</div>
+        <div class="scr-source">${item.sourceText}</div>
+        <div class="scr-slots">${slotsHtml}</div>
+        <div class="scr-tiles">${tilesHtml}</div>
+      </div>
+    `;
+    container.querySelectorAll('.scr-tile').forEach(b => {
+      b.addEventListener('click', () => onTile(parseInt(b.dataset.tile, 10)));
+    });
+    container.querySelectorAll('.scr-slot').forEach(b => {
+      b.addEventListener('click', () => onSlot(parseInt(b.dataset.slot, 10)));
+    });
+    container.querySelector('#scr-restart').addEventListener('click', () => runCurrentGame());
+  }
+
+  function onTile(tileIdx) {
+    if (state.locked) return;
+    const t = state.tiles[tileIdx];
+    if (!t || t.used) return;
+    const slot = state.placed.indexOf(null);
+    if (slot === -1) return;
+    state.placed[slot] = tileIdx;
+    t.used = true;
+
+    // Wszystkie sloty wypełnione → sprawdzaj
+    if (state.placed.indexOf(null) === -1) {
+      const built = currentBuiltWord();
+      const target = round[state.idx].targetText;
+      if (built === target) {
+        state.score++;
+        const last = state.idx === round.length - 1;
+        if (last) {
+          playUiSound('complete');
+          toast('Wszystkie słowa rozwiązane!', 3000);
+          state.locked = true;
+          render();
+          // Pokaż ekran końcowy zamiast iść dalej
+          setTimeout(() => {
+            container.innerHTML = `
+              <div class="match-done">🎉 Świetnie! Ułożyłeś/aś ${state.score} / ${round.length} słów.</div>
+              <div style="text-align:center;margin-top:1rem">
+                <button class="btn primary" id="scr-again">↻ Nowa runda</button>
+              </div>`;
+            container.querySelector('#scr-again').addEventListener('click', () => runCurrentGame());
+          }, 700);
+          return;
+        } else {
+          playUiSound('correct');
+          toast('Świetnie!', 1000);
+          state.locked = true;
+          render();
+          setTimeout(() => { state.idx++; startWord(); }, 600);
+          return;
+        }
+      } else {
+        playUiSound('wrong');
+        toast('Nie ten układ', 900);
+        state.wrong = true;
+        state.locked = true;
+        render();
+        setTimeout(() => {
+          // Czyść sloty, oznacz wszystkie tile'y jako wolne
+          state.tiles.forEach(t => t.used = false);
+          state.placed.fill(null);
+          state.wrong = false;
+          state.locked = false;
+          render();
+        }, 700);
+        return;
+      }
+    }
+    render();
+  }
+
+  function onSlot(slotIdx) {
+    if (state.locked) return;
+    const tileIdx = state.placed[slotIdx];
+    if (tileIdx == null) return;
+    state.tiles[tileIdx].used = false;
+    state.placed[slotIdx] = null;
+    render();
+  }
+
+  startWord();
+}
+
+// ─── HANGMAN (Wisielec) ──────────────────────────────────────────────────────
+//
+// Gra: jedno słowo, klawiatura ekranowa (litery wyciągnięte z dostępnych słów
+// w zakresie — language-agnostic). 6 błędów = porażka. Pełne odsłonięcie = wygrana.
+// Spacje i myślniki w słowie zostają widoczne.
+
+function startHangmanGame(container, items) {
+  const MAX_WRONGS = 6;
+  const candidates = items.filter(i =>
+    i.targetText && i.targetText.length >= 3 && i.targetText.length <= 12
+  );
+
+  if (!candidates.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>Brak słów odpowiednich do wisielca w tym zakresie.</p>
+      </div>`;
+    return;
+  }
+
+  // Klawiatura = wszystkie unikalne litery z puli słów (posortowane).
+  // Tym sposobem dla HR dostaniemy č/š/ž, dla ES — ñ, dla EL — alfabet grecki itd.
+  const keyboardLetters = (() => {
+    const set = new Set();
+    candidates.forEach(it => {
+      it.targetText.toLowerCase().split('').forEach(c => {
+        if (c !== ' ' && c !== '-' && c !== "'") set.add(c);
+      });
+    });
+    return Array.from(set).sort();
+  })();
+
+  const item = shuffle(candidates)[0];
+  const target = item.targetText;
+  const targetLower = target.toLowerCase();
+
+  const state = {
+    used: new Set(),       // litery klikane
+    wrongs: 0,
+    finished: false,       // win albo lose
+    won: false,
+  };
+
+  function maskedWord() {
+    return target.split('').map(c => {
+      if (c === ' ') return '  '; // dwa nbsp dla widocznej spacji
+      if (c === '-' || c === "'") return c;
+      return state.used.has(c.toLowerCase()) ? c : '_';
+    }).join(' ');
+  }
+
+  function isWordRevealed() {
+    return target.split('').every(c => {
+      if (c === ' ' || c === '-' || c === "'") return true;
+      return state.used.has(c.toLowerCase());
+    });
+  }
+
+  function render() {
+    const livesHtml = '●'.repeat(MAX_WRONGS - state.wrongs) + '○'.repeat(state.wrongs);
+    const word = maskedWord();
+    const keyboardHtml = keyboardLetters.map(l => {
+      let cls = 'hng-key';
+      if (state.used.has(l)) {
+        cls += targetLower.includes(l) ? ' hit' : ' miss';
+      }
+      const dis = state.used.has(l) || state.finished ? 'disabled' : '';
+      return `<button class="${cls}" data-letter="${l}" ${dis}>${l}</button>`;
+    }).join('');
+
+    let footer = '';
+    if (state.finished) {
+      footer = state.won
+        ? `<div class="match-done">🎉 Słowo odgadnięte!</div>`
+        : `<div class="hng-lose">Koniec gry. Słowo: <strong>${target}</strong></div>`;
+    }
+
+    container.innerHTML = `
+      <div class="match-header">
+        <div class="match-progress">Błędy: <strong>${state.wrongs}</strong> / ${MAX_WRONGS} · Życia: <span class="hng-lives">${livesHtml}</span></div>
+        <button class="btn" id="hng-new">↻ Nowe słowo</button>
+      </div>
+      <div class="hng-card">
+        <div class="scr-source-label">Polski</div>
+        <div class="scr-source">${item.sourceText}</div>
+        <div class="hng-word">${word}</div>
+        <div class="hng-keyboard">${keyboardHtml}</div>
+        ${footer}
+      </div>
+    `;
+    container.querySelectorAll('.hng-key').forEach(b => {
+      b.addEventListener('click', () => onLetter(b.dataset.letter));
+    });
+    container.querySelector('#hng-new').addEventListener('click', () => runCurrentGame());
+  }
+
+  function onLetter(letter) {
+    if (state.finished) return;
+    if (state.used.has(letter)) return;
+    state.used.add(letter);
+    if (targetLower.includes(letter)) {
+      if (isWordRevealed()) {
+        state.finished = true;
+        state.won = true;
+        playUiSound('complete');
+        toast('Słowo odgadnięte!', 2500);
+      }
+    } else {
+      state.wrongs++;
+      if (state.wrongs >= MAX_WRONGS) {
+        state.finished = true;
+        state.won = false;
+        playUiSound('wrong');
+        toast('Niestety — słowo: ' + target, 3000);
+      } else {
+        playUiSound('wrong');
+      }
+    }
+    render();
+  }
+
+  render();
+}
