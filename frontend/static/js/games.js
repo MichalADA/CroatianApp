@@ -307,6 +307,7 @@ function startScrambleGame(container, items) {
     placed: [],     // sloty: indeks tile'a albo null
     locked: false,
     wrong: false,
+    correct: false, // chwilowy zielony flash po poprawnym słowie
   };
 
   function startWord() {
@@ -315,6 +316,7 @@ function startScrambleGame(container, items) {
     state.placed = new Array(word.length).fill(null);
     state.locked = false;
     state.wrong = false;
+    state.correct = false;
     render();
   }
 
@@ -325,13 +327,19 @@ function startScrambleGame(container, items) {
   function render() {
     const item = round[state.idx];
     const total = round.length;
+    // Tile'e użyte znikają z DOM — pozostałe zwijają się przez flex-wrap.
     const tilesHtml = state.tiles.map((t, i) =>
-      `<button class="scr-tile" data-tile="${i}" ${t.used || state.locked ? 'disabled' : ''}>${t.char}</button>`
+      t.used ? '' :
+      `<button class="scramble-tile" data-tile="${i}" ${state.locked ? 'disabled' : ''}>${t.char}</button>`
     ).join('');
     const slotsHtml = state.placed.map((ti, i) => {
       const ch = ti == null ? '' : state.tiles[ti].char;
-      const cls = 'scr-slot' + (ti == null ? ' empty' : '') + (state.wrong ? ' wrong' : '');
-      return `<button class="${cls}" data-slot="${i}" ${ti == null || state.locked ? 'disabled' : ''}>${ch || '·'}</button>`;
+      let cls = 'scramble-slot';
+      if (ti == null) cls += ' empty';
+      if (state.wrong) cls += ' wrong';
+      if (state.correct) cls += ' correct';
+      const dis = (ti == null || state.locked) ? 'disabled' : '';
+      return `<button class="${cls}" data-slot="${i}" ${dis}>${ch || ''}</button>`;
     }).join('');
 
     container.innerHTML = `
@@ -342,14 +350,14 @@ function startScrambleGame(container, items) {
       <div class="scr-card">
         <div class="scr-source-label">Polski</div>
         <div class="scr-source">${item.sourceText}</div>
-        <div class="scr-slots">${slotsHtml}</div>
-        <div class="scr-tiles">${tilesHtml}</div>
+        <div class="scramble-slots">${slotsHtml}</div>
+        <div class="scramble-letters">${tilesHtml}</div>
       </div>
     `;
-    container.querySelectorAll('.scr-tile').forEach(b => {
+    container.querySelectorAll('.scramble-tile').forEach(b => {
       b.addEventListener('click', () => onTile(parseInt(b.dataset.tile, 10)));
     });
-    container.querySelectorAll('.scr-slot').forEach(b => {
+    container.querySelectorAll('.scramble-slot').forEach(b => {
       b.addEventListener('click', () => onSlot(parseInt(b.dataset.slot, 10)));
     });
     container.querySelector('#scr-restart').addEventListener('click', () => runCurrentGame());
@@ -370,13 +378,13 @@ function startScrambleGame(container, items) {
       const target = round[state.idx].targetText;
       if (built === target) {
         state.score++;
+        state.correct = true;   // zielony flash slotów
+        state.locked = true;
         const last = state.idx === round.length - 1;
         if (last) {
           playUiSound('complete');
-          toast('Wszystkie słowa rozwiązane!', 3000);
-          state.locked = true;
+          toast('Dobrze! Wszystkie słowa rozwiązane!', 3000);
           render();
-          // Pokaż ekran końcowy zamiast iść dalej
           setTimeout(() => {
             container.innerHTML = `
               <div class="match-done">🎉 Świetnie! Ułożyłeś/aś ${state.score} / ${round.length} słów.</div>
@@ -384,14 +392,13 @@ function startScrambleGame(container, items) {
                 <button class="btn primary" id="scr-again">↻ Nowa runda</button>
               </div>`;
             container.querySelector('#scr-again').addEventListener('click', () => runCurrentGame());
-          }, 700);
+          }, 900);
           return;
         } else {
           playUiSound('correct');
-          toast('Świetnie!', 1000);
-          state.locked = true;
+          toast('Dobrze!', 1000);
           render();
-          setTimeout(() => { state.idx++; startWord(); }, 600);
+          setTimeout(() => { state.idx++; startWord(); }, 800);
           return;
         }
       } else {
@@ -431,6 +438,67 @@ function startScrambleGame(container, items) {
 // Gra: jedno słowo, klawiatura ekranowa (litery wyciągnięte z dostępnych słów
 // w zakresie — language-agnostic). 6 błędów = porażka. Pełne odsłonięcie = wygrana.
 // Spacje i myślniki w słowie zostają widoczne.
+
+// ASCII rysunek wisielca — indeks = liczba błędów (0..6).
+// Indeks 6 = pełna postać = porażka.
+const HANGMAN_STATES = [
+  // 0 — sama szubienica
+  "  +---+\n" +
+  "  |   |\n" +
+  "      |\n" +
+  "      |\n" +
+  "      |\n" +
+  "      |\n" +
+  "=========",
+  // 1 — głowa
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  "      |\n" +
+  "      |\n" +
+  "      |\n" +
+  "=========",
+  // 2 — tułów
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  "  |   |\n" +
+  "      |\n" +
+  "      |\n" +
+  "=========",
+  // 3 — lewa ręka
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  " /|   |\n" +
+  "      |\n" +
+  "      |\n" +
+  "=========",
+  // 4 — prawa ręka
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  " /|\\  |\n" +
+  "      |\n" +
+  "      |\n" +
+  "=========",
+  // 5 — lewa noga
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  " /|\\  |\n" +
+  " /    |\n" +
+  "      |\n" +
+  "=========",
+  // 6 — prawa noga (game over)
+  "  +---+\n" +
+  "  |   |\n" +
+  "  O   |\n" +
+  " /|\\  |\n" +
+  " / \\  |\n" +
+  "      |\n" +
+  "=========",
+];
 
 function startHangmanGame(container, items) {
   const MAX_WRONGS = 6;
@@ -504,12 +572,15 @@ function startHangmanGame(container, items) {
         : `<div class="hng-lose">Koniec gry. Słowo: <strong>${target}</strong></div>`;
     }
 
+    const drawing = HANGMAN_STATES[Math.min(state.wrongs, HANGMAN_STATES.length - 1)];
+
     container.innerHTML = `
       <div class="match-header">
         <div class="match-progress">Błędy: <strong>${state.wrongs}</strong> / ${MAX_WRONGS} · Życia: <span class="hng-lives">${livesHtml}</span></div>
         <button class="btn" id="hng-new">↻ Nowe słowo</button>
       </div>
       <div class="hng-card">
+        <pre class="hng-drawing">${drawing}</pre>
         <div class="scr-source-label">Polski</div>
         <div class="scr-source">${item.sourceText}</div>
         <div class="hng-word">${word}</div>

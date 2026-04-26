@@ -288,47 +288,84 @@
   display:flex; align-items:center; justify-content:space-between;
   margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;
 }
-.scr-slots, .scr-tiles {
-  display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
-  margin:1rem 0;
+.scramble-slots, .scramble-letters {
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+  margin:1.25rem 0;
+  min-height:64px;
 }
-.scr-slot, .scr-tile {
-  width:46px; height:54px;
+.scramble-slot, .scramble-tile {
+  width:60px; height:64px;
   font-family:'Syne',sans-serif; font-weight:800;
-  font-size:1.4rem; color:var(--text);
+  font-size:1.7rem; color:var(--text);
   background:var(--surface2); border:2px solid var(--border2);
-  border-radius:10px; cursor:pointer;
+  border-radius:12px; cursor:pointer;
   display:inline-flex; align-items:center; justify-content:center;
-  transition:border-color .12s, background .12s, color .12s;
+  transition:border-color .12s, background .12s, color .12s, transform .08s;
   padding:0;
 }
-.scr-tile:hover:not(:disabled) { border-color:var(--accent2); }
-.scr-tile:disabled { opacity:.25; cursor:default; }
-.scr-slot.empty { color:var(--text3); border-style:dashed; }
-.scr-slot:not(.empty):hover:not(:disabled) { border-color:var(--accent2); }
-.scr-slot.wrong { border-color:var(--red); color:var(--red); background:rgba(232,125,125,0.08); }
+.scramble-tile:hover:not(:disabled) {
+  border-color:var(--accent); color:var(--accent);
+}
+.scramble-tile:active:not(:disabled) { transform: translateY(1px); }
+.scramble-slot.empty {
+  color:transparent; border-style:dashed; background:transparent;
+}
+.scramble-slot:not(.empty):hover:not(:disabled) {
+  border-color:var(--accent2);
+}
+.scramble-slot.wrong {
+  border-color:var(--red); color:var(--red);
+  background:rgba(232,125,125,0.10);
+  animation: scrShake .4s ease;
+}
+.scramble-slot.correct {
+  border-color:var(--green); color:var(--green);
+  background:rgba(107,207,138,0.12);
+}
+
+@keyframes scrShake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
 
 /* Hangman */
+.hng-drawing {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 28px;
+  margin: 0 auto 1.25rem;
+  display: inline-block;
+  text-align: left;
+  white-space: pre;
+  letter-spacing: 1px;
+}
 .hng-word {
   font-family:'Syne',sans-serif; font-weight:800;
-  font-size:clamp(1.4rem, 4vw, 2rem); letter-spacing:.15em;
-  color:var(--accent); margin:1.25rem 0 1.75rem;
+  font-size:clamp(1.6rem, 5vw, 2.4rem); letter-spacing:.2em;
+  color:var(--accent); margin:1.5rem 0 1.75rem;
 }
 .hng-keyboard {
   display:flex; flex-wrap:wrap; gap:6px; justify-content:center;
-  max-width:520px; margin:0 auto;
+  max-width:560px; margin:0 auto;
 }
 .hng-key {
-  min-width:36px; height:40px; padding:0 10px;
-  font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+  min-width:42px; height:46px; padding:0 10px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:15px;
   background:var(--surface2); border:1px solid var(--border2);
-  color:var(--text); border-radius:8px; cursor:pointer;
-  transition:border-color .12s, background .12s, color .12s;
+  color:var(--text); border-radius:10px; cursor:pointer;
+  transition:border-color .12s, background .12s, color .12s, transform .08s;
 }
-.hng-key:hover:not(:disabled) { border-color:var(--accent2); }
+.hng-key:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+.hng-key:active:not(:disabled) { transform: translateY(1px); }
 .hng-key:disabled { cursor:default; }
-.hng-key.hit  { background:rgba(107,207,138,0.12); border-color:var(--green); color:var(--green); }
-.hng-key.miss { background:rgba(232,125,125,0.10); border-color:var(--red); color:var(--red); opacity:.8; }
+.hng-key.hit  { background:rgba(107,207,138,0.14); border-color:var(--green); color:var(--green); }
+.hng-key.miss { background:rgba(232,125,125,0.12); border-color:var(--red); color:var(--red); opacity:.75; }
 .hng-lives { color:var(--accent); letter-spacing:2px; }
 .hng-lose {
   text-align:center; padding:1.25rem; margin-top:1.5rem;
