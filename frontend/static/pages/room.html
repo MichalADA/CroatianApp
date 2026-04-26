@@ -311,36 +311,36 @@
     </p>
 
     <div class="alphabet-grid">
-      <div class="letter">A<span>a — auto</span></div>
-      <div class="letter">B<span>b — brat</span></div>
-      <div class="letter">C<span>c — cesta</span></div>
-      <div class="letter">Č<span>cz — čaj</span></div>
-      <div class="letter">Ć<span>miękkie ć — kuća</span></div>
-      <div class="letter">D<span>d — dan</span></div>
-      <div class="letter">Dž<span>dż — džep</span></div>
-      <div class="letter">Đ<span>dź/dż — dođem</span></div>
-      <div class="letter">E<span>e — euro</span></div>
-      <div class="letter">F<span>f — film</span></div>
-      <div class="letter">G<span>g — grad</span></div>
-      <div class="letter">H<span>h — hotel</span></div>
-      <div class="letter">I<span>i — ime</span></div>
-      <div class="letter">J<span>j — ja</span></div>
-      <div class="letter">K<span>k — kava</span></div>
-      <div class="letter">L<span>l — ljubav</span></div>
-      <div class="letter">Lj<span>lj — ljudi</span></div>
-      <div class="letter">M<span>m — more</span></div>
-      <div class="letter">N<span>n — noć</span></div>
-      <div class="letter">Nj<span>ń — konj</span></div>
-      <div class="letter">O<span>o — otac</span></div>
-      <div class="letter">P<span>p — posao</span></div>
-      <div class="letter">R<span>r — ruka</span></div>
-      <div class="letter">S<span>s — soba</span></div>
-      <div class="letter">Š<span>sz — škola</span></div>
-      <div class="letter">T<span>t — tjedan</span></div>
-      <div class="letter">U<span>u — ulica</span></div>
-      <div class="letter">V<span>w — voda</span></div>
-      <div class="letter">Z<span>z — zima</span></div>
-      <div class="letter">Ž<span>ż/rz — žena</span></div>
+      <div class="letter" onclick="playAlphabetSound('a')">A<span>a — auto 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('b')">B<span>b — brat 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('c')">C<span>c — cesta 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('c-caron')">Č<span>cz — čaj 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('c-acute')">Ć<span>miękkie ć — kuća 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('d')">D<span>d — dan 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('dz')">Dž<span>dż — džep 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('d-stroke')">Đ<span>dź/dż — dođem 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('e')">E<span>e — euro 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('f')">F<span>f — film 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('g')">G<span>g — grad 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('h')">H<span>h — hotel 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('i')">I<span>i — ime 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('j')">J<span>j — ja 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('k')">K<span>k — kava 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('l')">L<span>l — ljubav 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('lj')">Lj<span>lj — ljudi 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('m')">M<span>m — more 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('n')">N<span>n — noć 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('nj')">Nj<span>ń — konj 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('o')">O<span>o — otac 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('p')">P<span>p — posao 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('r')">R<span>r — ruka 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('s')">S<span>s — soba 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('s-caron')">Š<span>sz — škola 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('t')">T<span>t — tjedan 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('u')">U<span>u — ulica 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('v')">V<span>w — voda 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('z')">Z<span>z — zima 🔊</span></div>
+      <div class="letter" onclick="playAlphabetSound('z-caron')">Ž<span>ż/rz — žena 🔊</span></div>
     </div>
     <div class="alphabet-rules">
       <h3>Jak czytać chorwacki?</h3>
@@ -978,7 +978,10 @@ async function loadProgres() {
     `).join('')}
   `;
 }
-
+function playAlphabetSound(file) {
+  const audio = new Audio(`/static/audio/hr/alphabet/${file}.mp3`);
+  audio.play().catch(() => toast('Nie udało się odtworzyć dźwięku'));
+}
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 init();
 </script>
