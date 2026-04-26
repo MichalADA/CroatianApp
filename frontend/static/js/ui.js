@@ -55,3 +55,46 @@ function renderUserAvatar(el, user) {
   }
   el.innerHTML = `<img src="${avatarUrl(DEFAULT_AVATAR)}" alt="">`;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   UI sound effects — bardzo krótkie, subtelne sygnały zwrotne.
+   Reguły:
+   - odtwarzane TYLKO po interakcji usera (np. klik w karcie gry),
+   - brak pliku → cicha awaria (catch),
+   - brak autoplay,
+   - kontrolowane przez localStorage (`ui_sounds_enabled`, domyślnie ON).
+
+   Pliki kładziemy w frontend/static/audio/ui/. Konwencja:
+     correct.mp3, wrong.mp3, complete.mp3
+   Aby dodać kolejny: po prostu wrzuć plik i wywołaj playUiSound('jego_nazwa').
+
+   TODO: dorzucić toggle "Dźwięki" do modala Ustawień
+   (helpery są — wystarczy podpiąć checkbox na areUiSoundsEnabled/setUiSoundsEnabled).
+   ────────────────────────────────────────────────────────────────────────── */
+
+const _UI_SOUND_DIR = '/static/audio/ui/';
+const _UI_SOUNDS_KEY = 'ui_sounds_enabled';
+const _uiSoundCache = {};
+
+function areUiSoundsEnabled() {
+  // domyślnie włączone — dopiero jawne '0' wyłącza
+  return localStorage.getItem(_UI_SOUNDS_KEY) !== '0';
+}
+
+function setUiSoundsEnabled(on) {
+  localStorage.setItem(_UI_SOUNDS_KEY, on ? '1' : '0');
+}
+
+function playUiSound(name) {
+  if (!areUiSoundsEnabled()) return;
+  try {
+    let a = _uiSoundCache[name];
+    if (!a) {
+      a = new Audio(_UI_SOUND_DIR + name + '.mp3');
+      a.volume = 0.45; // subtelnie
+      _uiSoundCache[name] = a;
+    }
+    a.currentTime = 0;
+    a.play().catch(() => { /* brak pliku albo autoplay block — cisza */ });
+  } catch { /* cisza */ }
+}

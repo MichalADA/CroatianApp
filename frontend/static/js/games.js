@@ -236,7 +236,18 @@ function startMatchingGame(container, items) {
         state.solved.add(state.pickedSrc);
         state.pickedSrc = null;
         state.pickedTgt = null;
+        const done = state.solved.size === round.length;
+        // Feedback: ostatnia para → tylko "complete", w przeciwnym razie "correct"
+        if (done) {
+          playUiSound('complete');
+          toast('Wszystkie pary dopasowane!', 3000);
+        } else {
+          playUiSound('correct');
+          toast('Dobra para!', 1200);
+        }
       } else {
+        playUiSound('wrong');
+        toast('To nie ta para', 1000);
         state.wrongSrc = state.pickedSrc;
         state.wrongTgt = state.pickedTgt;
         state.pickedSrc = null;
