@@ -203,8 +203,6 @@
 </style>
 </head>
 <body>
-<!-- Tryb skupienia: widoczny tylko gdy body.focus-mode jest aktywne -->
-<button class="focus-exit-btn" id="focus-exit-btn" type="button">Wyłącz tryb skupienia</button>
 <div class="container">
   <div class="topbar-room">
     <a href="/static/index.html" class="back-link" style="padding:0">← Pałac pamięci</a>
@@ -984,14 +982,8 @@ function playAlphabetSound(file) {
   const audio = new Audio(`/static/audio/hr/alphabet/${file}.mp3`);
   audio.play().catch(() => toast('Nie udało się odtworzyć dźwięku'));
 }
-// ─── Focus mode (przycisk wyjścia + zastosowanie klasy na body) ──────────────
+// Tryb skupienia — sama klasa na body, włączana z modala Ustawień.
 applyFocusModeClass();
-document.getElementById('focus-exit-btn').addEventListener('click', () => {
-  setFocusMode(false);
-  // Reset stanu wizualnego — bez pełnego reloadu, ale dla czystości
-  // odświeżamy widok (tabs/header wracają, aktywna zakładka zostaje).
-  location.reload();
-});
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 init();
