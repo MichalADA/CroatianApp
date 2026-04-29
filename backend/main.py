@@ -480,6 +480,8 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
             items.append({
                 "type": "word", "id": w.id, "croatian": w.croatian,
                 "polish": w.polish, "category": w.category, "status": "nowe",
+                "example_hr": w.example_hr,
+                "example_pl": w.example_pl,
             })
 
         if len(items) < limit:
@@ -493,6 +495,8 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
                     "polish": v.polish, "status": "nowe",
                     "conj_ja": v.conj_ja, "conj_ti": v.conj_ti, "conj_on": v.conj_on,
                     "conj_mi": v.conj_mi, "conj_vi": v.conj_vi, "conj_oni": v.conj_oni,
+                    "example_hr": v.example_hr,
+                    "example_pl": v.example_pl,
                 })
 
     items = items[:limit]
