@@ -243,7 +243,35 @@ def set_my_language(payload: schemas.LanguageSelectIn,
 # ROOMS (content)
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _room_stats(content_db: Session, room: models.Room, user_id: int) -> schemas.RoomOut:
+def _is_room_completed(content_db: Session, room_id: int, user_id: int) -> bool:
+    """Pokój ukończony = user zna >= 80% wszystkich elementów (słów + czasowników)."""
+    total_words = content_db.query(models.Word).filter(models.Word.room_id == room_id).count()
+    total_verbs = content_db.query(models.Verb).filter(models.Verb.room_id == room_id).count()
+    total = total_words + total_verbs
+    if total == 0:
+        return False
+    known = content_db.query(models.Progress).filter(
+        models.Progress.user_id == user_id,
+        models.Progress.room_id == room_id,
+        models.Progress.status == "znam",
+    ).count()
+    return (known / total) >= 0.8
+
+
+def _is_room_locked(content_db: Session, room: models.Room, user_id: int, user_username: str) -> bool:
+    """Pokój 1 zawsze odblokowany. User 'test' ma wszystko odblokowane.
+    Pozostałe pokoje wymagają ukończenia poprzedniego."""
+    if user_username == "test":
+        return False
+    if room.id == 1:
+        return False
+    prev_room = content_db.query(models.Room).filter(models.Room.id == room.id - 1).first()
+    if not prev_room:
+        return False
+    return not _is_room_completed(content_db, prev_room.id, user_id)
+
+
+def _room_stats(content_db: Session, room: models.Room, user_id: int, user_username: str = "") -> schemas.RoomOut:
     word_count = content_db.query(models.Word).filter(models.Word.room_id == room.id).count()
     verb_count = content_db.query(models.Verb).filter(models.Verb.room_id == room.id).count()
     known = content_db.query(models.Progress).filter(
@@ -257,11 +285,13 @@ def _room_stats(content_db: Session, room: models.Room, user_id: int) -> schemas
         models.Progress.next_review <= date.today(),
         models.Progress.status != "nowe",
     ).count()
+    locked = _is_room_locked(content_db, room, user_id, user_username)
     return schemas.RoomOut(
         id=room.id, name=room.name, description=room.description,
         emoji=room.emoji, color=room.color,
         word_count=word_count, verb_count=verb_count,
         known_count=known, due_today=due_today,
+        is_locked=locked,
     )
 
 
@@ -269,7 +299,7 @@ def _room_stats(content_db: Session, room: models.Room, user_id: int) -> schemas
 def get_rooms(content_db: Session = Depends(get_content_db),
               user: models.User = Depends(get_current_user)):
     rooms = content_db.query(models.Room).order_by(models.Room.id).all()
-    return [_room_stats(content_db, r, user.id) for r in rooms]
+    return [_room_stats(content_db, r, user.id, user.username) for r in rooms]
 
 
 @app.get("/rooms/{room_id}", response_model=schemas.RoomOut)
@@ -279,7 +309,10 @@ def get_room(room_id: int,
     room = content_db.query(models.Room).filter(models.Room.id == room_id).first()
     if not room:
         raise HTTPException(404, "Room not found")
-    return _room_stats(content_db, room, user.id)
+    result = _room_stats(content_db, room, user.id, user.username)
+    if result.is_locked:
+        raise HTTPException(403, "Pokój zablokowany. Ukończ poprzedni pokój (80% słów).")
+    return result
 
 
 # ═══════════════════════════════════════════════════════════════════════════

@@ -58,6 +58,28 @@
 }
 .room-card:hover { transform: translateY(-3px); border-color: var(--border2); }
 .room-card:hover::before { opacity: 1; }
+.room-card.room-locked {
+  opacity: 0.55;
+  cursor: default;
+  filter: grayscale(0.4);
+  position: relative;
+}
+.room-card.room-locked:hover { transform: none; border-color: var(--border); }
+.room-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  font-size: 12px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: .04em;
+  margin-top: 4px;
+}
 .room-emoji { font-size: 2.5rem; margin-bottom: 12px; display: block; }
 .room-name { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
 .room-desc { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 16px; }
@@ -298,17 +320,23 @@ async function init() {
   grid.innerHTML = rooms.map(r => {
     const total = r.word_count + r.verb_count;
     const pct = total ? Math.round(r.known_count / total * 100) : 0;
-    return `<a href="/static/pages/room.html?id=${r.id}" class="room-card" style="--room-color:${r.color}">
+    const isLocked = r.is_locked;
+    const cardClass = isLocked ? 'room-card room-locked' : 'room-card';
+    const clickHandler = isLocked
+      ? `onclick="toast('🔒 Ukończ poprzedni pokój, aby odblokować ten.');return false;"`
+      : `onclick="location.href='/static/pages/room.html?id=${r.id}'"`;
+    const metaBadges = isLocked
+      ? `<span class="room-lock-badge">🔒 Zablokowany</span>`
+      : `<span class="room-badge">${r.word_count} słów</span>
+        <span class="room-badge">${r.verb_count} cz.</span>
+        ${r.due_today > 0 ? `<span class="room-badge accent">⏰ ${r.due_today} do powtórki</span>` : ''}
+        ${r.known_count > 0 ? `<span class="room-badge" style="border-color:${r.color};color:${r.color}">✓ ${r.known_count} znam</span>` : ''}`;
+    return `<a class="${cardClass}" style="--room-color:${r.color}" ${clickHandler}>
       <img class="room-img" src="${roomImages[r.id]}" alt="${r.name}">
       <span class="room-emoji">${r.emoji}</span>
       <div class="room-name">${r.name}</div>
       <div class="room-desc">${r.description}</div>
-      <div class="room-meta">
-        <span class="room-badge">${r.word_count} słów</span>
-        <span class="room-badge">${r.verb_count} cz.</span>
-        ${r.due_today > 0 ? `<span class="room-badge accent">⏰ ${r.due_today} do powtórki</span>` : ''}
-        ${r.known_count > 0 ? `<span class="room-badge" style="border-color:${r.color};color:${r.color}">✓ ${r.known_count} znam</span>` : ''}
-      </div>
+      <div class="room-meta">${metaBadges}</div>
       <div class="room-progress"><div class="room-progress-bar" style="width:${pct}%"></div></div>
     </a>`;
   }).join('');

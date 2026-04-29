@@ -84,6 +84,7 @@ class RoomOut(BaseModel):
     verb_count: int = 0
     known_count: int = 0
     due_today: int = 0
+    is_locked: bool = False
     class Config: from_attributes = True
 
 
