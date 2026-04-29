@@ -33,6 +33,8 @@ def _seed_room(db, room_id: int, data: dict):
             polish=w["polish"],
             category=w["category"],
             difficulty=w.get("difficulty", 1),
+            example_hr=w.get("example_hr"),
+            example_pl=w.get("example_pl"),
         ))
 
     for v in verbs:
@@ -46,6 +48,8 @@ def _seed_room(db, room_id: int, data: dict):
             conj_mi=v["conj_mi"],
             conj_vi=v["conj_vi"],
             conj_oni=v["conj_oni"],
+            example_hr=v.get("example_hr"),
+            example_pl=v.get("example_pl"),
         ))
 
     print(f"✅ Pokój {room_id}: {len(words)} słów, {len(verbs)} czasowników.")
