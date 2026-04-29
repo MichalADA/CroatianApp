@@ -68,14 +68,14 @@ def startup():
         database.get_lang_engine(code)
         migration.ensure_user_id_columns_in_lang_db(code)
 
-    # 4) Seed contentu hr — tylko jeśli baza hr.db jest pusta (świeża instalka)
+    # 4) Seed contentu hr — zmiana zeby dodanie nowego pokoju sie liczylo
+    import seed
     hr_session = database.open_lang_session("hr")
     try:
-        if hr_session.query(models.Room).count() == 0:
-            import seed
-            seed.run(hr_session)
+        seed.run_incremental(hr_session)
     finally:
         hr_session.close()
+ 
 
     # 5) Konto testowe w app.db
     app_session = database.AppSessionLocal()
