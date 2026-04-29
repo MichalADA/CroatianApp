@@ -93,6 +93,29 @@
   animation: fadeUp .25s ease;
 }
 .learn-conj.hidden { display:none; }
+.learn-example {
+  margin: 1rem 0 0.25rem;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  width: 100%;
+  max-width: 420px;
+  text-align: left;
+  animation: fadeUp .25s ease;
+}
+.learn-example.hidden { display: none; }
+.learn-example-hr {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.learn-example-pl {
+  font-size: 12px;
+  color: var(--text3);
+}
 .learn-reveal-btn {
   margin-top: .5rem;
   padding: 12px 28px;
@@ -429,6 +452,10 @@
           <div class="learn-pl" id="learn-pl">—</div>
           <div class="learn-hr hidden" id="learn-hr">—</div>
           <div class="learn-conj hidden" id="learn-conj"></div>
+          <div class="learn-example hidden" id="learn-example">
+            <div class="learn-example-hr" id="learn-example-hr"></div>
+            <div class="learn-example-pl" id="learn-example-pl"></div>
+          </div>
           <button class="learn-reveal-btn" id="learn-reveal-btn" onclick="learnReveal()">Pokaż po chorwacku</button>
           <div class="learn-actions hidden" id="learn-actions">
             <button class="btn btn-nie-wiem" onclick="learnAnswer('nie wiem')">✗ Nie wiem</button>
@@ -851,6 +878,11 @@ function showLearnCard() {
   }
   conj.classList.add('hidden');
 
+  // reset przykładu przy każdej nowej karcie
+  document.getElementById('learn-example-hr').textContent = item.example_hr || '';
+  document.getElementById('learn-example-pl').textContent = item.example_pl || '';
+  document.getElementById('learn-example').classList.add('hidden');
+
   document.getElementById('learn-reveal-btn').style.display = 'inline-flex';
   document.getElementById('learn-actions').classList.add('hidden');
 
@@ -869,6 +901,12 @@ function learnReveal() {
   }
   document.getElementById('learn-reveal-btn').style.display = 'none';
   document.getElementById('learn-actions').classList.remove('hidden');
+
+  // pokaż przykład jeśli istnieje
+  const ex = document.getElementById('learn-example');
+  if (item.example_hr) {
+    ex.classList.remove('hidden');
+  }
 }
 
 async function learnAnswer(choice) {
