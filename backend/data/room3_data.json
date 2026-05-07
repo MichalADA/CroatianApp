@@ -1,7 +1,1575 @@
 {
   "room_id": 3,
-  "note": "Czasowniki w czasie przyszłym (futur I). Forma: ja ću + bezokolicznik.",
+  "note": "Czasowniki w czasie przyszłym (futur I). Forma: ja ću + bezokolicznik. Słownictwo rozwija kategorie z pokoju 2 oraz wprowadza ważne tematy (edukacja, praca, kultura, finanse, media, relacje).",
   "words": [
+    {
+      "croatian": "lubenica",
+      "polish": "arbuz",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Ljeti ću jesti lubenicu svaki dan.",
+      "example_pl": "Latem będę codziennie jeść arbuza."
+    },
+    {
+      "croatian": "dinja",
+      "polish": "melon",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Dinja je slađa od lubenice.",
+      "example_pl": "Melon jest słodszy od arbuza."
+    },
+    {
+      "croatian": "marelica",
+      "polish": "morela",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Pekmez od marelice je najbolji.",
+      "example_pl": "Dżem morelowy jest najlepszy."
+    },
+    {
+      "croatian": "breskva",
+      "polish": "brzoskwinia",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Kupit ću kilogram bresaka na tržnici.",
+      "example_pl": "Kupię kilogram brzoskwiń na targu."
+    },
+    {
+      "croatian": "šljiva",
+      "polish": "śliwka",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Od šljiva pravimo rakiju.",
+      "example_pl": "Ze śliwek robimy rakiję."
+    },
+    {
+      "croatian": "malina",
+      "polish": "malina",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Maline rastu u našem vrtu.",
+      "example_pl": "Maliny rosną w naszym ogrodzie."
+    },
+    {
+      "croatian": "smokva",
+      "polish": "figa",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Dalmatinska smokva je posebno slatka.",
+      "example_pl": "Dalmatyńska figa jest wyjątkowo słodka."
+    },
+    {
+      "croatian": "lignje",
+      "polish": "kalmary",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Pržene lignje su specijalitet Jadrana.",
+      "example_pl": "Smażone kalmary to specjał Adriatyku."
+    },
+    {
+      "croatian": "škampi",
+      "polish": "krewetki",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Škampi na buzaru su moja omiljena jela.",
+      "example_pl": "Krewetki na buzarę to moje ulubione danie."
+    },
+    {
+      "croatian": "mrkva",
+      "polish": "marchew",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Mrkva je dobra za vid.",
+      "example_pl": "Marchew jest dobra dla wzroku."
+    },
+    {
+      "croatian": "paprika",
+      "polish": "papryka",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Volim punjenu papriku s rižom.",
+      "example_pl": "Lubię paprykę nadziewaną ryżem."
+    },
+    {
+      "croatian": "češnjak",
+      "polish": "czosnek",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Bez češnjaka nema dobre kuhinje.",
+      "example_pl": "Bez czosnku nie ma dobrej kuchni."
+    },
+    {
+      "croatian": "peršin",
+      "polish": "pietruszka",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Sitno sam nasjeckao peršin.",
+      "example_pl": "Drobno posiekałem pietruszkę."
+    },
+    {
+      "croatian": "tjestenina",
+      "polish": "makaron",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Tjestenina sa školjkama je odlična.",
+      "example_pl": "Makaron z małżami jest świetny."
+    },
+    {
+      "croatian": "začin",
+      "polish": "przyprawa",
+      "category": "jedzenie",
+      "difficulty": 3,
+      "example_hr": "Dodaj malo začina u juhu.",
+      "example_pl": "Dodaj trochę przyprawy do zupy."
+    },
+    {
+      "croatian": "cjedilo",
+      "polish": "durszlak",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Procijedi tjesteninu kroz cjedilo.",
+      "example_pl": "Odcedź makaron przez durszlak."
+    },
+    {
+      "croatian": "kuhača",
+      "polish": "warząchew",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Promiješaj juhu kuhačom.",
+      "example_pl": "Zamieszaj zupę warząchwią."
+    },
+    {
+      "croatian": "lopatica",
+      "polish": "łopatka",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Okreni palačinku lopaticom.",
+      "example_pl": "Przewróć naleśnik łopatką."
+    },
+    {
+      "croatian": "štednjak",
+      "polish": "kuchenka",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Naš štednjak je na plin.",
+      "example_pl": "Nasza kuchenka jest gazowa."
+    },
+    {
+      "croatian": "sudoper",
+      "polish": "zlew",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Sudoper je pun prljavog suđa.",
+      "example_pl": "Zlew jest pełen brudnych naczyń."
+    },
+    {
+      "croatian": "miješalica",
+      "polish": "mikser",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Miješalicom ćemo umutiti tijesto.",
+      "example_pl": "Mikserem ubijemy ciasto."
+    },
+    {
+      "croatian": "pekač",
+      "polish": "forma do pieczenia",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Stavi kolač u pekač.",
+      "example_pl": "Włóż ciasto do formy do pieczenia."
+    },
+    {
+      "croatian": "zdjela",
+      "polish": "miska",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Salatu ćemo poslužiti u velikoj zdjeli.",
+      "example_pl": "Sałatkę podamy w dużej misce."
+    },
+    {
+      "croatian": "krpa",
+      "polish": "ścierka",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Obriši ruke krpom.",
+      "example_pl": "Wytrzyj ręce ścierką."
+    },
+    {
+      "croatian": "perilica posuđa",
+      "polish": "zmywarka",
+      "category": "kuchnia",
+      "difficulty": 3,
+      "example_hr": "Perilica posuđa nam štedi vrijeme.",
+      "example_pl": "Zmywarka oszczędza nam czas."
+    },
+    {
+      "croatian": "lakat",
+      "polish": "łokieć",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Udario sam lakat o vrata.",
+      "example_pl": "Uderzyłem łokciem o drzwi."
+    },
+    {
+      "croatian": "koljeno",
+      "polish": "kolano",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Boli me koljeno nakon trčanja.",
+      "example_pl": "Boli mnie kolano po bieganiu."
+    },
+    {
+      "croatian": "gležanj",
+      "polish": "kostka",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Iskrivio sam gležanj na stepenicama.",
+      "example_pl": "Skręciłem kostkę na schodach."
+    },
+    {
+      "croatian": "zglob",
+      "polish": "staw / nadgarstek",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Zglob mi je otečen.",
+      "example_pl": "Mam opuchnięty staw."
+    },
+    {
+      "croatian": "čelo",
+      "polish": "czoło",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Stavi mu hladnu krpu na čelo.",
+      "example_pl": "Połóż mu zimną ścierkę na czole."
+    },
+    {
+      "croatian": "obraz",
+      "polish": "policzek",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Poljubila ga je u obraz.",
+      "example_pl": "Pocałowała go w policzek."
+    },
+    {
+      "croatian": "brada",
+      "polish": "broda / podbródek",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Pusti bradu zimi.",
+      "example_pl": "Zimą zapuszczam brodę."
+    },
+    {
+      "croatian": "jezik",
+      "polish": "język",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Opekao sam jezik na čaju.",
+      "example_pl": "Sparzyłem język herbatą."
+    },
+    {
+      "croatian": "zub",
+      "polish": "ząb",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Boli me zub već tri dana.",
+      "example_pl": "Boli mnie ząb od trzech dni."
+    },
+    {
+      "croatian": "pluća",
+      "polish": "płuca",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Plivanje jača pluća.",
+      "example_pl": "Pływanie wzmacnia płuca."
+    },
+    {
+      "croatian": "bubreg",
+      "polish": "nerka",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Pij više vode zbog bubrega.",
+      "example_pl": "Pij więcej wody dla nerek."
+    },
+    {
+      "croatian": "jetra",
+      "polish": "wątroba",
+      "category": "tijelo",
+      "difficulty": 3,
+      "example_hr": "Alkohol šteti jetrima.",
+      "example_pl": "Alkohol szkodzi wątrobie."
+    },
+    {
+      "croatian": "rukavice",
+      "polish": "rękawiczki",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Zaboravio sam rukavice u autu.",
+      "example_pl": "Zostawiłem rękawiczki w samochodzie."
+    },
+    {
+      "croatian": "šal",
+      "polish": "szalik",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Mama mi je isplela šal.",
+      "example_pl": "Mama zrobiła mi szalik."
+    },
+    {
+      "croatian": "kravata",
+      "polish": "krawat",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Nosit ću kravatu na sastanku.",
+      "example_pl": "Założę krawat na spotkanie."
+    },
+    {
+      "croatian": "remen",
+      "polish": "pasek",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Kupio sam novi kožni remen.",
+      "example_pl": "Kupiłem nowy skórzany pasek."
+    },
+    {
+      "croatian": "suknja",
+      "polish": "spódnica",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Suknja joj je predugačka.",
+      "example_pl": "Spódnica jest dla niej za długa."
+    },
+    {
+      "croatian": "košulja",
+      "polish": "koszula",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Trebam izglačati košulju.",
+      "example_pl": "Muszę wyprasować koszulę."
+    },
+    {
+      "croatian": "vesta",
+      "polish": "sweter",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Obuci vestu, hladno je.",
+      "example_pl": "Załóż sweter, jest zimno."
+    },
+    {
+      "croatian": "čizme",
+      "polish": "kozaki",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Ove čizme su nepromočive.",
+      "example_pl": "Te kozaki są wodoodporne."
+    },
+    {
+      "croatian": "traperice",
+      "polish": "dżinsy",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Nosim traperice svaki dan.",
+      "example_pl": "Codziennie noszę dżinsy."
+    },
+    {
+      "croatian": "pidžama",
+      "polish": "piżama",
+      "category": "odjeća",
+      "difficulty": 3,
+      "example_hr": "Spavam u udobnoj pidžami.",
+      "example_pl": "Śpię w wygodnej piżamie."
+    },
+    {
+      "croatian": "potok",
+      "polish": "potok",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Iza kuće teče mali potok.",
+      "example_pl": "Za domem płynie mały potok."
+    },
+    {
+      "croatian": "vodopad",
+      "polish": "wodospad",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Plitvički vodopadi su prekrasni.",
+      "example_pl": "Wodospady Plitwickie są przepiękne."
+    },
+    {
+      "croatian": "brijeg",
+      "polish": "wzgórze",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Popet ćemo se na onaj brijeg.",
+      "example_pl": "Wejdziemy na to wzgórze."
+    },
+    {
+      "croatian": "dolina",
+      "polish": "dolina",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "U dolini se nalazi staro selo.",
+      "example_pl": "W dolinie znajduje się stara wieś."
+    },
+    {
+      "croatian": "livada",
+      "polish": "łąka",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Krave pasu na livadi.",
+      "example_pl": "Krowy pasą się na łące."
+    },
+    {
+      "croatian": "polje",
+      "polish": "pole",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Polje je puno suncokreta.",
+      "example_pl": "Pole jest pełne słoneczników."
+    },
+    {
+      "croatian": "zalazak sunca",
+      "polish": "zachód słońca",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Zalazak sunca u Rovinju je nezaboravan.",
+      "example_pl": "Zachód słońca w Rovinju jest niezapomniany."
+    },
+    {
+      "croatian": "izlazak sunca",
+      "polish": "wschód słońca",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Probudit ću se za izlazak sunca.",
+      "example_pl": "Obudzę się na wschód słońca."
+    },
+    {
+      "croatian": "mjesec",
+      "polish": "księżyc",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Pun mjesec sjaji nad morem.",
+      "example_pl": "Pełnia księżyca świeci nad morzem."
+    },
+    {
+      "croatian": "zvijezda",
+      "polish": "gwiazda",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Brojimo zvijezde s balkona.",
+      "example_pl": "Liczymy gwiazdy z balkonu."
+    },
+    {
+      "croatian": "magla",
+      "polish": "mgła",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Jutros je gusta magla.",
+      "example_pl": "Dziś rano jest gęsta mgła."
+    },
+    {
+      "croatian": "oluja",
+      "polish": "burza",
+      "category": "priroda",
+      "difficulty": 3,
+      "example_hr": "Dolazi velika oluja s mora.",
+      "example_pl": "Nadchodzi wielka burza od morza."
+    },
+    {
+      "croatian": "ozljeda",
+      "polish": "uraz / kontuzja",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Imao je ozbiljnu ozljedu koljena.",
+      "example_pl": "Miał poważny uraz kolana."
+    },
+    {
+      "croatian": "posjekotina",
+      "polish": "skaleczenie",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Posjekotina krvari, treba flaster.",
+      "example_pl": "Skaleczenie krwawi, trzeba plastra."
+    },
+    {
+      "croatian": "modrica",
+      "polish": "siniak",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Imam veliku modricu na nozi.",
+      "example_pl": "Mam dużego siniaka na nodze."
+    },
+    {
+      "croatian": "lom",
+      "polish": "złamanie",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Rendgen je pokazao lom kosti.",
+      "example_pl": "Rentgen pokazał złamanie kości."
+    },
+    {
+      "croatian": "krvni tlak",
+      "polish": "ciśnienie krwi",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Moram redovito mjeriti krvni tlak.",
+      "example_pl": "Muszę regularnie mierzyć ciśnienie krwi."
+    },
+    {
+      "croatian": "infekcija",
+      "polish": "infekcja",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Antibiotici će pomoći protiv infekcije.",
+      "example_pl": "Antybiotyki pomogą przy infekcji."
+    },
+    {
+      "croatian": "simptom",
+      "polish": "objaw",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Najgori simptom je glavobolja.",
+      "example_pl": "Najgorszym objawem jest ból głowy."
+    },
+    {
+      "croatian": "dijagnoza",
+      "polish": "diagnoza",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Liječnik će postaviti dijagnozu sutra.",
+      "example_pl": "Lekarz postawi diagnozę jutro."
+    },
+    {
+      "croatian": "terapija",
+      "polish": "terapia",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Terapija traje šest tjedana.",
+      "example_pl": "Terapia trwa sześć tygodni."
+    },
+    {
+      "croatian": "cjepivo",
+      "polish": "szczepionka",
+      "category": "zdravlje",
+      "difficulty": 3,
+      "example_hr": "Cjepivo štiti od bolesti.",
+      "example_pl": "Szczepionka chroni przed chorobą."
+    },
+    {
+      "croatian": "arhitekt",
+      "polish": "architekt",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Arhitekt je projektirao našu kuću.",
+      "example_pl": "Architekt zaprojektował nasz dom."
+    },
+    {
+      "croatian": "novinar",
+      "polish": "dziennikarz",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Novinar piše o lokalnoj politici.",
+      "example_pl": "Dziennikarz pisze o lokalnej polityce."
+    },
+    {
+      "croatian": "glumac",
+      "polish": "aktor",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Ovaj glumac ima Oskara.",
+      "example_pl": "Ten aktor ma Oscara."
+    },
+    {
+      "croatian": "slikar",
+      "polish": "malarz",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Slikar radi u svom ateljeu.",
+      "example_pl": "Malarz pracuje w swoim atelier."
+    },
+    {
+      "croatian": "fotograf",
+      "polish": "fotograf",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Fotograf je snimio prekrasne portrete.",
+      "example_pl": "Fotograf zrobił piękne portrety."
+    },
+    {
+      "croatian": "zubar",
+      "polish": "dentysta",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Idem zubaru svakih šest mjeseci.",
+      "example_pl": "Chodzę do dentysty co sześć miesięcy."
+    },
+    {
+      "croatian": "frizer",
+      "polish": "fryzjer",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Naručit ću se kod frizera.",
+      "example_pl": "Umówię się u fryzjera."
+    },
+    {
+      "croatian": "mehaničar",
+      "polish": "mechanik",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Mehaničar popravlja moj auto.",
+      "example_pl": "Mechanik naprawia mój samochód."
+    },
+    {
+      "croatian": "prevoditelj",
+      "polish": "tłumacz",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Prevoditelj radi s tri jezika.",
+      "example_pl": "Tłumacz pracuje w trzech językach."
+    },
+    {
+      "croatian": "znanstvenik",
+      "polish": "naukowiec",
+      "category": "profesije",
+      "difficulty": 3,
+      "example_hr": "Znanstvenik istražuje rak.",
+      "example_pl": "Naukowiec bada raka."
+    },
+    {
+      "croatian": "jamstvo",
+      "polish": "gwarancja",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Telefon ima dvije godine jamstva.",
+      "example_pl": "Telefon ma dwa lata gwarancji."
+    },
+    {
+      "croatian": "blagajna",
+      "polish": "kasa",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Red ispred blagajne je dugačak.",
+      "example_pl": "Kolejka przy kasie jest długa."
+    },
+    {
+      "croatian": "blagajnik",
+      "polish": "kasjer",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Blagajnik je vrlo ljubazan.",
+      "example_pl": "Kasjer jest bardzo uprzejmy."
+    },
+    {
+      "croatian": "vrećica",
+      "polish": "torebka / reklamówka",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Trebam platnenu vrećicu.",
+      "example_pl": "Potrzebuję płóciennej torebki."
+    },
+    {
+      "croatian": "košarica",
+      "polish": "koszyk",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Stavit ću mlijeko u košaricu.",
+      "example_pl": "Włożę mleko do koszyka."
+    },
+    {
+      "croatian": "etiketa",
+      "polish": "etykieta / metka",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Pročitaj etiketu prije kupnje.",
+      "example_pl": "Przeczytaj etykietę przed zakupem."
+    },
+    {
+      "croatian": "sniženje",
+      "polish": "wyprzedaż",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Zimsko sniženje počinje sutra.",
+      "example_pl": "Zimowa wyprzedaż zaczyna się jutro."
+    },
+    {
+      "croatian": "reklamacija",
+      "polish": "reklamacja",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Podnijet ću reklamaciju za neispravan proizvod.",
+      "example_pl": "Złożę reklamację za wadliwy produkt."
+    },
+    {
+      "croatian": "trgovački centar",
+      "polish": "centrum handlowe",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "Idemo u trgovački centar po vikendu.",
+      "example_pl": "W weekend idziemy do centrum handlowego."
+    },
+    {
+      "croatian": "izlog",
+      "polish": "witryna sklepowa",
+      "category": "kupovina",
+      "difficulty": 3,
+      "example_hr": "U izlogu su novi modeli.",
+      "example_pl": "Na witrynie są nowe modele."
+    },
+    {
+      "croatian": "preglednik",
+      "polish": "przeglądarka",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Otvori novu karticu u pregledniku.",
+      "example_pl": "Otwórz nową kartę w przeglądarce."
+    },
+    {
+      "croatian": "datoteka",
+      "polish": "plik",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Pošalji mi datoteku e-mailom.",
+      "example_pl": "Wyślij mi plik mailem."
+    },
+    {
+      "croatian": "mapa",
+      "polish": "folder",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Spremi to u mapu Dokumenti.",
+      "example_pl": "Zapisz to w folderze Dokumenty."
+    },
+    {
+      "croatian": "sigurnosna kopija",
+      "polish": "kopia zapasowa",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Radim sigurnosnu kopiju svaki tjedan.",
+      "example_pl": "Robię kopię zapasową co tydzień."
+    },
+    {
+      "croatian": "virus",
+      "polish": "wirus",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Antivirusni program je otkrio virus.",
+      "example_pl": "Antywirus wykrył wirusa."
+    },
+    {
+      "croatian": "miš",
+      "polish": "mysz (komputerowa)",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Bežični miš ne radi.",
+      "example_pl": "Bezprzewodowa mysz nie działa."
+    },
+    {
+      "croatian": "tablet",
+      "polish": "tablet",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Čitam knjige na tabletu.",
+      "example_pl": "Czytam książki na tablecie."
+    },
+    {
+      "croatian": "pametni telefon",
+      "polish": "smartfon",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Pametni telefon mi se pokvario.",
+      "example_pl": "Smartfon mi się zepsuł."
+    },
+    {
+      "croatian": "kamera",
+      "polish": "kamera",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Uključi kameru na sastanku.",
+      "example_pl": "Włącz kamerę na spotkaniu."
+    },
+    {
+      "croatian": "slušalice",
+      "polish": "słuchawki",
+      "category": "tehnologija",
+      "difficulty": 3,
+      "example_hr": "Bežične slušalice imaju dobar zvuk.",
+      "example_pl": "Bezprzewodowe słuchawki mają dobry dźwięk."
+    },
+    {
+      "croatian": "stoljeće",
+      "polish": "wiek / stulecie",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Živimo u 21. stoljeću.",
+      "example_pl": "Żyjemy w 21. wieku."
+    },
+    {
+      "croatian": "desetljeće",
+      "polish": "dekada",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Posljednje desetljeće bilo je burno.",
+      "example_pl": "Ostatnia dekada była burzliwa."
+    },
+    {
+      "croatian": "polovica",
+      "polish": "połowa",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Prošla je polovica godine.",
+      "example_pl": "Minęła połowa roku."
+    },
+    {
+      "croatian": "četvrtina",
+      "polish": "ćwierć",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Tri četvrtine sata sam čekao.",
+      "example_pl": "Czekałem trzy kwadranse."
+    },
+    {
+      "croatian": "prošlost",
+      "polish": "przeszłość",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Ne živi u prošlosti.",
+      "example_pl": "Nie żyj w przeszłości."
+    },
+    {
+      "croatian": "budućnost",
+      "polish": "przyszłość",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Budućnost je neizvjesna.",
+      "example_pl": "Przyszłość jest niepewna."
+    },
+    {
+      "croatian": "sadašnjost",
+      "polish": "teraźniejszość",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Uživaj u sadašnjosti.",
+      "example_pl": "Ciesz się teraźniejszością."
+    },
+    {
+      "croatian": "trenutak",
+      "polish": "chwila / moment",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Daj mi samo trenutak.",
+      "example_pl": "Daj mi tylko chwilę."
+    },
+    {
+      "croatian": "vječnost",
+      "polish": "wieczność",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "Čekam već vječnost.",
+      "example_pl": "Czekam już wieczność."
+    },
+    {
+      "croatian": "doba",
+      "polish": "epoka / pora",
+      "category": "czas",
+      "difficulty": 3,
+      "example_hr": "U ovo doba godine pada kiša.",
+      "example_pl": "O tej porze roku pada deszcz."
+    },
+    {
+      "croatian": "ružičasta",
+      "polish": "różowy",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Kupila je ružičastu haljinu.",
+      "example_pl": "Kupiła różową sukienkę."
+    },
+    {
+      "croatian": "zlatna",
+      "polish": "złoty",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Nosi zlatnu ogrlicu.",
+      "example_pl": "Nosi złoty naszyjnik."
+    },
+    {
+      "croatian": "srebrna",
+      "polish": "srebrny",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Srebrne naušnice su elegantne.",
+      "example_pl": "Srebrne kolczyki są eleganckie."
+    },
+    {
+      "croatian": "tirkizna",
+      "polish": "turkusowy",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "More je tirkizne boje.",
+      "example_pl": "Morze ma turkusowy kolor."
+    },
+    {
+      "croatian": "bež",
+      "polish": "beżowy",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Bež boja se slaže sa svime.",
+      "example_pl": "Beżowy pasuje do wszystkiego."
+    },
+    {
+      "croatian": "tamna",
+      "polish": "ciemny",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Tamna boja je mršavija.",
+      "example_pl": "Ciemny kolor wyszczupla."
+    },
+    {
+      "croatian": "svijetla",
+      "polish": "jasny",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Volim svijetle ljetne boje.",
+      "example_pl": "Lubię jasne letnie kolory."
+    },
+    {
+      "croatian": "šarena",
+      "polish": "kolorowy / barwny",
+      "category": "boja",
+      "difficulty": 3,
+      "example_hr": "Šarena tržnica privlači turiste.",
+      "example_pl": "Barwny targ przyciąga turystów."
+    },
+    {
+      "croatian": "vrijedan",
+      "polish": "pracowity / wartościowy",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "On je vrlo vrijedan radnik.",
+      "example_pl": "On jest bardzo pracowitym pracownikiem."
+    },
+    {
+      "croatian": "lijen",
+      "polish": "leniwy",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Nedjelja je dan za lijene aktivnosti.",
+      "example_pl": "Niedziela to dzień na leniwe zajęcia."
+    },
+    {
+      "croatian": "hrabar",
+      "polish": "odważny",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Trebaš biti hrabar i pokušati.",
+      "example_pl": "Musisz być odważny i spróbować."
+    },
+    {
+      "croatian": "plemenit",
+      "polish": "szlachetny",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Plemenita gesta dirnula nas je.",
+      "example_pl": "Szlachetny gest nas wzruszył."
+    },
+    {
+      "croatian": "pošten",
+      "polish": "uczciwy",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Pošten čovjek vraća izgubljeni novac.",
+      "example_pl": "Uczciwy człowiek zwraca zgubione pieniądze."
+    },
+    {
+      "croatian": "skroman",
+      "polish": "skromny",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Skroman je iako je uspješan.",
+      "example_pl": "Jest skromny, choć odnosi sukcesy."
+    },
+    {
+      "croatian": "ozbiljan",
+      "polish": "poważny",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Imam ozbiljan razgovor s tobom.",
+      "example_pl": "Mam z tobą poważną rozmowę."
+    },
+    {
+      "croatian": "zanimljiv",
+      "polish": "interesujący",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Pročitao sam zanimljiv članak.",
+      "example_pl": "Przeczytałem interesujący artykuł."
+    },
+    {
+      "croatian": "dosadan",
+      "polish": "nudny",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Film je bio jako dosadan.",
+      "example_pl": "Film był bardzo nudny."
+    },
+    {
+      "croatian": "mlad",
+      "polish": "młody",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Još je mlad za vožnju.",
+      "example_pl": "Jeszcze jest młody na prowadzenie."
+    },
+    {
+      "croatian": "star",
+      "polish": "stary",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Naša kuća je stara stotinu godina.",
+      "example_pl": "Nasz dom ma sto lat."
+    },
+    {
+      "croatian": "visok",
+      "polish": "wysoki",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Brat mi je viši od mene.",
+      "example_pl": "Brat jest wyższy ode mnie."
+    },
+    {
+      "croatian": "nizak",
+      "polish": "niski",
+      "category": "przymiotnik",
+      "difficulty": 3,
+      "example_hr": "Strop je prenizak za njega.",
+      "example_pl": "Sufit jest dla niego za niski."
+    },
+    {
+      "croatian": "oduševljenje",
+      "polish": "zachwyt",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Vidio sam oduševljenje u njegovim očima.",
+      "example_pl": "Widziałem zachwyt w jego oczach."
+    },
+    {
+      "croatian": "razočaranje",
+      "polish": "rozczarowanie",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Bilo je veliko razočaranje.",
+      "example_pl": "Było wielkie rozczarowanie."
+    },
+    {
+      "croatian": "ljubomora",
+      "polish": "zazdrość",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Ljubomora uništava veze.",
+      "example_pl": "Zazdrość niszczy związki."
+    },
+    {
+      "croatian": "suosjećanje",
+      "polish": "współczucie",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Pokazao je veliko suosjećanje.",
+      "example_pl": "Okazał wielkie współczucie."
+    },
+    {
+      "croatian": "nostalgija",
+      "polish": "nostalgia",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Stare pjesme bude nostalgiju.",
+      "example_pl": "Stare piosenki budzą nostalgię."
+    },
+    {
+      "croatian": "čežnja",
+      "polish": "tęsknota",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Osjećam čežnju za rodnim krajem.",
+      "example_pl": "Czuję tęsknotę za rodzinnymi stronami."
+    },
+    {
+      "croatian": "zbunjenost",
+      "polish": "zakłopotanie / zmieszanie",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Na licu mu se vidjela zbunjenost.",
+      "example_pl": "Na jego twarzy było widać zakłopotanie."
+    },
+    {
+      "croatian": "tjeskoba",
+      "polish": "lęk",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Tjeskoba ga je obuzela prije ispita.",
+      "example_pl": "Lęk ogarnął go przed egzaminem."
+    },
+    {
+      "croatian": "olakšanje",
+      "polish": "ulga",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Osjetio sam veliko olakšanje.",
+      "example_pl": "Poczułem wielką ulgę."
+    },
+    {
+      "croatian": "divljenje",
+      "polish": "podziw",
+      "category": "emocje",
+      "difficulty": 3,
+      "example_hr": "Gledala ga je s divljenjem.",
+      "example_pl": "Patrzyła na niego z podziwem."
+    },
+    {
+      "croatian": "uostalom",
+      "polish": "zresztą",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Uostalom, to više nije važno.",
+      "example_pl": "Zresztą, to już nie jest ważne."
+    },
+    {
+      "croatian": "dakle",
+      "polish": "więc / zatem",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Dakle, što ćemo sada?",
+      "example_pl": "Więc co teraz zrobimy?"
+    },
+    {
+      "croatian": "štoviše",
+      "polish": "co więcej",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Štoviše, dobio je i nagradu.",
+      "example_pl": "Co więcej, dostał też nagrodę."
+    },
+    {
+      "croatian": "naprotiv",
+      "polish": "przeciwnie",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Naprotiv, slažem se s tobom.",
+      "example_pl": "Przeciwnie, zgadzam się z tobą."
+    },
+    {
+      "croatian": "navodno",
+      "polish": "rzekomo / podobno",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Navodno se vraća sljedeći tjedan.",
+      "example_pl": "Podobno wraca w przyszłym tygodniu."
+    },
+    {
+      "croatian": "nedavno",
+      "polish": "niedawno",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Nedavno smo se preselili.",
+      "example_pl": "Niedawno się przeprowadziliśmy."
+    },
+    {
+      "croatian": "istovremeno",
+      "polish": "jednocześnie",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Istovremeno se smijao i plakao.",
+      "example_pl": "Jednocześnie śmiał się i płakał."
+    },
+    {
+      "croatian": "neprestano",
+      "polish": "nieustannie",
+      "category": "prilog",
+      "difficulty": 3,
+      "example_hr": "Neprestano zvoni telefon.",
+      "example_pl": "Telefon nieustannie dzwoni."
+    },
+    {
+      "croatian": "vrtić",
+      "polish": "przedszkole",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Vodim sina u vrtić svaki dan.",
+      "example_pl": "Codziennie zawożę syna do przedszkola."
+    },
+    {
+      "croatian": "igralište",
+      "polish": "plac zabaw",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Djeca se igraju na igralištu.",
+      "example_pl": "Dzieci bawią się na placu zabaw."
+    },
+    {
+      "croatian": "parkiralište",
+      "polish": "parking",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Parkiralište je puno.",
+      "example_pl": "Parking jest pełny."
+    },
+    {
+      "croatian": "vatrogasna postaja",
+      "polish": "straż pożarna",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Vatrogasna postaja je u centru.",
+      "example_pl": "Straż pożarna jest w centrum."
+    },
+    {
+      "croatian": "policijska postaja",
+      "polish": "komisariat",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Prijavit ću krađu u policijskoj postaji.",
+      "example_pl": "Zgłoszę kradzież na komisariacie."
+    },
+    {
+      "croatian": "sudnica",
+      "polish": "sala sądowa",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Suđenje je počelo u sudnici.",
+      "example_pl": "Rozprawa zaczęła się na sali sądowej."
+    },
+    {
+      "croatian": "zatvor",
+      "polish": "więzienie",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Završio je u zatvoru zbog prevare.",
+      "example_pl": "Trafił do więzienia za oszustwo."
+    },
+    {
+      "croatian": "crkva",
+      "polish": "kościół",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Crkva je puna ljudi nedjeljom.",
+      "example_pl": "Kościół jest pełen ludzi w niedzielę."
+    },
+    {
+      "croatian": "džamija",
+      "polish": "meczet",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "U Zagrebu postoji velika džamija.",
+      "example_pl": "W Zagrzebiu jest duży meczet."
+    },
+    {
+      "croatian": "groblje",
+      "polish": "cmentarz",
+      "category": "mjesta",
+      "difficulty": 3,
+      "example_hr": "Posjećujemo groblje za Sve svete.",
+      "example_pl": "Odwiedzamy cmentarz na Wszystkich Świętych."
+    },
+    {
+      "croatian": "peron",
+      "polish": "peron",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Vlak kreće s perona broj tri.",
+      "example_pl": "Pociąg odjeżdża z peronu trzeciego."
+    },
+    {
+      "croatian": "terminal",
+      "polish": "terminal",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Naš let je s terminala dva.",
+      "example_pl": "Nasz lot jest z terminalu drugiego."
+    },
+    {
+      "croatian": "izlaz",
+      "polish": "wyjście (do bramki)",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Izlaz za naš let je promijenjen.",
+      "example_pl": "Bramka do naszego lotu została zmieniona."
+    },
+    {
+      "croatian": "ukrcaj",
+      "polish": "wsiadanie / boarding",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Ukrcaj počinje za pola sata.",
+      "example_pl": "Boarding zaczyna się za pół godziny."
+    },
+    {
+      "croatian": "sjedalo",
+      "polish": "miejsce / siedzenie",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Imam sjedalo do prozora.",
+      "example_pl": "Mam miejsce przy oknie."
+    },
+    {
+      "croatian": "povratna karta",
+      "polish": "bilet powrotny",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Kupit ću povratnu kartu.",
+      "example_pl": "Kupię bilet powrotny."
+    },
+    {
+      "croatian": "jednosmjerna karta",
+      "polish": "bilet w jedną stronę",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Jednosmjerna karta je jeftinija.",
+      "example_pl": "Bilet w jedną stronę jest tańszy."
+    },
+    {
+      "croatian": "zračna luka",
+      "polish": "lotnisko",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Zagrebačka zračna luka je moderna.",
+      "example_pl": "Zagrzebskie lotnisko jest nowoczesne."
+    },
+    {
+      "croatian": "kolodvor",
+      "polish": "dworzec",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Glavni kolodvor je u centru grada.",
+      "example_pl": "Dworzec główny jest w centrum miasta."
+    },
+    {
+      "croatian": "prtljažnik",
+      "polish": "bagażnik",
+      "category": "putovanje",
+      "difficulty": 3,
+      "example_hr": "Stavi kofer u prtljažnik.",
+      "example_pl": "Włóż walizkę do bagażnika."
+    },
+    {
+      "croatian": "krov",
+      "polish": "dach",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Krov prokišnjava nakon oluje.",
+      "example_pl": "Dach przecieka po burzy."
+    },
+    {
+      "croatian": "pod",
+      "polish": "podłoga",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Drveni pod je topao i lijep.",
+      "example_pl": "Drewniana podłoga jest ciepła i ładna."
+    },
+    {
+      "croatian": "strop",
+      "polish": "sufit",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Strop je visok pet metara.",
+      "example_pl": "Sufit ma pięć metrów wysokości."
+    },
+    {
+      "croatian": "zid",
+      "polish": "ściana",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Obojit ćemo zid u plavo.",
+      "example_pl": "Pomalujemy ścianę na niebiesko."
+    },
+    {
+      "croatian": "prag",
+      "polish": "próg",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Pazi na prag, visok je.",
+      "example_pl": "Uważaj na próg, jest wysoki."
+    },
+    {
+      "croatian": "dvorište",
+      "polish": "podwórko",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Djeca se igraju u dvorištu.",
+      "example_pl": "Dzieci bawią się na podwórku."
+    },
+    {
+      "croatian": "garaža",
+      "polish": "garaż",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Auto držim u garaži.",
+      "example_pl": "Trzymam samochód w garażu."
+    },
+    {
+      "croatian": "podrum",
+      "polish": "piwnica",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "U podrumu čuvamo vino.",
+      "example_pl": "W piwnicy trzymamy wino."
+    },
+    {
+      "croatian": "tavan",
+      "polish": "strych",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Stare stvari su na tavanu.",
+      "example_pl": "Stare rzeczy są na strychu."
+    },
+    {
+      "croatian": "brava",
+      "polish": "zamek",
+      "category": "dom",
+      "difficulty": 3,
+      "example_hr": "Brava se pokvarila.",
+      "example_pl": "Zamek się zepsuł."
+    },
+    {
+      "croatian": "zakon",
+      "polish": "ustawa / prawo",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Novi zakon stupa na snagu sutra.",
+      "example_pl": "Nowa ustawa wchodzi w życie jutro."
+    },
+    {
+      "croatian": "sloboda",
+      "polish": "wolność",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Sloboda govora je važno pravo.",
+      "example_pl": "Wolność słowa jest ważnym prawem."
+    },
+    {
+      "croatian": "demokracija",
+      "polish": "demokracja",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Demokracija zahtijeva sudjelovanje.",
+      "example_pl": "Demokracja wymaga uczestnictwa."
+    },
+    {
+      "croatian": "izbori",
+      "polish": "wybory",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Izbori su sljedeće nedjelje.",
+      "example_pl": "Wybory są w następną niedzielę."
+    },
+    {
+      "croatian": "građanin",
+      "polish": "obywatel",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Svaki građanin ima pravo glasa.",
+      "example_pl": "Każdy obywatel ma prawo głosu."
+    },
+    {
+      "croatian": "nejednakost",
+      "polish": "nierówność",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Borimo se protiv društvene nejednakosti.",
+      "example_pl": "Walczymy z nierównością społeczną."
+    },
+    {
+      "croatian": "ljudska prava",
+      "polish": "prawa człowieka",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Ljudska prava moraju biti zaštićena.",
+      "example_pl": "Prawa człowieka muszą być chronione."
+    },
+    {
+      "croatian": "mir",
+      "polish": "pokój",
+      "category": "društvo",
+      "difficulty": 3,
+      "example_hr": "Svi želimo mir u svijetu.",
+      "example_pl": "Wszyscy chcemy pokoju na świecie."
+    },
+    {
+      "croatian": "utakmica",
+      "polish": "mecz",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Gledat ćemo utakmicu večeras.",
+      "example_pl": "Obejrzymy mecz dziś wieczorem."
+    },
+    {
+      "croatian": "navijač",
+      "polish": "kibic",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Najveći sam navijač Hajduka.",
+      "example_pl": "Jestem największym kibicem Hajduka."
+    },
+    {
+      "croatian": "suparnik",
+      "polish": "rywal / przeciwnik",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Naš suparnik je vrlo jak.",
+      "example_pl": "Nasz rywal jest bardzo silny."
+    },
+    {
+      "croatian": "pobjeda",
+      "polish": "zwycięstwo",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Pobjeda je bila zaslužena.",
+      "example_pl": "Zwycięstwo było zasłużone."
+    },
+    {
+      "croatian": "poraz",
+      "polish": "porażka",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Poraz je teško prihvatiti.",
+      "example_pl": "Porażkę trudno zaakceptować."
+    },
+    {
+      "croatian": "izlet",
+      "polish": "wycieczka",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Idemo na izlet u prirodu.",
+      "example_pl": "Jedziemy na wycieczkę na łono natury."
+    },
+    {
+      "croatian": "pješačenje",
+      "polish": "piesza wędrówka",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Pješačenje po Velebitu je čarobno.",
+      "example_pl": "Wędrówka po Velebicie jest magiczna."
+    },
+    {
+      "croatian": "kampiranje",
+      "polish": "kemping / biwak",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Volimo kampiranje uz more.",
+      "example_pl": "Lubimy kemping nad morzem."
+    },
+    {
+      "croatian": "ribolov",
+      "polish": "wędkarstwo",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Djed me vodi na ribolov.",
+      "example_pl": "Dziadek zabiera mnie na wędkarstwo."
+    },
+    {
+      "croatian": "šah",
+      "polish": "szachy",
+      "category": "slobodno vrijeme",
+      "difficulty": 3,
+      "example_hr": "Igram šah s ocem nedjeljom.",
+      "example_pl": "Gram w szachy z ojcem w niedziele."
+    },
     {
       "croatian": "sveučilište",
       "polish": "uniwersytet",
@@ -12,7 +1580,7 @@
     },
     {
       "croatian": "fakultet",
-      "polish": "wydział / uczelnia",
+      "polish": "wydział",
       "category": "obrazovanje",
       "difficulty": 3,
       "example_hr": "Studiram na filozofskom fakultetu.",
@@ -20,7 +1588,7 @@
     },
     {
       "croatian": "predmet",
-      "polish": "przedmiot",
+      "polish": "przedmiot (szkolny)",
       "category": "obrazovanje",
       "difficulty": 3,
       "example_hr": "Moj omiljeni predmet je povijest.",
@@ -31,16 +1599,16 @@
       "polish": "ocena",
       "category": "obrazovanje",
       "difficulty": 3,
-      "example_hr": "Dobio sam odličnu ocjenu na ispitu.",
-      "example_pl": "Dostałem świetną ocenę na egzaminie."
+      "example_hr": "Dobio sam odličnu ocjenu.",
+      "example_pl": "Dostałem świetną ocenę."
     },
     {
       "croatian": "ispit",
       "polish": "egzamin",
       "category": "obrazovanje",
       "difficulty": 3,
-      "example_hr": "Sutra imam važan ispit iz matematike.",
-      "example_pl": "Jutro mam ważny egzamin z matematyki."
+      "example_hr": "Sutra imam važan ispit.",
+      "example_pl": "Jutro mam ważny egzamin."
     },
     {
       "croatian": "stipendija",
@@ -75,20 +1643,12 @@
       "example_pl": "Zapomniałem zrobić zadanie domowe."
     },
     {
-      "croatian": "rječnik",
-      "polish": "słownik",
-      "category": "obrazovanje",
-      "difficulty": 3,
-      "example_hr": "Koristim rječnik kada ne razumijem riječ.",
-      "example_pl": "Używam słownika, gdy nie rozumiem słowa."
-    },
-    {
       "croatian": "gramatika",
       "polish": "gramatyka",
       "category": "obrazovanje",
       "difficulty": 3,
-      "example_hr": "Hrvatska gramatika je složena ali lijepa.",
-      "example_pl": "Chorwacka gramatyka jest skomplikowana, ale piękna."
+      "example_hr": "Hrvatska gramatika je složena.",
+      "example_pl": "Chorwacka gramatyka jest skomplikowana."
     },
     {
       "croatian": "vokabular",
@@ -99,28 +1659,36 @@
       "example_pl": "Każdego dnia uczę się nowego słownictwa."
     },
     {
-      "croatian": "napredak",
-      "polish": "postęp",
-      "category": "obrazovanje",
-      "difficulty": 3,
-      "example_hr": "Vidim veliki napredak u tvom učenju.",
-      "example_pl": "Widzę ogromny postęp w twoim uczeniu."
-    },
-    {
-      "croatian": "prijevod",
-      "polish": "tłumaczenie",
-      "category": "obrazovanje",
-      "difficulty": 3,
-      "example_hr": "Trebam prijevod ovog teksta na engleski.",
-      "example_pl": "Potrzebuję tłumaczenia tego tekstu na angielski."
-    },
-    {
       "croatian": "lekcija",
       "polish": "lekcja",
       "category": "obrazovanje",
       "difficulty": 3,
       "example_hr": "Danas imamo lekciju o glagolima.",
       "example_pl": "Dziś mamy lekcję o czasownikach."
+    },
+    {
+      "croatian": "predavanje",
+      "polish": "wykład",
+      "category": "obrazovanje",
+      "difficulty": 3,
+      "example_hr": "Predavanje počinje u devet.",
+      "example_pl": "Wykład zaczyna się o dziewiątej."
+    },
+    {
+      "croatian": "profesor",
+      "polish": "profesor",
+      "category": "obrazovanje",
+      "difficulty": 3,
+      "example_hr": "Profesor je vrlo zahtjevan.",
+      "example_pl": "Profesor jest bardzo wymagający."
+    },
+    {
+      "croatian": "student",
+      "polish": "student",
+      "category": "obrazovanje",
+      "difficulty": 3,
+      "example_hr": "Student je stigao na vrijeme.",
+      "example_pl": "Student przyszedł na czas."
     },
     {
       "croatian": "tvrtka",
@@ -148,11 +1716,11 @@
     },
     {
       "croatian": "kolega",
-      "polish": "współpracownik",
+      "polish": "kolega / współpracownik",
       "category": "posao",
       "difficulty": 3,
       "example_hr": "Moji kolege su sjajni ljudi.",
-      "example_pl": "Moi współpracownicy to wspaniali ludzie."
+      "example_pl": "Moi koledzy to wspaniali ludzie."
     },
     {
       "croatian": "ured",
@@ -200,7 +1768,7 @@
       "category": "posao",
       "difficulty": 3,
       "example_hr": "Imam intervju za novi posao sutra.",
-      "example_pl": "Jutro mam rozmowę kwalifikacyjną na nową pracę."
+      "example_pl": "Jutro mam rozmowę kwalifikacyjną."
     },
     {
       "croatian": "životopis",
@@ -208,39 +1776,39 @@
       "category": "posao",
       "difficulty": 3,
       "example_hr": "Poslao sam životopis na tri mjesta.",
-      "example_pl": "Wysłałem CV na trzy miejsca."
+      "example_pl": "Wysłałem CV w trzy miejsca."
     },
     {
-      "croatian": "napredovanje",
-      "polish": "awans",
+      "croatian": "plaća",
+      "polish": "pensja / wynagrodzenie",
       "category": "posao",
       "difficulty": 3,
-      "example_hr": "Zaslužuje napredovanje nakon svih tih godina.",
-      "example_pl": "Zasługuje na awans po tylu latach."
+      "example_hr": "Plaća kasni već dva tjedna.",
+      "example_pl": "Pensja spóźnia się już dwa tygodnie."
     },
     {
-      "croatian": "iskustvo",
-      "polish": "doświadczenie",
+      "croatian": "posao",
+      "polish": "praca",
       "category": "posao",
       "difficulty": 3,
-      "example_hr": "Imam pet godina iskustva u ovom poslu.",
-      "example_pl": "Mam pięć lat doświadczenia w tej pracy."
+      "example_hr": "Tražim novi posao u IT-u.",
+      "example_pl": "Szukam nowej pracy w IT."
     },
     {
-      "croatian": "slika",
-      "polish": "obraz",
-      "category": "kultura",
+      "croatian": "zaposlenik",
+      "polish": "pracownik",
+      "category": "posao",
       "difficulty": 3,
-      "example_hr": "Ova slika je remek-djelo.",
-      "example_pl": "Ten obraz to arcydzieło."
+      "example_hr": "Tvrtka ima sto zaposlenika.",
+      "example_pl": "Firma ma stu pracowników."
     },
     {
-      "croatian": "skulptura",
-      "polish": "rzeźba",
-      "category": "kultura",
+      "croatian": "mirovina",
+      "polish": "emerytura",
+      "category": "posao",
       "difficulty": 3,
-      "example_hr": "Skulptura u centru grada je impresivna.",
-      "example_pl": "Rzeźba w centrum miasta jest imponująca."
+      "example_hr": "Otac ide u mirovinu sljedeće godine.",
+      "example_pl": "Ojciec przechodzi na emeryturę w przyszłym roku."
     },
     {
       "croatian": "roman",
@@ -248,7 +1816,7 @@
       "category": "kultura",
       "difficulty": 3,
       "example_hr": "Čitam roman poznatog hrvatskog pisca.",
-      "example_pl": "Czytam powieść słynnego chorwackiego pisarza."
+      "example_pl": "Czytam powieść znanego chorwackiego pisarza."
     },
     {
       "croatian": "pjesma",
@@ -267,12 +1835,12 @@
       "example_pl": "Odwiedziliśmy nowoczesną galerię w Splicie."
     },
     {
-      "croatian": "izvedba",
-      "polish": "przedstawienie / wykonanie",
+      "croatian": "predstava",
+      "polish": "przedstawienie",
       "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Izvedba je bila nevjerojatna.",
-      "example_pl": "Przedstawienie było niesamowite."
+      "example_hr": "Predstava počinje u osam navečer.",
+      "example_pl": "Przedstawienie zaczyna się o ósmej wieczorem."
     },
     {
       "croatian": "redatelj",
@@ -287,8 +1855,8 @@
       "polish": "pisarz",
       "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Moj omiljeni pisac je Miroslav Krleža.",
-      "example_pl": "Mój ulubiony pisarz to Miroslav Krleža."
+      "example_hr": "Moj omiljeni pisac je Krleža.",
+      "example_pl": "Mój ulubiony pisarz to Krleža."
     },
     {
       "croatian": "glazbenik",
@@ -299,148 +1867,388 @@
       "example_pl": "Młody muzyk zachwycił publiczność."
     },
     {
-      "croatian": "arhitektura",
-      "polish": "architektura",
+      "croatian": "slika",
+      "polish": "obraz",
       "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Dubrovnik je poznat po svojoj arhitekturi.",
-      "example_pl": "Dubrownik jest znany ze swojej architektury."
+      "example_hr": "Ova slika je remek-djelo.",
+      "example_pl": "Ten obraz to arcydzieło."
     },
     {
-      "croatian": "dizajn",
-      "polish": "design / wzornictwo",
+      "croatian": "skulptura",
+      "polish": "rzeźba",
       "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Studiram grafički dizajn.",
-      "example_pl": "Studiuję projektowanie graficzne."
+      "example_hr": "Skulptura u centru grada je impresivna.",
+      "example_pl": "Rzeźba w centrum miasta jest imponująca."
     },
     {
-      "croatian": "kreativnost",
-      "polish": "kreatywność",
+      "croatian": "opera",
+      "polish": "opera",
       "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Kreativnost je ključna u ovom poslu.",
-      "example_pl": "Kreatywność jest kluczowa w tej pracy."
+      "example_hr": "Idemo u operu na premijeru.",
+      "example_pl": "Idziemy do opery na premierę."
     },
     {
-      "croatian": "trening",
-      "polish": "trening",
-      "category": "sport",
+      "croatian": "balet",
+      "polish": "balet",
+      "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Imam trening svaki ponedjeljak i srijedu.",
-      "example_pl": "Mam trening każdy poniedziałek i środę."
+      "example_hr": "Kći mi pleše balet od pete godine.",
+      "example_pl": "Córka tańczy balet od piątego roku życia."
     },
     {
-      "croatian": "utakmica",
-      "polish": "mecz",
-      "category": "sport",
+      "croatian": "književnost",
+      "polish": "literatura",
+      "category": "kultura",
       "difficulty": 3,
-      "example_hr": "Sutra je važna utakmica.",
-      "example_pl": "Jutro jest ważny mecz."
+      "example_hr": "Hrvatska književnost je bogata.",
+      "example_pl": "Chorwacka literatura jest bogata."
     },
     {
-      "croatian": "pobijeda",
-      "polish": "zwycięstwo",
+      "croatian": "nogomet",
+      "polish": "piłka nożna",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Ova pobijeda je bila zaslužena.",
-      "example_pl": "To zwycięstwo było zasłużone."
+      "example_hr": "Nogomet je najpopularniji sport ovdje.",
+      "example_pl": "Piłka nożna jest tu najpopularniejszym sportem."
     },
     {
-      "croatian": "poraz",
-      "polish": "porażka",
+      "croatian": "košarka",
+      "polish": "koszykówka",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Poraz nas je naučio puno.",
-      "example_pl": "Porażka nauczyła nas wiele."
+      "example_hr": "Igram košarku tri puta tjedno.",
+      "example_pl": "Gram w koszykówkę trzy razy w tygodniu."
     },
     {
-      "croatian": "tim",
-      "polish": "drużyna / zespół",
+      "croatian": "tenis",
+      "polish": "tenis",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Naš tim je u odličnoj formi.",
-      "example_pl": "Nasza drużyna jest w świetnej formie."
-    },
-    {
-      "croatian": "trener",
-      "polish": "trener",
-      "category": "sport",
-      "difficulty": 3,
-      "example_hr": "Trener je motivirao cijeli tim.",
-      "example_pl": "Trener zmotywował całą drużynę."
-    },
-    {
-      "croatian": "natjecanje",
-      "polish": "zawody / rywalizacja",
-      "category": "sport",
-      "difficulty": 3,
-      "example_hr": "Sudjelujem na nacionalnom natjecanju.",
-      "example_pl": "Biorę udział w krajowych zawodach."
-    },
-    {
-      "croatian": "stadion",
-      "polish": "stadion",
-      "category": "sport",
-      "difficulty": 3,
-      "example_hr": "Stadion je bio prepun navijača.",
-      "example_pl": "Stadion był pełen kibiców."
-    },
-    {
-      "croatian": "teretana",
-      "polish": "siłownia",
-      "category": "sport",
-      "difficulty": 3,
-      "example_hr": "Idem u teretanu tri puta tjedno.",
-      "example_pl": "Chodzę na siłownię trzy razy w tygodniu."
+      "example_hr": "Tenis je elegantan sport.",
+      "example_pl": "Tenis to elegancki sport."
     },
     {
       "croatian": "plivanje",
       "polish": "pływanie",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Plivanje je moj omiljeni sport.",
-      "example_pl": "Pływanie to mój ulubiony sport."
+      "example_hr": "Plivanje je dobro za leđa.",
+      "example_pl": "Pływanie jest dobre dla pleców."
     },
     {
-      "croatian": "bicikl",
-      "polish": "rower",
+      "croatian": "trčanje",
+      "polish": "bieganie",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Vozim bicikl svaki dan na posao.",
-      "example_pl": "Jeżdżę rowerem do pracy każdego dnia."
+      "example_hr": "Trčanje me opušta.",
+      "example_pl": "Bieganie mnie relaksuje."
     },
     {
-      "croatian": "navijač",
-      "polish": "kibic / fan",
+      "croatian": "biciklizam",
+      "polish": "kolarstwo",
       "category": "sport",
       "difficulty": 3,
-      "example_hr": "Gorljivi navijači su glasno navijali.",
-      "example_pl": "Zagorzali kibice głośno dopingowali."
+      "example_hr": "Biciklizam u prirodi je zdrav.",
+      "example_pl": "Kolarstwo w naturze jest zdrowe."
     },
     {
-      "croatian": "sloboda",
-      "polish": "wolność",
-      "category": "apstraktno",
+      "croatian": "skijanje",
+      "polish": "narciarstwo",
+      "category": "sport",
       "difficulty": 3,
-      "example_hr": "Sloboda je osnovno pravo svakog čovjeka.",
-      "example_pl": "Wolność to podstawowe prawo każdego człowieka."
+      "example_hr": "Skijanje je naša zimska tradicija.",
+      "example_pl": "Narciarstwo to nasza zimowa tradycja."
     },
     {
-      "croatian": "pravda",
-      "polish": "sprawiedliwość",
-      "category": "apstraktno",
+      "croatian": "jedrenje",
+      "polish": "żeglarstwo",
+      "category": "sport",
       "difficulty": 3,
-      "example_hr": "Borimo se za pravdu i jednakost.",
-      "example_pl": "Walczymy o sprawiedliwość i równość."
+      "example_hr": "Jedrenje na Jadranu je predivno.",
+      "example_pl": "Żeglarstwo na Adriatyku jest cudowne."
+    },
+    {
+      "croatian": "gimnastika",
+      "polish": "gimnastyka",
+      "category": "sport",
+      "difficulty": 3,
+      "example_hr": "Sestra trenira ritmičku gimnastiku.",
+      "example_pl": "Siostra trenuje gimnastykę artystyczną."
+    },
+    {
+      "croatian": "joga",
+      "polish": "joga",
+      "category": "sport",
+      "difficulty": 3,
+      "example_hr": "Joga mi pomaže smiriti se.",
+      "example_pl": "Joga pomaga mi się uspokoić."
+    },
+    {
+      "croatian": "turnir",
+      "polish": "turniej",
+      "category": "sport",
+      "difficulty": 3,
+      "example_hr": "Sudjelujemo na velikom turniru.",
+      "example_pl": "Bierzemy udział w wielkim turnieju."
+    },
+    {
+      "croatian": "trener",
+      "polish": "trener",
+      "category": "sport",
+      "difficulty": 3,
+      "example_hr": "Trener nas tjera da treniramo.",
+      "example_pl": "Trener zmusza nas do treningu."
+    },
+    {
+      "croatian": "kredit",
+      "polish": "kredyt",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Uzimam kredit za stan.",
+      "example_pl": "Biorę kredyt na mieszkanie."
+    },
+    {
+      "croatian": "kamata",
+      "polish": "odsetki",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Kamata na ovaj kredit je niska.",
+      "example_pl": "Odsetki od tego kredytu są niskie."
+    },
+    {
+      "croatian": "štednja",
+      "polish": "oszczędności",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Štednja je važna za budućnost.",
+      "example_pl": "Oszczędności są ważne dla przyszłości."
+    },
+    {
+      "croatian": "ulaganje",
+      "polish": "inwestycja",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Ulaganje u obrazovanje se isplati.",
+      "example_pl": "Inwestycja w edukację się opłaca."
+    },
+    {
+      "croatian": "dionica",
+      "polish": "akcja (giełdowa)",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Dionice su pale prošli tjedan.",
+      "example_pl": "Akcje spadły w zeszłym tygodniu."
+    },
+    {
+      "croatian": "valuta",
+      "polish": "waluta",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Hrvatska valuta je euro od 2023.",
+      "example_pl": "Chorwacka waluta to euro od 2023 roku."
+    },
+    {
+      "croatian": "porez",
+      "polish": "podatek",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Porez moramo platiti do ožujka.",
+      "example_pl": "Podatek musimy zapłacić do marca."
+    },
+    {
+      "croatian": "proračun",
+      "polish": "budżet",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Naš proračun je ograničen.",
+      "example_pl": "Nasz budżet jest ograniczony."
+    },
+    {
+      "croatian": "dug",
+      "polish": "dług",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Otplatit ću dug do kraja godine.",
+      "example_pl": "Spłacę dług do końca roku."
+    },
+    {
+      "croatian": "novac",
+      "polish": "pieniądze",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Novac nije sve u životu.",
+      "example_pl": "Pieniądze to nie wszystko w życiu."
+    },
+    {
+      "croatian": "bankovni račun",
+      "polish": "konto bankowe",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Otvorio sam novi bankovni račun.",
+      "example_pl": "Otworzyłem nowe konto bankowe."
+    },
+    {
+      "croatian": "inflacija",
+      "polish": "inflacja",
+      "category": "financije",
+      "difficulty": 3,
+      "example_hr": "Inflacija pojede našu štednju.",
+      "example_pl": "Inflacja zjada nasze oszczędności."
+    },
+    {
+      "croatian": "novine",
+      "polish": "gazeta",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Čitam novine svako jutro.",
+      "example_pl": "Czytam gazetę każdego ranka."
+    },
+    {
+      "croatian": "časopis",
+      "polish": "czasopismo",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Pretplaćen sam na modni časopis.",
+      "example_pl": "Mam prenumeratę modowego czasopisma."
+    },
+    {
+      "croatian": "radio",
+      "polish": "radio",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Slušam radio u autu.",
+      "example_pl": "Słucham radia w samochodzie."
+    },
+    {
+      "croatian": "televizija",
+      "polish": "telewizja",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Televizija danas nije zanimljiva.",
+      "example_pl": "Telewizja dziś nie jest interesująca."
+    },
+    {
+      "croatian": "reklama",
+      "polish": "reklama",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Reklame me iritiraju.",
+      "example_pl": "Reklamy mnie irytują."
+    },
+    {
+      "croatian": "urednik",
+      "polish": "redaktor",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Urednik je odbio moj članak.",
+      "example_pl": "Redaktor odrzucił mój artykuł."
+    },
+    {
+      "croatian": "emisija",
+      "polish": "program (telewizyjny)",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Omiljena emisija mi je u devet.",
+      "example_pl": "Mój ulubiony program jest o dziewiątej."
+    },
+    {
+      "croatian": "društvene mreže",
+      "polish": "media społecznościowe",
+      "category": "mediji",
+      "difficulty": 3,
+      "example_hr": "Provodim previše vremena na društvenim mrežama.",
+      "example_pl": "Spędzam za dużo czasu w mediach społecznościowych."
+    },
+    {
+      "croatian": "jer",
+      "polish": "ponieważ / bo",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Ostao sam doma jer je padala kiša.",
+      "example_pl": "Zostałem w domu, ponieważ padał deszcz."
+    },
+    {
+      "croatian": "zato",
+      "polish": "dlatego",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Bilo je hladno, zato smo se vratili.",
+      "example_pl": "Było zimno, dlatego wróciliśmy."
+    },
+    {
+      "croatian": "dok",
+      "polish": "podczas gdy / dopóki",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Čitam dok ti kuhaš.",
+      "example_pl": "Czytam, podczas gdy ty gotujesz."
+    },
+    {
+      "croatian": "iako",
+      "polish": "chociaż",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Iako je umoran, radi dalje.",
+      "example_pl": "Chociaż jest zmęczony, pracuje dalej."
+    },
+    {
+      "croatian": "ali",
+      "polish": "ale",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Pokušao sam, ali nisam uspio.",
+      "example_pl": "Próbowałem, ale nie udało mi się."
+    },
+    {
+      "croatian": "ili",
+      "polish": "lub / albo",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Hoćeš čaj ili kavu?",
+      "example_pl": "Chcesz herbatę lub kawę?"
+    },
+    {
+      "croatian": "te",
+      "polish": "oraz / i",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Donosi kruh, mlijeko te jaja.",
+      "example_pl": "Przynieś chleb, mleko oraz jajka."
+    },
+    {
+      "croatian": "čim",
+      "polish": "gdy tylko / jak tylko",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Čim stignem, javit ću se.",
+      "example_pl": "Gdy tylko dotrę, dam znać."
+    },
+    {
+      "croatian": "kako bi",
+      "polish": "żeby / aby",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Učim hrvatski kako bih razumio prijatelje.",
+      "example_pl": "Uczę się chorwackiego, żeby rozumieć przyjaciół."
+    },
+    {
+      "croatian": "kao da",
+      "polish": "jakby",
+      "category": "veznik",
+      "difficulty": 3,
+      "example_hr": "Ponaša se kao da ništa nije bilo.",
+      "example_pl": "Zachowuje się, jakby nic się nie stało."
     },
     {
       "croatian": "istina",
       "polish": "prawda",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Uvijek govori istinu.",
-      "example_pl": "Zawsze mów prawdę."
+      "example_hr": "Istina uvijek izlazi na vidjelo.",
+      "example_pl": "Prawda zawsze wychodzi na jaw."
     },
     {
       "croatian": "laž",
@@ -451,16 +2259,16 @@
       "example_pl": "Kłamstwo ma krótkie nogi."
     },
     {
-      "croatian": "mir",
-      "polish": "pokój / spokój",
+      "croatian": "pravda",
+      "polish": "sprawiedliwość",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Mir je najvažnija stvar na svijetu.",
-      "example_pl": "Pokój jest najważniejszą rzeczą na świecie."
+      "example_hr": "Pravda je spora ali dostižna.",
+      "example_pl": "Sprawiedliwość jest powolna, ale osiągalna."
     },
     {
-      "croatian": "moć",
-      "polish": "moc / władza",
+      "croatian": "znanje",
+      "polish": "wiedza",
       "category": "apstraktno",
       "difficulty": 3,
       "example_hr": "Znanje je moć.",
@@ -472,319 +2280,95 @@
       "category": "apstraktno",
       "difficulty": 3,
       "example_hr": "Mudrost dolazi s godinama.",
-      "example_pl": "Mądrość przychodzi z wiekiem."
+      "example_pl": "Mądrość przychodzi z latami."
     },
     {
-      "croatian": "vjera",
-      "polish": "wiara",
+      "croatian": "moć",
+      "polish": "władza / moc",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Vjera nam daje snagu.",
-      "example_pl": "Wiara daje nam siłę."
-    },
-    {
-      "croatian": "sumnja",
-      "polish": "wątpliwość / podejrzenie",
-      "category": "apstraktno",
-      "difficulty": 3,
-      "example_hr": "Imam sumnje o ovoj odluci.",
-      "example_pl": "Mam wątpliwości co do tej decyzji."
-    },
-    {
-      "croatian": "mašta",
-      "polish": "wyobraźnia",
-      "category": "apstraktno",
-      "difficulty": 3,
-      "example_hr": "Djeca imaju bogatu maštu.",
-      "example_pl": "Dzieci mają bogatą wyobraźnię."
+      "example_hr": "Moć kvari ljude.",
+      "example_pl": "Władza psuje ludzi."
     },
     {
       "croatian": "snaga",
       "polish": "siła",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Treba mi više snage za ovaj zadatak.",
-      "example_pl": "Potrzebuję więcej siły do tego zadania."
+      "example_hr": "Imaš snagu da to izdržiš.",
+      "example_pl": "Masz siłę, żeby to wytrzymać."
     },
     {
-      "croatian": "slabost",
-      "polish": "słabość",
+      "croatian": "sudbina",
+      "polish": "los / przeznaczenie",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Svako ima svoju slabost.",
-      "example_pl": "Każdy ma swoją słabość."
+      "example_hr": "Vjerujem u sudbinu.",
+      "example_pl": "Wierzę w przeznaczenie."
     },
     {
-      "croatian": "vrijednost",
-      "polish": "wartość",
+      "croatian": "duša",
+      "polish": "dusza",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Porodične vrijednosti su mi najvažnije.",
-      "example_pl": "Wartości rodzinne są dla mnie najważniejsze."
+      "example_hr": "Glazba hrani dušu.",
+      "example_pl": "Muzyka karmi duszę."
     },
     {
-      "croatian": "smisao",
-      "polish": "sens / znaczenie",
+      "croatian": "san",
+      "polish": "sen / marzenie",
       "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Tražim smisao u svemu što radim.",
-      "example_pl": "Szukam sensu we wszystkim, co robię."
+      "example_hr": "Imam san o vlastitoj kući.",
+      "example_pl": "Mam marzenie o własnym domu."
     },
     {
-      "croatian": "uzbuđenje",
-      "polish": "podekscytowanie",
-      "category": "osjećaji",
+      "croatian": "iskustvo",
+      "polish": "doświadczenie",
+      "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Osjećam uzbuđenje pred put.",
-      "example_pl": "Czuję podekscytowanie przed podróżą."
+      "example_hr": "Imam pet godina iskustva u struci.",
+      "example_pl": "Mam pięć lat doświadczenia w zawodzie."
     },
     {
-      "croatian": "nervoza",
-      "polish": "nerwowość",
-      "category": "osjećaji",
+      "croatian": "pamćenje",
+      "polish": "pamięć",
+      "category": "apstraktno",
       "difficulty": 3,
-      "example_hr": "Nervoza me obuzima pred ispitom.",
-      "example_pl": "Nerwowość ogarnia mnie przed egzaminem."
-    },
-    {
-      "croatian": "zadovoljstvo",
-      "polish": "zadowolenie / satysfakcja",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Osjećam duboko zadovoljstvo.",
-      "example_pl": "Czuję głęboką satysfakcję."
-    },
-    {
-      "croatian": "razočaranje",
-      "polish": "rozczarowanie",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Njegovo razočaranje je bilo očito.",
-      "example_pl": "Jego rozczarowanie było oczywiste."
-    },
-    {
-      "croatian": "nostalgija",
-      "polish": "nostalgia",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Osjećam nostalgiju kad čujem stare pjesme.",
-      "example_pl": "Czuję nostalgię, gdy słyszę stare piosenki."
-    },
-    {
-      "croatian": "zahvalnost",
-      "polish": "wdzięczność",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Pun sam zahvalnosti za vašu pomoć.",
-      "example_pl": "Jestem pełen wdzięczności za waszą pomoc."
-    },
-    {
-      "croatian": "strpljivost",
-      "polish": "cierpliwość",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Strpljivost je vrlina.",
-      "example_pl": "Cierpliwość jest cnotą."
-    },
-    {
-      "croatian": "ljubomora",
-      "polish": "zazdrość / zawiść",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Ljubomora uništava prijateljstvo.",
-      "example_pl": "Zazdrość niszczy przyjaźń."
-    },
-    {
-      "croatian": "samopoštovanje",
-      "polish": "szacunek do siebie",
-      "category": "osjećaji",
-      "difficulty": 3,
-      "example_hr": "Važno je imati samopoštovanje.",
-      "example_pl": "Ważne jest, aby mieć szacunek do siebie."
-    },
-    {
-      "croatian": "složen",
-      "polish": "złożony / skomplikowany",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Ovo je složen problem.",
-      "example_pl": "To jest złożony problem."
-    },
-    {
-      "croatian": "jednostavan",
-      "polish": "prosty / zwykły",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Imam jednostavan životni stil.",
-      "example_pl": "Prowadzę prosty styl życia."
-    },
-    {
-      "croatian": "zanimljiv",
-      "polish": "interesujący / ciekawy",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Ovo je jako zanimljiv projekt.",
-      "example_pl": "To jest bardzo interesujący projekt."
-    },
-    {
-      "croatian": "dosadan",
-      "polish": "nudny",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Film je bio dosadan.",
-      "example_pl": "Film był nudny."
-    },
-    {
-      "croatian": "hrabar",
-      "polish": "odważny",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Bila je hrabra u teškim trenucima.",
-      "example_pl": "Była odważna w trudnych chwilach."
-    },
-    {
-      "croatian": "stidljiv",
-      "polish": "nieśmiały",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Kao dijete bio sam jako stidljiv.",
-      "example_pl": "Jako dziecko byłem bardzo nieśmiały."
-    },
-    {
-      "croatian": "ljubazan",
-      "polish": "uprzejmy / miły",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Uvijek je ljubazan prema svima.",
-      "example_pl": "Zawsze jest uprzejmy wobec wszystkich."
-    },
-    {
-      "croatian": "pouzdan",
-      "polish": "niezawodny / godny zaufania",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "On je pouzdan partner.",
-      "example_pl": "On jest niezawodnym partnerem."
-    },
-    {
-      "croatian": "iskren",
-      "polish": "szczery",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Budi iskren prema meni.",
-      "example_pl": "Bądź wobec mnie szczery."
-    },
-    {
-      "croatian": "ozbiljan",
-      "polish": "poważny",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Ovo je ozbiljna situacija.",
-      "example_pl": "To jest poważna sytuacja."
-    },
-    {
-      "croatian": "temeljit",
-      "polish": "dokładny / gruntowny",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Napravili smo temeljitu analizu.",
-      "example_pl": "Przeprowadziliśmy dokładną analizę."
-    },
-    {
-      "croatian": "neočekivan",
-      "polish": "nieoczekiwany",
-      "category": "przymiotnik",
-      "difficulty": 3,
-      "example_hr": "Dobili smo neočekivanu vijest.",
-      "example_pl": "Dostaliśmy nieoczekiwaną wiadomość."
-    },
-    {
-      "croatian": "zajam",
-      "polish": "pożyczka / kredyt",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Uzeo sam zajam za kupnju stana.",
-      "example_pl": "Wziąłem pożyczkę na zakup mieszkania."
-    },
-    {
-      "croatian": "štednja",
-      "polish": "oszczędności",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Imam male štednje za nužne slučajeve.",
-      "example_pl": "Mam małe oszczędności na nagłe przypadki."
-    },
-    {
-      "croatian": "ulaganje",
-      "polish": "inwestycja",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Ovo je dobro ulaganje za budućnost.",
-      "example_pl": "To jest dobra inwestycja na przyszłość."
-    },
-    {
-      "croatian": "porez",
-      "polish": "podatek",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Plaćamo porez na dohodak.",
-      "example_pl": "Płacimy podatek dochodowy."
-    },
-    {
-      "croatian": "proračun",
-      "polish": "budżet",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Trebamo smanjiti proračun za ovaj projekt.",
-      "example_pl": "Musimy zmniejszyć budżet na ten projekt."
-    },
-    {
-      "croatian": "dug",
-      "polish": "dług",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Otplatio sam sav dug.",
-      "example_pl": "Spłaciłem cały dług."
-    },
-    {
-      "croatian": "profit",
-      "polish": "zysk",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Tvrtka je ostvarila veliki profit.",
-      "example_pl": "Firma osiągnęła duży zysk."
-    },
-    {
-      "croatian": "gubitak",
-      "polish": "strata",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Prošle godine imali smo financijski gubitak.",
-      "example_pl": "W zeszłym roku mieliśmy stratę finansową."
-    },
-    {
-      "croatian": "osiguranje",
-      "polish": "ubezpieczenie",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Imam zdravstveno osiguranje.",
-      "example_pl": "Mam ubezpieczenie zdrowotne."
-    },
-    {
-      "croatian": "mirovina",
-      "polish": "emerytura",
-      "category": "financije",
-      "difficulty": 3,
-      "example_hr": "Moj djed živi od mirovine.",
-      "example_pl": "Mój dziadek żyje z emerytury."
+      "example_hr": "Bakino pamćenje je još uvijek izvrsno.",
+      "example_pl": "Pamięć babci jest nadal doskonała."
     },
     {
       "croatian": "prijateljstvo",
       "polish": "przyjaźń",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Naše prijateljstvo traje već dvadeset godina.",
-      "example_pl": "Nasza przyjaźń trwa już dwadzieścia lat."
+      "example_hr": "Pravo prijateljstvo traje cijeli život.",
+      "example_pl": "Prawdziwa przyjaźń trwa całe życie."
+    },
+    {
+      "croatian": "brak",
+      "polish": "małżeństwo",
+      "category": "odnosi",
+      "difficulty": 3,
+      "example_hr": "Njihov brak traje već dvadeset godina.",
+      "example_pl": "Ich małżeństwo trwa już dwadzieścia lat."
+    },
+    {
+      "croatian": "razvod",
+      "polish": "rozwód",
+      "category": "odnosi",
+      "difficulty": 3,
+      "example_hr": "Razvod je bio bolan, ali nužan.",
+      "example_pl": "Rozwód był bolesny, ale konieczny."
+    },
+    {
+      "croatian": "obitelj",
+      "polish": "rodzina",
+      "category": "odnosi",
+      "difficulty": 3,
+      "example_hr": "Obitelj je najvažnija u životu.",
+      "example_pl": "Rodzina jest najważniejsza w życiu."
     },
     {
       "croatian": "povjerenje",
@@ -799,312 +2383,40 @@
       "polish": "zdrada",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Izdaja prijatelja boli više od svega.",
+      "example_hr": "Izdaja prijatelja najviše boli.",
       "example_pl": "Zdrada przyjaciela boli najbardziej."
-    },
-    {
-      "croatian": "opraštanje",
-      "polish": "przebaczenie",
-      "category": "odnosi",
-      "difficulty": 3,
-      "example_hr": "Opraštanje je znak snage.",
-      "example_pl": "Przebaczenie jest oznaką siły."
     },
     {
       "croatian": "podrška",
       "polish": "wsparcie",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Tvoja podrška mi puno znači.",
-      "example_pl": "Twoje wsparcie wiele dla mnie znaczy."
+      "example_hr": "Trebam tvoju podršku sada.",
+      "example_pl": "Potrzebuję teraz twojego wsparcia."
     },
     {
-      "croatian": "razgovor",
-      "polish": "rozmowa",
+      "croatian": "konflikt",
+      "polish": "konflikt",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Trebamo ozbiljan razgovor.",
-      "example_pl": "Potrzebujemy poważnej rozmowy."
+      "example_hr": "Konflikt smo riješili razgovorom.",
+      "example_pl": "Konflikt rozwiązaliśmy rozmową."
     },
     {
-      "croatian": "svađa",
-      "polish": "kłótnia",
+      "croatian": "razumijevanje",
+      "polish": "zrozumienie",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Svađa ne rješava probleme.",
-      "example_pl": "Kłótnia nie rozwiązuje problemów."
+      "example_hr": "Tražim malo razumijevanja.",
+      "example_pl": "Proszę o trochę zrozumienia."
     },
     {
-      "croatian": "pomirenje",
-      "polish": "pojednanie",
+      "croatian": "poštovanje",
+      "polish": "szacunek",
       "category": "odnosi",
       "difficulty": 3,
-      "example_hr": "Pomirenje je uvijek bolje od sukoba.",
-      "example_pl": "Pojednanie jest zawsze lepsze niż konflikt."
-    },
-    {
-      "croatian": "novine",
-      "polish": "gazeta",
-      "category": "mediji",
-      "difficulty": 3,
-      "example_hr": "Čitam novine svako jutro.",
-      "example_pl": "Czytam gazetę każdego ranka."
-    },
-    {
-      "croatian": "časopis",
-      "polish": "czasopismo / magazyn",
-      "category": "mediji",
-      "difficulty": 3,
-      "example_hr": "Pretplaćen sam na jedan glazbeni časopis.",
-      "example_pl": "Jestem zasubskrybowany na jeden muzyczny magazyn."
-    },
-    {
-      "croatian": "reklama",
-      "polish": "reklama",
-      "category": "mediji",
-      "difficulty": 3,
-      "example_hr": "Previše je reklama na televiziji.",
-      "example_pl": "Za dużo jest reklam w telewizji."
-    },
-    {
-      "croatian": "društvene mreže",
-      "polish": "media społecznościowe",
-      "category": "mediji",
-      "difficulty": 3,
-      "example_hr": "Provodim previše vremena na društvenim mrežama.",
-      "example_pl": "Spędzam za dużo czasu w mediach społecznościowych."
-    },
-    {
-      "croatian": "podcast",
-      "polish": "podcast",
-      "category": "mediji",
-      "difficulty": 3,
-      "example_hr": "Slušam podcast o povijesti svaki tjedan.",
-      "example_pl": "Co tydzień słucham podcastu o historii."
-    },
-    {
-      "croatian": "klimatske promjene",
-      "polish": "zmiany klimatyczne",
-      "category": "okoliš",
-      "difficulty": 3,
-      "example_hr": "Klimatske promjene su ozbiljna prijetnja.",
-      "example_pl": "Zmiany klimatyczne są poważnym zagrożeniem."
-    },
-    {
-      "croatian": "obnovljivi izvori",
-      "polish": "odnawialne źródła energii",
-      "category": "okoliš",
-      "difficulty": 3,
-      "example_hr": "Trebamo više obnovljivih izvora energije.",
-      "example_pl": "Potrzebujemy więcej odnawialnych źródeł energii."
-    },
-    {
-      "croatian": "ekologija",
-      "polish": "ekologia",
-      "category": "okoliš",
-      "difficulty": 3,
-      "example_hr": "Ekologija je predmet koji me zanima.",
-      "example_pl": "Ekologia to przedmiot, który mnie interesuje."
-    },
-    {
-      "croatian": "ugljični otisak",
-      "polish": "ślad węglowy",
-      "category": "okoliš",
-      "difficulty": 3,
-      "example_hr": "Smanjujem svoj ugljični otisak.",
-      "example_pl": "Zmniejszam swój ślad węglowy."
-    },
-    {
-      "croatian": "dijagnoza",
-      "polish": "diagnoza",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Liječnik je postavio dijagnozu.",
-      "example_pl": "Lekarz postawił diagnozę."
-    },
-    {
-      "croatian": "terapija",
-      "polish": "terapia",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Pohađam terapiju jednom tjedno.",
-      "example_pl": "Uczęszczam na terapię raz w tygodniu."
-    },
-    {
-      "croatian": "psiholog",
-      "polish": "psycholog",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Razgovarao sam s psihologom.",
-      "example_pl": "Rozmawiałem z psychologiem."
-    },
-    {
-      "croatian": "stres",
-      "polish": "stres",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Stres na poslu je velik problem.",
-      "example_pl": "Stres w pracy to duży problem."
-    },
-    {
-      "croatian": "rehabilitacija",
-      "polish": "rehabilitacja",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Nakon operacije treba rehabilitacija.",
-      "example_pl": "Po operacji potrzebna jest rehabilitacja."
-    },
-    {
-      "croatian": "prevencija",
-      "polish": "profilaktyka / zapobieganie",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Prevencija je bolja od liječenja.",
-      "example_pl": "Profilaktyka jest lepsza niż leczenie."
-    },
-    {
-      "croatian": "cijepljenje",
-      "polish": "szczepienie",
-      "category": "zdravlje",
-      "difficulty": 3,
-      "example_hr": "Cijepljenje je važno za javno zdravlje.",
-      "example_pl": "Szczepienie jest ważne dla zdrowia publicznego."
-    },
-    {
-      "croatian": "unatoč",
-      "polish": "pomimo / mimo",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Unatoč problemima, uspio je.",
-      "example_pl": "Pomimo problemów, udało mu się."
-    },
-    {
-      "croatian": "osim",
-      "polish": "poza / oprócz",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Osim toga, imam još jedno pitanje.",
-      "example_pl": "Poza tym mam jeszcze jedno pytanie."
-    },
-    {
-      "croatian": "prema",
-      "polish": "według / ku / wobec",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Prema izvještaju, situacija se poboljšava.",
-      "example_pl": "Według raportu sytuacja się poprawia."
-    },
-    {
-      "croatian": "zbog",
-      "polish": "z powodu",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Kasnio sam zbog prometne gužve.",
-      "example_pl": "Spóźniłem się z powodu korków."
-    },
-    {
-      "croatian": "zahvaljujući",
-      "polish": "dzięki",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Zahvaljujući vama, sve je uspjelo.",
-      "example_pl": "Dzięki wam wszystko się udało."
-    },
-    {
-      "croatian": "umjesto",
-      "polish": "zamiast",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Umjesto kave, pijem čaj.",
-      "example_pl": "Zamiast kawy, piję herbatę."
-    },
-    {
-      "croatian": "nadalje",
-      "polish": "ponadto / dalej",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Nadalje, moram reći da sam zadovoljan.",
-      "example_pl": "Ponadto muszę powiedzieć, że jestem zadowolony."
-    },
-    {
-      "croatian": "pritom",
-      "polish": "przy tym / jednocześnie",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Radi i pritom sluša glazbu.",
-      "example_pl": "Pracuje i jednocześnie słucha muzyki."
-    },
-    {
-      "croatian": "stoga",
-      "polish": "dlatego / zatem",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "Stoga smo odlučili otkazati sastanak.",
-      "example_pl": "Dlatego zdecydowaliśmy odwołać spotkanie."
-    },
-    {
-      "croatian": "s obzirom na",
-      "polish": "biorąc pod uwagę / ze względu na",
-      "category": "veznik",
-      "difficulty": 3,
-      "example_hr": "S obzirom na situaciju, bolje je pričekati.",
-      "example_pl": "Biorąc pod uwagę sytuację, lepiej poczekać."
-    },
-    {
-      "croatian": "jelovnik",
-      "polish": "menu / jadłospis",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Jelovnik je pun zanimljivih jela.",
-      "example_pl": "Menu jest pełne ciekawych dań."
-    },
-    {
-      "croatian": "predjelo",
-      "polish": "przystawka",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Za predjelo sam uzeo bruschette.",
-      "example_pl": "Na przystawkę wziąłem bruschettę."
-    },
-    {
-      "croatian": "glavno jelo",
-      "polish": "danie główne",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Glavno jelo je bila riba na žaru.",
-      "example_pl": "Daniem głównym była ryba z rusztu."
-    },
-    {
-      "croatian": "prilog",
-      "polish": "dodatek / garnitur",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Kao prilog uzeo sam krumpir.",
-      "example_pl": "Jako dodatek wziąłem ziemniaki."
-    },
-    {
-      "croatian": "specijalitet",
-      "polish": "specjalność",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Paška janjetina je specijalitet otoka Paga.",
-      "example_pl": "Jagnięcina z Pagu to specjalność tej wyspy."
-    },
-    {
-      "croatian": "veganski",
-      "polish": "wegański",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Imam veganski životni stil.",
-      "example_pl": "Prowadzę wegański styl życia."
-    },
-    {
-      "croatian": "organsko",
-      "polish": "organiczny / ekologiczny",
-      "category": "jedzenie",
-      "difficulty": 3,
-      "example_hr": "Kupujem organsko voće i povrće.",
-      "example_pl": "Kupuję ekologiczne owoce i warzywa."
+      "example_hr": "Poštovanje se zaslužuje.",
+      "example_pl": "Na szacunek trzeba zasłużyć."
     }
   ],
   "verbs": [
