@@ -58,6 +58,42 @@
 }
 .room-card:hover { transform: translateY(-3px); border-color: var(--border2); }
 .room-card:hover::before { opacity: 1; }
+
+/* ─── Locked rooms ─── */
+.room-card.locked { cursor: not-allowed; }
+.room-card.locked:hover { transform: none; border-color: var(--border); }
+.room-card.locked:hover::before { opacity: 0; }
+.room-card.locked .room-img { filter: grayscale(0.6) brightness(0.55); }
+.room-card.locked .room-name,
+.room-card.locked .room-desc,
+.room-card.locked .room-emoji,
+.room-card.locked .room-meta { opacity: 0.55; }
+.room-img-wrap { position: relative; margin-bottom: 12px; }
+.room-img-wrap .room-img { margin-bottom: 0; }
+.room-lock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(20, 18, 16, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+.room-card.locked:hover .room-lock-badge {
+  transform: scale(1.05);
+  transition: transform 0.15s ease;
+}
+
 .room-emoji { font-size: 2.5rem; margin-bottom: 12px; display: block; }
 .room-name { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
 .room-desc { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 16px; }
@@ -204,6 +240,23 @@ const roomImages = {
 };
 
 
+function isRoomCompleted(r) {
+  const total = (r.word_count || 0) + (r.verb_count || 0);
+  return total > 0 && (r.known_count || 0) >= total;
+}
+
+function computeLockedRooms(rooms, user) {
+  const locked = new Set();
+  if (user && user.username === 'test') return locked; // wyjątek: konto testowe
+  const sorted = [...rooms].sort((a, b) => a.id - b.id);
+  let unlockNext = true;
+  for (const r of sorted) {
+    if (!unlockNext) locked.add(r.id);
+    if (!isRoomCompleted(r)) unlockNext = false;
+  }
+  return locked;
+}
+
 function applyLanguageTitle(lang) {
   // lang = obiekt z {code, name, title, flag}
   document.getElementById('hero-sub').textContent = `${lang.flag} pałac pamięci`;
@@ -294,24 +347,41 @@ async function init() {
   document.getElementById('d-known').textContent = dash.known;
   document.getElementById('d-due').textContent = dash.due_today;
 
+  const lockedIds = computeLockedRooms(rooms, user);
+
   const grid = document.getElementById('rooms-grid');
   grid.innerHTML = rooms.map(r => {
     const total = r.word_count + r.verb_count;
     const pct = total ? Math.round(r.known_count / total * 100) : 0;
-    return `<a href="/static/pages/room.html?id=${r.id}" class="room-card" style="--room-color:${r.color}">
-      <img class="room-img" src="${roomImages[r.id]}" alt="${r.name}">
+    const locked = lockedIds.has(r.id);
+    const tag = locked ? 'div' : 'a';
+    const attrs = locked
+      ? `class="room-card locked" data-room-id="${r.id}"`
+      : `href="/static/pages/room.html?id=${r.id}" class="room-card"`;
+    return `<${tag} ${attrs} style="--room-color:${r.color}">
+      <div class="room-img-wrap">
+        <img class="room-img" src="${roomImages[r.id]}" alt="${r.name}">
+        ${locked ? '<span class="room-lock-badge" aria-label="Zablokowane">🔒</span>' : ''}
+      </div>
       <span class="room-emoji">${r.emoji}</span>
       <div class="room-name">${r.name}</div>
       <div class="room-desc">${r.description}</div>
       <div class="room-meta">
         <span class="room-badge">${r.word_count} słów</span>
         <span class="room-badge">${r.verb_count} cz.</span>
-        ${r.due_today > 0 ? `<span class="room-badge accent">⏰ ${r.due_today} do powtórki</span>` : ''}
-        ${r.known_count > 0 ? `<span class="room-badge" style="border-color:${r.color};color:${r.color}">✓ ${r.known_count} znam</span>` : ''}
+        ${!locked && r.due_today > 0 ? `<span class="room-badge accent">⏰ ${r.due_today} do powtórki</span>` : ''}
+        ${!locked && r.known_count > 0 ? `<span class="room-badge" style="border-color:${r.color};color:${r.color}">✓ ${r.known_count} znam</span>` : ''}
       </div>
       <div class="room-progress"><div class="room-progress-bar" style="width:${pct}%"></div></div>
-    </a>`;
+    </${tag}>`;
   }).join('');
+
+  grid.querySelectorAll('.room-card.locked').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      toast('🔒 Ukończ poprzedni pokój, żeby przejść dalej');
+    });
+  });
 
   if (dash.recent_sentences && dash.recent_sentences.length) {
     document.getElementById('recent-wrap').style.display = '';
