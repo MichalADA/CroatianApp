@@ -207,11 +207,33 @@
     <p class="hero-desc" id="hero-desc">Ucz się pokój po pokoju — metodą skojarzeń i powtórek.</p>
   </div>
 
+  <div class="streak-row" id="streak-row" style="display:none">
+    <div class="streak-card">
+      <div class="streak-emoji" id="streak-emoji">🔥</div>
+      <div>
+        <div class="streak-num" id="streak-num">0</div>
+        <div class="streak-lbl">dni z rzędu</div>
+      </div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-head">
+        <div class="goal-title">Dzienny cel</div>
+        <div class="goal-count" id="goal-count">0 / 10</div>
+      </div>
+      <div class="goal-bar"><div class="goal-bar-fill" id="goal-bar-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
   <div class="dashboard-strip" id="dash-strip">
     <div class="dash-stat"><div class="num" id="d-words">—</div><div class="lbl">słów w bazie</div></div>
     <div class="dash-stat"><div class="num" id="d-verbs">—</div><div class="lbl">czasowników</div></div>
     <div class="dash-stat"><div class="num accent" id="d-known">—</div><div class="lbl">znam</div></div>
     <div class="dash-stat"><div class="num" id="d-due" style="color:var(--red)">—</div><div class="lbl">do powtórki dziś</div></div>
+  </div>
+
+  <div id="weak-wrap" style="display:none">
+    <div class="section-title">Najsłabsze słowa (ostatni tydzień)</div>
+    <div class="weak-list" id="weak-list"></div>
   </div>
 
   <div class="section-title">Pokoje pałacu pamięci</div>
@@ -346,6 +368,43 @@ async function init() {
   document.getElementById('d-verbs').textContent = dash.total_verbs;
   document.getElementById('d-known').textContent = dash.known;
   document.getElementById('d-due').textContent = dash.due_today;
+
+  // Streak + dzienny cel
+  const streakRow = document.getElementById('streak-row');
+  streakRow.style.display = 'flex';
+  const streak = dash.streak || 0;
+  const streakNum = document.getElementById('streak-num');
+  streakNum.textContent = streak;
+  streakNum.classList.toggle('zero', streak === 0);
+  document.getElementById('streak-emoji').textContent = streak > 0 ? '🔥' : '💤';
+  const goal = dash.daily_goal || 10;
+  const done = dash.daily_done || 0;
+  const goalCount = document.getElementById('goal-count');
+  goalCount.textContent = `${done} / ${goal}`;
+  goalCount.classList.toggle('done', done >= goal);
+  const pctGoal = Math.min(100, Math.round((done / Math.max(goal, 1)) * 100));
+  const goalFill = document.getElementById('goal-bar-fill');
+  goalFill.style.width = pctGoal + '%';
+  goalFill.classList.toggle('done', done >= goal);
+
+  // Top słabe słowa
+  const weakItems = dash.weak_items || [];
+  if (weakItems.length) {
+    document.getElementById('weak-wrap').style.display = '';
+    const langCode = current && current.code ? current.code : '';
+    document.getElementById('weak-list').innerHTML = weakItems.map(it => `
+      <div class="weak-item">
+        <div class="weak-item-text">
+          <div class="weak-item-source">
+            ${it.source}
+            ${ttsButtonHtml(it.source, langCode, { size: 'sm' })}
+          </div>
+          <div class="weak-item-pl">${it.polish}</div>
+        </div>
+        <span class="weak-item-cnt">✗ ${it.miss_count}× nie wiem</span>
+      </div>
+    `).join('');
+  }
 
   const lockedIds = computeLockedRooms(rooms, user);
 

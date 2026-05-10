@@ -67,6 +67,7 @@ def startup():
     for code in languages.codes():
         database.get_lang_engine(code)
         migration.ensure_user_id_columns_in_lang_db(code)
+        migration.ensure_progress_sm2_columns(code)
 
     # 4) Seed contentu hr — zmiana zeby dodanie nowego pokoju sie liczylo
     import seed
@@ -170,6 +171,11 @@ def update_settings(payload: schemas.SettingsIn,
         # Limit 16 znaków — wystarczy na pojedynczy emoji (max 4 bajty) albo kilka liter.
         avatar = (payload.avatar or "").strip()[:64]
         fresh.avatar = avatar or None
+
+    if payload.daily_goal is not None:
+        if payload.daily_goal < 1 or payload.daily_goal > 200:
+            raise HTTPException(400, "Dzienny cel musi być w zakresie 1–200")
+        fresh.daily_goal = payload.daily_goal
 
     db.commit()
     db.refresh(fresh)
@@ -503,8 +509,28 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
     return {"items": items, "count": len(items)}
 
 
-REVIEW_DAYS = {"nie wiem": 1, "prawie": 3, "wiem": 7}
-STATUS_MAP = {"nie wiem": "uczę się", "prawie": "uczę się", "wiem": "znam"}
+# SM-2: ocena ucznia 0..5. Mapujemy 3 przyciski na q.
+SM2_QUALITY = {"nie wiem": 0, "prawie": 3, "wiem": 5}
+
+
+def _sm2_step(prev_ef: float, prev_interval: int, prev_reps: int, q: int):
+    """Krok SuperMemo-2. Zwraca (new_ef, new_interval_days, new_reps).
+    Reguły:
+      q < 3 → reset powtórek, interval = 1 dzień (uczymy od nowa).
+      q >= 3 → reps+1, interval rośnie wykładniczo z ease_factor.
+    Min ease = 1.3 (po wielu wpadkach karta nie idzie do nieskończoności).
+    """
+    new_ef = prev_ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
+    if new_ef < 1.3:
+        new_ef = 1.3
+    if q < 3:
+        return new_ef, 1, 0
+    new_reps = prev_reps + 1
+    if new_reps == 1:
+        return new_ef, 1, new_reps
+    if new_reps == 2:
+        return new_ef, 6, new_reps
+    return new_ef, max(1, round(prev_interval * new_ef)), new_reps
 
 
 @app.post("/progress", response_model=schemas.ProgressOut)
@@ -512,10 +538,7 @@ def update_progress(payload: schemas.ProgressIn,
                     content_db: Session = Depends(get_content_db),
                     user: models.User = Depends(get_current_user)):
     today = date.today()
-    days = REVIEW_DAYS.get(payload.answer, 1)
-    new_status = STATUS_MAP.get(payload.answer, "uczę się")
-    if payload.answer == "nie wiem":
-        new_status = "trudne"
+    q = SM2_QUALITY.get(payload.answer, 0)
 
     prog = content_db.query(models.Progress).filter(
         models.Progress.user_id == user.id,
@@ -523,11 +546,27 @@ def update_progress(payload: schemas.ProgressIn,
         models.Progress.item_id == payload.item_id,
     ).first()
 
+    prev_ef = prog.ease_factor if prog else 2.5
+    prev_interval = prog.interval_days if prog else 0
+    # "review_count" przed inkrementem = liczba udanych powtórek.
+    prev_reps = prog.review_count if prog and prog.status in ("znam", "uczę się") else 0
+
+    new_ef, new_interval, new_reps = _sm2_step(prev_ef, prev_interval, prev_reps, q)
+
+    if q < 3:
+        new_status = "trudne"
+    elif q == 5:
+        new_status = "znam"
+    else:
+        new_status = "uczę się"
+
     if prog:
         prog.status = new_status
-        prog.next_review = today + timedelta(days=days)
+        prog.next_review = today + timedelta(days=new_interval)
         prog.last_reviewed = today
-        prog.review_count += 1
+        prog.review_count = (prog.review_count or 0) + 1
+        prog.ease_factor = new_ef
+        prog.interval_days = new_interval
     else:
         prog = models.Progress(
             user_id=user.id,
@@ -535,11 +574,24 @@ def update_progress(payload: schemas.ProgressIn,
             item_id=payload.item_id,
             room_id=payload.room_id,
             status=new_status,
-            next_review=today + timedelta(days=days),
+            next_review=today + timedelta(days=new_interval),
             last_reviewed=today,
             review_count=1,
+            ease_factor=new_ef,
+            interval_days=new_interval,
         )
         content_db.add(prog)
+
+    content_db.add(models.ReviewLog(
+        user_id=user.id,
+        item_type=payload.item_type,
+        item_id=payload.item_id,
+        room_id=payload.room_id,
+        answer=payload.answer,
+        status_after=new_status,
+        reviewed_on=today,
+    ))
+
     content_db.commit()
     content_db.refresh(prog)
     return prog
@@ -623,9 +675,69 @@ def delete_sentence(sentence_id: int,
 # DASHBOARD
 # ═══════════════════════════════════════════════════════════════════════════
 
+def _compute_streak(content_db: Session, user_id: int) -> int:
+    """Seria dni z rzędu, w których user wykonał jakąkolwiek powtórkę.
+    Liczona od dziś w dół. Brak dziś + brak wczoraj = 0."""
+    rows = content_db.query(models.ReviewLog.reviewed_on).filter(
+        models.ReviewLog.user_id == user_id,
+    ).distinct().all()
+    days = {r[0] for r in rows if r[0] is not None}
+    if not days:
+        return 0
+    today = date.today()
+    # Jeśli nie ćwiczył dziś, ale ćwiczył wczoraj — streak liczy się od wczoraj.
+    cursor = today if today in days else (today - timedelta(days=1))
+    if cursor not in days:
+        return 0
+    streak = 0
+    while cursor in days:
+        streak += 1
+        cursor -= timedelta(days=1)
+    return streak
+
+
+def _weak_items(content_db: Session, user_id: int, limit: int = 5):
+    """Top N słów/czasowników z największą liczbą 'nie wiem' w ostatnich 7 dniach."""
+    from sqlalchemy import func as sqlfunc
+    cutoff = date.today() - timedelta(days=7)
+    q = content_db.query(
+        models.ReviewLog.item_type,
+        models.ReviewLog.item_id,
+        models.ReviewLog.room_id,
+        sqlfunc.count(models.ReviewLog.id).label("cnt"),
+    ).filter(
+        models.ReviewLog.user_id == user_id,
+        models.ReviewLog.answer == "nie wiem",
+        models.ReviewLog.reviewed_on >= cutoff,
+    ).group_by(
+        models.ReviewLog.item_type, models.ReviewLog.item_id, models.ReviewLog.room_id,
+    ).order_by(sqlfunc.count(models.ReviewLog.id).desc()).limit(limit).all()
+
+    out = []
+    for item_type, item_id, room_id, cnt in q:
+        if item_type == "word":
+            w = content_db.query(models.Word).filter(models.Word.id == item_id).first()
+            if w:
+                out.append({
+                    "type": "word", "id": w.id, "room_id": room_id,
+                    "source": w.croatian, "polish": w.polish,
+                    "miss_count": cnt,
+                })
+        else:
+            v = content_db.query(models.Verb).filter(models.Verb.id == item_id).first()
+            if v:
+                out.append({
+                    "type": "verb", "id": v.id, "room_id": room_id,
+                    "source": v.infinitive, "polish": v.polish,
+                    "miss_count": cnt,
+                })
+    return out
+
+
 @app.get("/dashboard")
 def get_dashboard(content_db: Session = Depends(get_content_db),
                   user: models.User = Depends(get_current_user)):
+    today = date.today()
     total_words = content_db.query(models.Word).count()
     total_verbs = content_db.query(models.Verb).count()
     known = content_db.query(models.Progress).filter(
@@ -642,12 +754,21 @@ def get_dashboard(content_db: Session = Depends(get_content_db),
     ).count()
     due = content_db.query(models.Progress).filter(
         models.Progress.user_id == user.id,
-        models.Progress.next_review <= date.today(),
+        models.Progress.next_review <= today,
         models.Progress.status != "nowe",
     ).count()
     recent_sentences = content_db.query(models.Sentence).filter(
         models.Sentence.user_id == user.id,
     ).order_by(models.Sentence.created_at.desc()).limit(5).all()
+
+    # Distinct itemy powtórzone DZIŚ — to liczy się do dziennego celu.
+    daily_done = content_db.query(
+        models.ReviewLog.item_type, models.ReviewLog.item_id,
+    ).filter(
+        models.ReviewLog.user_id == user.id,
+        models.ReviewLog.reviewed_on == today,
+    ).distinct().count()
+
     return {
         "total_words": total_words,
         "total_verbs": total_verbs,
@@ -655,6 +776,45 @@ def get_dashboard(content_db: Session = Depends(get_content_db),
         "learning": learning,
         "hard": hard,
         "due_today": due,
+        "streak": _compute_streak(content_db, user.id),
+        "daily_goal": user.daily_goal or 10,
+        "daily_done": daily_done,
+        "weak_items": _weak_items(content_db, user.id, limit=5),
         "recent_sentences": [{"id": s.id, "text_hr": s.text_hr, "text_pl": s.text_pl,
                               "room_id": s.room_id} for s in recent_sentences],
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# WORDS — multi-room (dla zakresów gier "poprzednie pokoje" / "wszystkie")
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.get("/words", response_model=List[schemas.WordOut])
+def get_words_multi(rooms: str,
+                    content_db: Session = Depends(get_content_db),
+                    user: models.User = Depends(get_current_user)):
+    """Słowa z wielu pokoi naraz. `rooms` to CSV id pokoi, np. ?rooms=1,2,3."""
+    try:
+        room_ids = [int(x) for x in rooms.split(",") if x.strip()]
+    except ValueError:
+        raise HTTPException(400, "Nieprawidłowy parametr rooms")
+    if not room_ids:
+        return []
+    words = content_db.query(models.Word).filter(
+        models.Word.room_id.in_(room_ids)
+    ).order_by(models.Word.id).all()
+    out = []
+    for w in words:
+        prog = content_db.query(models.Progress).filter(
+            models.Progress.user_id == user.id,
+            models.Progress.item_type == "word",
+            models.Progress.item_id == w.id,
+        ).first()
+        out.append(schemas.WordOut(
+            id=w.id, room_id=w.room_id, croatian=w.croatian, polish=w.polish,
+            category=w.category, difficulty=w.difficulty,
+            example_hr=w.example_hr, example_pl=w.example_pl,
+            status=prog.status if prog else "nowe",
+            next_review=prog.next_review if prog else None,
+        ))
+    return out

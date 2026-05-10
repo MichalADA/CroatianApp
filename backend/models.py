@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Float
 from sqlalchemy.sql import func
 from database import AppBase, ContentBase
 
@@ -18,6 +18,7 @@ class User(AppBase):
     # personalizacja UI
     theme = Column(String(8), nullable=False, default="dark")  # "dark" | "light"
     avatar = Column(String(64), nullable=True, default=None)   # nazwa pliku avatara albo emoji (back-compat)
+    daily_goal = Column(Integer, nullable=False, default=10)   # ile powtórek dziennie do wykonania
     created_at = Column(DateTime, server_default=func.now())
 
 
@@ -75,6 +76,24 @@ class Progress(ContentBase):
     next_review = Column(Date)
     last_reviewed = Column(Date)
     review_count = Column(Integer, default=0)
+    # SM-2: ease factor (min 1.3, start 2.5) i ostatni interwał w dniach
+    ease_factor = Column(Float, nullable=False, default=2.5)
+    interval_days = Column(Integer, nullable=False, default=0)
+
+
+class ReviewLog(ContentBase):
+    """Pełna historia powtórek — fundament dla statystyk, streaków i SM-2.
+    Każdy klik 'wiem/prawie/nie wiem' zostawia tu wpis."""
+    __tablename__ = "review_log"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    item_type = Column(String, nullable=False)
+    item_id = Column(Integer, nullable=False)
+    room_id = Column(Integer, ForeignKey("rooms.id"))
+    answer = Column(String, nullable=False)        # "nie wiem" | "prawie" | "wiem"
+    status_after = Column(String, nullable=False)  # status nadany po tym kliknięciu
+    reviewed_on = Column(Date, nullable=False, index=True)
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class Sentence(ContentBase):

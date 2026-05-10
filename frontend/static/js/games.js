@@ -32,6 +32,44 @@ async function getGameItemsForRoom(roomId, lang) {
   return words.map(w => normalizeWordForGame(w, lang)).filter(i => i.sourceText && i.targetText);
 }
 
+// Pobiera słowa ze WSZYSTKICH wskazanych pokoi (multi-room) — używane dla scope'ów
+// "poprzednie pokoje" i "wszystkie odblokowane".
+async function getGameItemsForRooms(roomIds, lang) {
+  if (!roomIds || !roomIds.length) return [];
+  const words = await api.getWordsMulti(roomIds);
+  return words.map(w => normalizeWordForGame(w, lang)).filter(i => i.sourceText && i.targetText);
+}
+
+// Mapuje element z /reviews na format gry.
+function _normalizeReviewItem(it, lang) {
+  if (it.type !== 'word') return null;  // gry słownikowe biorą tylko słowa
+  return {
+    id: it.id,
+    sourceText: it.polish,
+    targetText: it.croatian || '',
+    category: it.category || null,
+    status: it.status || 'do powtórki',
+    roomId: null,
+    languageCode: lang ? lang.code : null,
+    languageName: lang ? lang.name : null,
+  };
+}
+
+// "Wszystkie odblokowane" = pokoje od początku do pierwszego nieukończonego (włącznie),
+// taka sama logika jak na dashboardzie. Konto testowe ma wszystkie odblokowane.
+function _unlockedRoomIds(rooms, user) {
+  const sorted = [...rooms].sort((a, b) => a.id - b.id);
+  if (user && user.username === 'test') return sorted.map(r => r.id);
+  const out = [];
+  for (const r of sorted) {
+    out.push(r.id);
+    const total = (r.word_count || 0) + (r.verb_count || 0);
+    const done = total > 0 && (r.known_count || 0) >= total;
+    if (!done) break;
+  }
+  return out;
+}
+
 // Fisher-Yates shuffle, nie mutuje wejścia.
 function shuffle(arr) {
   const a = arr.slice();
@@ -44,26 +82,36 @@ function shuffle(arr) {
 
 // ─── Rejestr gier ────────────────────────────────────────────────────────────
 // Dodanie nowej gry = dopisanie wpisu z `start: function(container, items)`.
+// Gra może oznaczyć `useVerbs: true` — wtedy zamiast słów dostaje czasowniki
+// pobrane bezpośrednio przez api.getVerbs (scope obecnie ograniczony do current-room).
 const GAME_TYPES = [
   { id: 'matching', label: 'Dopasowanie', start: startMatchingGame },
   { id: 'scramble', label: 'Rozsypanka', start: startScrambleGame },
   { id: 'hangman',  label: 'Wisielec',   start: startHangmanGame },
+  { id: 'verb-conj', label: 'Odmiana czasowników', start: startVerbConjGame, useVerbs: true },
 ];
 
 // Rejestr zakresów. `fetch(ctx)` ma zwrócić tablicę game items.
-// `enabled: false` = pokazuje pill ale klik niczego nie robi (UI placeholder).
 const GAME_SCOPES = [
   {
     id: 'current-room', label: 'Ten pokój', enabled: true,
     fetch: (ctx) => getGameItemsForRoom(ctx.roomId, ctx.lang),
   },
   {
-    id: 'previous-rooms', label: 'Poprzednie pokoje', enabled: false,
-    fetch: null /* TODO: fetch room list, take rooms with id < ctx.roomId */,
+    id: 'previous-rooms', label: 'Poprzednie pokoje', enabled: true,
+    fetch: async (ctx) => {
+      const rooms = await api.getRooms();
+      const ids = rooms.filter(r => r.id < ctx.roomId).map(r => r.id);
+      return getGameItemsForRooms(ids, ctx.lang);
+    },
   },
   {
-    id: 'all-unlocked', label: 'Wszystkie odblokowane', enabled: false,
-    fetch: null /* TODO: definicja "odblokowany" do uzgodnienia */,
+    id: 'all-unlocked', label: 'Wszystkie odblokowane', enabled: true,
+    fetch: async (ctx) => {
+      const [rooms, user] = await Promise.all([api.getRooms(), api.me()]);
+      const ids = _unlockedRoomIds(rooms, user);
+      return getGameItemsForRooms(ids, ctx.lang);
+    },
   },
   {
     id: 'hard', label: 'Trudne', enabled: true,
@@ -73,8 +121,13 @@ const GAME_SCOPES = [
     },
   },
   {
-    id: 'review', label: 'Do powtórki', enabled: false,
-    fetch: null /* TODO: użyć api.getReviews(roomId), zmapować na game items */,
+    id: 'review', label: 'Do powtórki', enabled: true,
+    fetch: async (ctx) => {
+      const data = await api.getReviews(ctx.roomId);
+      return (data.items || [])
+        .map(it => _normalizeReviewItem(it, ctx.lang))
+        .filter(Boolean);
+    },
   },
 ];
 
@@ -149,21 +202,27 @@ async function runCurrentGame() {
     render.innerHTML = `<div class="empty-state"><p>Ta gra jeszcze niedostępna.</p></div>`;
     return;
   }
-  if (!scope || !scope.fetch) {
-    render.innerHTML = `<div class="empty-state"><p>Ten zakres jeszcze niedostępny.</p></div>`;
-    return;
-  }
 
   render.innerHTML = `<div class="empty-state"><p>Ładowanie…</p></div>`;
   let items;
   try {
-    items = await scope.fetch(gamesState.ctx);
+    if (type.useVerbs) {
+      // Gry odmianowe potrzebują czasowników z aktualnego pokoju.
+      // Scope zostaje wyświetlony w UI ale nie wpływa — zaznaczamy to w pustym stanie.
+      items = await api.getVerbs(gamesState.ctx.roomId);
+    } else {
+      if (!scope || !scope.fetch) {
+        render.innerHTML = `<div class="empty-state"><p>Ten zakres jeszcze niedostępny.</p></div>`;
+        return;
+      }
+      items = await scope.fetch(gamesState.ctx);
+    }
   } catch (e) {
-    render.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Nie udało się pobrać słów: ${e.message || e}</p></div>`;
+    render.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Nie udało się pobrać danych: ${e.message || e}</p></div>`;
     return;
   }
   if (!items || !items.length) {
-    render.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Brak słów dla wybranego zakresu.</p></div>`;
+    render.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Brak danych dla wybranego zakresu.</p></div>`;
     return;
   }
   type.start(render, items);
@@ -617,6 +676,127 @@ function startHangmanGame(container, items) {
       }
     }
     render();
+  }
+
+  render();
+}
+
+// ─── VERB CONJUGATION (Odmiana czasowników) ─────────────────────────────────
+//
+// Gra: losujemy czasownik z pokoju + losujemy osobę (ja/ti/on/mi/vi/oni).
+// Pokazujemy: bezokolicznik + tłumaczenie + osobę. User wpisuje formę. Sprawdzamy.
+// Tolerancja błędu: 0 dla form ≤ 5 znaków, 1 dla dłuższych. Akcent ignorowany.
+
+const VERB_PERSONS = [
+  { key: 'conj_ja',  label: 'ja' },
+  { key: 'conj_ti',  label: 'ti' },
+  { key: 'conj_on',  label: 'on/ona' },
+  { key: 'conj_mi',  label: 'mi' },
+  { key: 'conj_vi',  label: 'vi' },
+  { key: 'conj_oni', label: 'oni' },
+];
+
+function _normVerbAns(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+function _vcLevenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+      prev = tmp;
+    }
+  }
+  return dp[n];
+}
+
+function startVerbConjGame(container, verbs) {
+  const ROUND_SIZE = 5;
+  // Czasownik musi mieć przynajmniej jedną wypełnioną formę i bezokolicznik.
+  const candidates = verbs.filter(v => v.infinitive && VERB_PERSONS.some(p => v[p.key]));
+  if (!candidates.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>Brak czasowników z odmianą w tym pokoju.</p>
+      </div>`;
+    return;
+  }
+
+  // Generujemy rundę: dla każdego czasownika losujemy jedną osobę z wypełnioną formą.
+  const round = shuffle(candidates).slice(0, Math.min(ROUND_SIZE, candidates.length)).map(v => {
+    const filled = VERB_PERSONS.filter(p => v[p.key]);
+    const person = filled[Math.floor(Math.random() * filled.length)];
+    return { verb: v, person, target: v[person.key] };
+  });
+
+  const state = { idx: 0, score: 0 };
+
+  function render() {
+    if (state.idx >= round.length) {
+      container.innerHTML = `
+        <div class="match-done">🎉 Koniec rundy! Wynik: ${state.score} / ${round.length}</div>
+        <div style="text-align:center;margin-top:1rem">
+          <button class="btn primary" id="vc-again">↻ Nowa runda</button>
+        </div>`;
+      container.querySelector('#vc-again').addEventListener('click', () => runCurrentGame());
+      return;
+    }
+    const cur = round[state.idx];
+    container.innerHTML = `
+      <div class="scr-header">
+        <div class="match-progress">Czasownik <strong>${state.idx + 1}</strong> / ${round.length} · Wynik: <strong>${state.score}</strong></div>
+        <button class="btn" id="vc-restart">↻ Nowa runda</button>
+      </div>
+      <div class="scr-card">
+        <div class="scr-source-label">Bezokolicznik</div>
+        <div class="scr-source">${cur.verb.infinitive}</div>
+        <div style="color:var(--text2);font-size:14px;margin-bottom:1rem">${cur.verb.polish || ''}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.3rem;color:var(--accent);margin-bottom:1.25rem">
+          forma: <strong>${cur.person.label}</strong>
+        </div>
+        <input type="text" id="vc-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+               class="learn-typing-input" placeholder="Wpisz formę i Enter" style="max-width:320px">
+        <div id="vc-fb" style="font-size:12px;color:var(--text3);margin-top:8px;min-height:18px"></div>
+      </div>`;
+    const inp = container.querySelector('#vc-input');
+    const fb = container.querySelector('#vc-fb');
+    setTimeout(() => inp.focus(), 50);
+    inp.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      if (!inp.value.trim()) return;
+      const a = _normVerbAns(inp.value);
+      const b = _normVerbAns(cur.target);
+      const dist = _vcLevenshtein(a, b);
+      const tol = b.length >= 6 ? 1 : 0;
+      if (a === b) {
+        state.score++;
+        inp.classList.add('correct');
+        fb.innerHTML = `✓ Dobrze! <span style="color:var(--text3)">${cur.target}</span>`;
+        playUiSound('correct');
+      } else if (dist <= tol) {
+        state.score++;
+        inp.classList.add('correct');
+        fb.innerHTML = `~ Prawie! Poprawnie: <strong style="color:var(--accent)">${cur.target}</strong>`;
+        playUiSound('correct');
+      } else {
+        inp.classList.add('wrong');
+        fb.innerHTML = `✗ Niestety. Poprawnie: <strong style="color:var(--accent)">${cur.target}</strong>`;
+        playUiSound('wrong');
+      }
+      inp.disabled = true;
+      setTimeout(() => { state.idx++; render(); }, 1400);
+    });
+    container.querySelector('#vc-restart').addEventListener('click', () => runCurrentGame());
   }
 
   render();

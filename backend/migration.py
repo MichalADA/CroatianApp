@@ -143,7 +143,7 @@ def ensure_selected_language_column() -> None:
 
 
 def ensure_user_settings_columns() -> None:
-    """ALTER TABLE users ADD COLUMN theme/avatar jeśli brak."""
+    """ALTER TABLE users ADD COLUMN theme/avatar/daily_goal jeśli brak."""
     from sqlalchemy import inspect, text
     insp = inspect(database.app_engine)
     if not insp.has_table("users"):
@@ -156,3 +156,26 @@ def ensure_user_settings_columns() -> None:
             ))
         if "avatar" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN avatar VARCHAR(16)"))
+        if "daily_goal" not in cols:
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN daily_goal INTEGER NOT NULL DEFAULT 10"
+            ))
+
+
+def ensure_progress_sm2_columns(lang: str) -> None:
+    """Dorzuć ease_factor i interval_days do progress jeśli brak (SM-2)."""
+    from sqlalchemy import inspect, text
+    eng = database.get_lang_engine(lang)
+    insp = inspect(eng)
+    if not insp.has_table("progress"):
+        return
+    cols = {c["name"] for c in insp.get_columns("progress")}
+    with eng.begin() as conn:
+        if "ease_factor" not in cols:
+            conn.execute(text(
+                "ALTER TABLE progress ADD COLUMN ease_factor FLOAT NOT NULL DEFAULT 2.5"
+            ))
+        if "interval_days" not in cols:
+            conn.execute(text(
+                "ALTER TABLE progress ADD COLUMN interval_days INTEGER NOT NULL DEFAULT 0"
+            ))

@@ -441,20 +441,32 @@
   <!-- ─── NAUKA (flashcards, default) ─── -->
   <div id="tab-nauka" class="tab-panel active">
     <div class="learn-wrap">
+      <div class="learn-mode-tabs" id="learn-mode-tabs" style="max-width:420px;width:100%">
+        <button class="learn-mode-tab active" data-mode="flip">🃏 Fiszki</button>
+        <button class="learn-mode-tab" data-mode="typing">⌨️ Pisanie</button>
+        <button class="learn-mode-tab" data-mode="listening">🎧 Słuchanie</button>
+      </div>
       <!-- Active flashcard -->
       <div id="learn-active" class="learn-active-wrap">
         <div class="learn-counter">
           Karta <span class="lc-num" id="lc-current">1</span> / <span id="lc-total">1</span>
         </div>
-        <div class="learn-direction">🇵🇱 polski → 🇭🇷 chorwacki</div>
+        <div class="learn-direction" id="learn-direction">🇵🇱 polski → 🇭🇷 chorwacki</div>
         <div class="learn-card">
           <div class="learn-type" id="learn-type">📖 Słowo</div>
           <div class="learn-pl" id="learn-pl">—</div>
+          <button type="button" id="learn-listen-btn" class="learn-listen-btn" style="display:none">🔊</button>
           <div class="learn-hr hidden" id="learn-hr">—</div>
           <div class="learn-conj hidden" id="learn-conj"></div>
           <div class="learn-example hidden" id="learn-example">
             <div class="learn-example-hr" id="learn-example-hr"></div>
             <div class="learn-example-pl" id="learn-example-pl"></div>
+          </div>
+          <div id="learn-typing-area" class="learn-typing-wrap" style="display:none">
+            <input type="text" id="learn-typing-input" class="learn-typing-input"
+                   placeholder="Wpisz tłumaczenie i wciśnij Enter" autocomplete="off"
+                   autocapitalize="off" autocorrect="off" spellcheck="false">
+            <div class="learn-typing-feedback" id="learn-typing-feedback"></div>
           </div>
           <button class="learn-reveal-btn" id="learn-reveal-btn" onclick="learnReveal()">Pokaż po chorwacku</button>
           <div class="learn-actions hidden" id="learn-actions">
@@ -462,6 +474,13 @@
             <button class="btn btn-prawie" onclick="learnAnswer('prawie')">~ Prawie</button>
             <button class="btn btn-wiem" onclick="learnAnswer('wiem')">✓ Wiem</button>
           </div>
+        </div>
+        <div class="kbd-hint" id="learn-kbd-hint">
+          <span><kbd>Spacja</kbd> pokaż</span>
+          <span><kbd>1</kbd> nie wiem</span>
+          <span><kbd>2</kbd> prawie</span>
+          <span><kbd>3</kbd> wiem</span>
+          <span><kbd>P</kbd> wymowa</span>
         </div>
         <div class="learn-progress-wrap">
           <div class="learn-progress-bar"><div class="learn-progress-fill" id="learn-bar" style="width:0%"></div></div>
@@ -729,6 +748,8 @@ let learnQueue = [];
 let learnIndex = 0;
 let learnRevealed = false;
 let learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
+let learnMode = 'flip'; // 'flip' | 'typing' | 'listening'
+let activeTab = 'nauka';
 
 // Cache aktualnego języka — wykorzystywany przez moduł gier (games.js).
 let currentLang = null;
@@ -786,6 +807,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab-${name}`).classList.add('active');
   btn.classList.add('active');
+  activeTab = name;
   if (name === 'nauka' && !learnQueue.length) startLearningSession();
   if (name === 'powtorki') loadReviews();
   if (name === 'progres') loadProgres();
@@ -855,12 +877,30 @@ function showLearnCard() {
     : (item.status === 'nowe' ? ' <span class="lt-cat" style="background:transparent;border:1px solid var(--border2);color:var(--text3)">nowe</span>' : '');
   document.getElementById('learn-type').innerHTML = typeLabel + cat + statusBadge;
 
-  // Front: polski
-  document.getElementById('learn-pl').textContent = item.polish;
+  // Front: polski (z TTS PL — ale TTS gra dopiero kiedy user kliknie głośnik)
+  // W trybie listening NIE pokazujemy tłumaczenia z góry — user ma usłyszeć i wpisać.
+  const langCode = currentLang ? currentLang.code : '';
+  const plEl = document.getElementById('learn-pl');
+  const listenBtn = document.getElementById('learn-listen-btn');
+  const directionEl = document.getElementById('learn-direction');
+
+  if (learnMode === 'listening') {
+    plEl.innerHTML = '<span style="color:var(--text3);font-size:0.55em;letter-spacing:.08em;text-transform:uppercase">Posłuchaj i wpisz</span>';
+    listenBtn.style.display = 'inline-flex';
+    listenBtn.onclick = () => speak(item.croatian, langCode);
+    directionEl.innerHTML = '🎧 słuchanie → ⌨️ pisanie';
+    // Auto-graj raz przy nowej karcie (po user-gesture przy starcie sesji już jest).
+    setTimeout(() => speak(item.croatian, langCode), 200);
+  } else {
+    plEl.innerHTML = `${item.polish} ${ttsButtonHtml(item.polish, 'pl', { size: 'sm' })}`;
+    listenBtn.style.display = 'none';
+    directionEl.innerHTML = '🇵🇱 polski → 🇭🇷 docelowy';
+  }
 
   // Back: chorwacki (ukryty)
-  document.getElementById('learn-hr').textContent = item.croatian;
-  document.getElementById('learn-hr').classList.add('hidden');
+  const hrEl = document.getElementById('learn-hr');
+  hrEl.innerHTML = `${item.croatian} ${ttsButtonHtml(item.croatian, langCode, { size: 'sm' })}`;
+  hrEl.classList.add('hidden');
 
   // Koniugacja (tylko czasowniki, po odsłonięciu)
   const conj = document.getElementById('learn-conj');
@@ -883,7 +923,22 @@ function showLearnCard() {
   document.getElementById('learn-example-pl').textContent = item.example_pl || '';
   document.getElementById('learn-example').classList.add('hidden');
 
-  document.getElementById('learn-reveal-btn').style.display = 'inline-flex';
+  // Reveal button vs typing input zależnie od trybu
+  const typingArea = document.getElementById('learn-typing-area');
+  const typingInput = document.getElementById('learn-typing-input');
+  const typingFeedback = document.getElementById('learn-typing-feedback');
+  typingInput.value = '';
+  typingInput.classList.remove('correct', 'wrong');
+  typingFeedback.textContent = '';
+
+  if (learnMode === 'flip') {
+    document.getElementById('learn-reveal-btn').style.display = 'inline-flex';
+    typingArea.style.display = 'none';
+  } else {
+    document.getElementById('learn-reveal-btn').style.display = 'none';
+    typingArea.style.display = 'flex';
+    setTimeout(() => typingInput.focus(), 50);
+  }
   document.getElementById('learn-actions').classList.add('hidden');
 
   // Pasek postępu
@@ -906,6 +961,108 @@ function learnReveal() {
   const ex = document.getElementById('learn-example');
   if (item.example_hr) {
     ex.classList.remove('hidden');
+  }
+
+  // Auto-wymowa odsłoniętego słowa, żeby user usłyszał poprawną wymowę.
+  const langCode = currentLang ? currentLang.code : '';
+  if (langCode && item.croatian) {
+    setTimeout(() => speak(item.croatian, langCode), 100);
+  }
+}
+
+// Normalizacja do porównania w trybie pisania: bez spacji na brzegach,
+// lowercase, zdjęty akcent. Cudzysłowy/myślniki zostawiamy.
+function _normalizeAnswer(s) {
+  return (s || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')  // zdejmuje akcent
+    .toLowerCase().trim();
+}
+
+function _levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      dp[j] = a[i - 1] === b[j - 1]
+        ? prev
+        : 1 + Math.min(prev, dp[j], dp[j - 1]);
+      prev = tmp;
+    }
+  }
+  return dp[n];
+}
+
+function learnTypingSubmit() {
+  if (learnRevealed) return;
+  const item = learnQueue[learnIndex];
+  const inp = document.getElementById('learn-typing-input');
+  const fb = document.getElementById('learn-typing-feedback');
+  const userAns = inp.value;
+  if (!userAns.trim()) return;
+
+  const target = item.croatian;
+  const a = _normalizeAnswer(userAns);
+  const b = _normalizeAnswer(target);
+  const dist = _levenshtein(a, b);
+  const tolerance = b.length >= 6 ? 1 : 0;
+
+  let answer;
+  if (a === b) {
+    answer = 'wiem';
+    inp.classList.add('correct');
+    fb.innerHTML = `✓ Dobrze! <span style="color:var(--text3)">${target}</span>`;
+  } else if (dist <= tolerance) {
+    answer = 'prawie';
+    inp.classList.add('correct');
+    fb.innerHTML = `~ Prawie! Poprawnie: <strong style="color:var(--accent)">${target}</strong>`;
+  } else {
+    answer = 'nie wiem';
+    inp.classList.add('wrong');
+    fb.innerHTML = `✗ Niestety. Poprawnie: <strong style="color:var(--accent)">${target}</strong>`;
+  }
+  // Pokaż odsłonięcie tak samo jak w trybie flip — tyle że bez akcji ręcznej.
+  learnRevealed = true;
+  document.getElementById('learn-hr').classList.remove('hidden');
+  if (item.type === 'verb' && item.conj_ja) {
+    document.getElementById('learn-conj').classList.remove('hidden');
+  }
+  document.getElementById('learn-actions').classList.remove('hidden');
+  if (item.example_hr) document.getElementById('learn-example').classList.remove('hidden');
+
+  // Wyślij na serwer i przejdź dalej po krótkiej pauzie.
+  api.postProgress({
+    item_type: item.type, item_id: item.id, room_id: ROOM_ID, answer,
+  }).catch(() => {});
+  learnStats[answer] = (learnStats[answer] || 0) + 1;
+
+  setTimeout(() => {
+    learnIndex++;
+    document.getElementById('learn-bar').style.width =
+      (learnIndex / learnQueue.length) * 100 + '%';
+    showLearnCard();
+  }, answer === 'wiem' ? 900 : 1800);
+}
+
+function setLearnMode(mode) {
+  if (mode === learnMode) return;
+  learnMode = mode;
+  document.querySelectorAll('#learn-mode-tabs .learn-mode-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  // Reset: zaczynamy od początku aktualnej kolejki, bez ponownego pobierania.
+  if (learnQueue.length) {
+    learnIndex = 0;
+    learnStats = { 'nie wiem': 0, 'prawie': 0, 'wiem': 0 };
+    document.getElementById('learn-summary').style.display = 'none';
+    document.getElementById('learn-empty').style.display = 'none';
+    document.getElementById('learn-active').classList.add('is-active');
+    showLearnCard();
   }
 }
 
@@ -975,10 +1132,11 @@ function renderWords(words) {
     document.getElementById('word-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>Brak wyników</p></div>';
     return;
   }
+  const langCode = currentLang ? currentLang.code : '';
   document.getElementById('word-grid').innerHTML = words.map((w, i) => `
     <div class="word-card" style="animation-delay:${Math.min(i * 0.025, 0.5)}s">
       <span class="word-status"><span class="status-dot ${statusDotClass(w.status)}" title="${w.status}"></span></span>
-      <div class="word-hr">${w.croatian}</div>
+      <div class="word-hr">${w.croatian} ${ttsButtonHtml(w.croatian, langCode, { size: 'sm' })}</div>
       <div class="word-pl">${w.polish}</div>
       <span class="word-cat">${w.category || ''}</span>
       <div class="word-actions">
@@ -1015,10 +1173,11 @@ function renderVerbs(verbs) {
     document.getElementById('verb-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>Brak wyników</p></div>';
     return;
   }
+  const langCode = currentLang ? currentLang.code : '';
   document.getElementById('verb-grid').innerHTML = verbs.map((v, i) => `
     <div class="verb-card" style="animation-delay:${Math.min(i * 0.02, 0.5)}s">
       <span class="verb-status"><span class="status-dot ${statusDotClass(v.status)}" title="${v.status}"></span></span>
-      <div class="verb-head">${v.infinitive}</div>
+      <div class="verb-head">${v.infinitive} ${ttsButtonHtml(v.infinitive, langCode, { size: 'sm' })}</div>
       <div class="verb-pl">${v.polish}</div>
       <div class="conj-table">
         <div class="conj-row"><span class="pron">ja</span><span class="form">${v.conj_ja || '—'}</span></div>
@@ -1078,7 +1237,8 @@ function showCurrentCard() {
 
   document.getElementById('review-card').style.display = 'block';
   document.getElementById('rv-type').textContent = item.type === 'word' ? '📖 Słowo' : '🔤 Czasownik';
-  document.getElementById('rv-q').textContent = item.croatian;
+  const langCode = currentLang ? currentLang.code : '';
+  document.getElementById('rv-q').innerHTML = `${item.croatian} ${ttsButtonHtml(item.croatian, langCode)}`;
 
   const rvA = document.getElementById('rv-a');
   rvA.textContent = 'Kliknij, aby zobaczyć odpowiedź';
@@ -1234,6 +1394,71 @@ function playAlphabetSound(file) {
   const audio = new Audio(`/static/audio/hr/alphabet/${file}.mp3`);
   audio.play().catch(() => toast('Nie udało się odtworzyć dźwięku'));
 }
+
+// ─── Tryby nauki: listenery przycisków + Enter w polu pisania ────────────────
+document.querySelectorAll('#learn-mode-tabs .learn-mode-tab').forEach(b => {
+  b.addEventListener('click', () => setLearnMode(b.dataset.mode));
+});
+document.getElementById('learn-typing-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    learnTypingSubmit();
+  }
+});
+
+// ─── Skróty klawiszowe globalne ──────────────────────────────────────────────
+// Reguły: ignorujemy klawisze gdy fokus jest w polu tekstowym (oprócz Enter
+// w typing — to obsłużone wyżej). Działają tylko na zakładce Nauka i Powtórki.
+function _isTyping(el) {
+  if (!el) return false;
+  const tag = (el.tagName || '').toLowerCase();
+  return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+}
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (_isTyping(document.activeElement)) return;
+
+  const key = e.key;
+  if (activeTab === 'nauka' && document.getElementById('learn-active').classList.contains('is-active')) {
+    if (learnMode === 'flip') {
+      if (key === ' ' || key === 'Spacebar') {
+        e.preventDefault();
+        if (!learnRevealed) learnReveal();
+        return;
+      }
+    }
+    if (learnRevealed) {
+      if (key === '1') { e.preventDefault(); learnAnswer('nie wiem'); return; }
+      if (key === '2') { e.preventDefault(); learnAnswer('prawie'); return; }
+      if (key === '3') { e.preventDefault(); learnAnswer('wiem'); return; }
+    }
+    if (key === 'p' || key === 'P') {
+      const item = learnQueue[learnIndex];
+      const lang = currentLang ? currentLang.code : '';
+      if (item) speak(item.croatian, lang);
+      return;
+    }
+  }
+
+  if (activeTab === 'powtorki' && document.getElementById('review-card').style.display !== 'none') {
+    if (key === ' ' || key === 'Spacebar') {
+      e.preventDefault();
+      if (!reviewRevealed) revealAnswer();
+      return;
+    }
+    if (reviewRevealed) {
+      if (key === '1') { e.preventDefault(); answer('nie wiem'); return; }
+      if (key === '2') { e.preventDefault(); answer('prawie'); return; }
+      if (key === '3') { e.preventDefault(); answer('wiem'); return; }
+    }
+    if (key === 'p' || key === 'P') {
+      const item = reviewQueue[reviewIndex];
+      const lang = currentLang ? currentLang.code : '';
+      if (item) speak(item.croatian, lang);
+    }
+  }
+});
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 init();
 </script>

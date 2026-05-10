@@ -96,6 +96,10 @@ const api = {
     if (cat && cat !== 'wszystkie') p.set('category', cat);
     return request(`/rooms/${roomId}/words?${p}`);
   },
+  async getWordsMulti(roomIds) {
+    if (!roomIds || !roomIds.length) return [];
+    return request(`/words?rooms=${roomIds.join(',')}`);
+  },
   async getWordCategories(roomId) { return request(`/rooms/${roomId}/words/categories`); },
   async getVerbs(roomId, q = '') {
     const p = new URLSearchParams();
@@ -183,6 +187,15 @@ function openSettingsModal(user) {
       </div>
 
       <div class="form-group">
+        <label>Dzienny cel powtórek</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" id="set-daily-goal" min="1" max="200" value="${user.daily_goal || 10}"
+                 style="width:100px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px">
+          <span style="font-size:12px;color:var(--text3)">powtórek/dzień</span>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>Konto</label>
         <div style="background:var(--surface2);padding:10px 12px;border-radius:8px;font-size:13px;color:var(--text2)">
           <div><strong style="color:var(--text)">${user.username}</strong></div>
@@ -248,10 +261,14 @@ function openSettingsModal(user) {
   overlay.querySelector('#set-save').onclick = async () => {
     const btn = overlay.querySelector('#set-save');
     btn.disabled = true;
+    let goal = parseInt(overlay.querySelector('#set-daily-goal').value, 10);
+    if (!Number.isFinite(goal) || goal < 1) goal = 10;
+    if (goal > 200) goal = 200;
     try {
       const updated = await api.updateSettings({
         theme: chosenTheme,
         avatar: chosenAvatar,
+        daily_goal: goal,
       });
       applyTheme(updated.theme);
       // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu — używamy

@@ -46,6 +46,7 @@ class UserOut(BaseModel):
     selected_language: str = "hr"
     theme: str = "dark"
     avatar: Optional[str] = None
+    daily_goal: int = 10
     created_at: Optional[datetime]
     class Config: from_attributes = True
 
@@ -70,6 +71,7 @@ class LanguageSelectIn(BaseModel):
 class SettingsIn(BaseModel):
     theme: Optional[str] = None   # "dark" | "light"
     avatar: Optional[str] = None  # emoji / krótki tekst; "" = wyczyść
+    daily_goal: Optional[int] = None  # 1..200, ile powtórek dziennie
 
 
 # ─── DATA ────────────────────────────────────────────────────────────────────

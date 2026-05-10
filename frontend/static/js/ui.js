@@ -98,3 +98,70 @@ function playUiSound(name) {
     a.play().catch(() => { /* brak pliku albo autoplay block — cisza */ });
   } catch { /* cisza */ }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   TTS — wymowa słów przez Web Speech API.
+   Działa offline w przeglądarce, bez nagrywania plików.
+   Mapowanie kodów językowych appki na BCP-47 dla SpeechSynthesis.
+   ────────────────────────────────────────────────────────────────────────── */
+
+const _TTS_LANG_MAP = {
+  hr: 'hr-HR',
+  es: 'es-ES',
+  el: 'el-GR',
+};
+
+let _ttsVoiceCache = null;
+function _ttsVoices() {
+  if (!('speechSynthesis' in window)) return [];
+  if (_ttsVoiceCache) return _ttsVoiceCache;
+  _ttsVoiceCache = window.speechSynthesis.getVoices() || [];
+  return _ttsVoiceCache;
+}
+if ('speechSynthesis' in window && typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
+  window.speechSynthesis.onvoiceschanged = () => { _ttsVoiceCache = null; };
+}
+
+function ttsAvailable() {
+  return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+}
+
+// Mówi `text` w języku `langCode` (kod aplikacji: hr/es/el).
+// Cicha awaria gdy brak głosu — user nie zobaczy nic poza brakiem dźwięku.
+function speak(text, langCode) {
+  if (!ttsAvailable() || !text) return;
+  try {
+    window.speechSynthesis.cancel(); // przerwij poprzednią wypowiedź
+    const u = new SpeechSynthesisUtterance(String(text));
+    const bcp47 = _TTS_LANG_MAP[langCode] || langCode || 'en-US';
+    u.lang = bcp47;
+    u.rate = 0.92;
+    // Spróbuj dobrać konkretny głos dla danego języka, jeśli dostępny.
+    const voices = _ttsVoices();
+    const match = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(bcp47.toLowerCase()))
+               || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(bcp47.split('-')[0]));
+    if (match) u.voice = match;
+    window.speechSynthesis.speak(u);
+  } catch { /* cisza */ }
+}
+
+// Ikona głośnika do wstawienia obok słowa. Klik = speak() w danym języku.
+// Używaj `data-tts-text` i `data-tts-lang`, żeby nie wstrzykiwać onclick.
+function ttsButtonHtml(text, langCode, opts = {}) {
+  if (!ttsAvailable() || !text) return '';
+  const size = opts.size === 'sm' ? 'tts-btn-sm' : '';
+  const safeText = String(text).replace(/"/g, '&quot;');
+  return `<button type="button" class="tts-btn ${size}" title="Posłuchaj"
+            data-tts-text="${safeText}" data-tts-lang="${langCode || ''}"
+          >🔊</button>`;
+}
+
+// Globalne wpięcie: jakikolwiek klik w `.tts-btn` odpala speak() —
+// nie trzeba pamiętać o ręcznym podpinaniu listenerów dla każdej dynamicznej karty.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.tts-btn');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  speak(btn.getAttribute('data-tts-text'), btn.getAttribute('data-tts-lang'));
+});
