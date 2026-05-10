@@ -163,13 +163,23 @@ hybrydowych.)
 3. Pusta baza `/data/languages/de.db` utworzy się automatycznie ze schematem
    contentu. Wystarczy ją wypełnić — własnym seedem albo importem.
 
-## System powtórek (Spaced Repetition)
+## System powtórek (Spaced Repetition — Anki / SM-2)
 
-| Odpowiedź | Status      | Następna powtórka |
-|-----------|-------------|-------------------|
-| Nie wiem  | trudne      | +1 dzień          |
-| Prawie    | uczę się    | +3 dni            |
-| Wiem      | znam        | +7 dni            |
+Algorytm zbliżony do Anki: każda karta ma `ease_factor` (start 2.5, min 1.3),
+`interval` (dni) i licznik `lapses`. Po każdej odpowiedzi interwał rośnie
+geometrycznie zamiast trzymać się stałego harmonogramu.
+
+| Odpowiedź | Karta nowa (interval=0) | Karta po graduacji        | Δ ease |
+|-----------|--------------------------|----------------------------|--------|
+| Znowu     | wraca dziś (lapse)      | reset do 1 dnia, +1 lapse  | −0.20  |
+| Trudne    | +1 dzień                | `interval × 1.2`           | −0.15  |
+| Dobrze    | graduate +1 dzień       | `interval × ease`          |  0.00  |
+| Łatwe     | graduate +4 dni         | `interval × ease × 1.3`    | +0.15  |
+
+Po odsłonięciu odpowiedzi pod każdym przyciskiem widać podgląd interwału
+("3d", "2tyg", "5mies"…) — dokładnie jak w Anki. Endpoint `/progress`
+akceptuje obie nazwy: nowe `znowu/trudne/dobrze/łatwe` oraz stare
+`nie wiem/prawie/wiem` (mapowane wstecznie).
 
 ## Zatrzymanie
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from typing import Optional, List
 
-import models, schemas, database, languages, migration
+import models, schemas, database, languages, migration, srs
 from auth import (
     hash_password, verify_password, create_token, get_current_user,
 )
@@ -363,6 +363,19 @@ def get_verbs(room_id: int, q: Optional[str] = None,
 # REVIEWS / LEARNING SESSION / PROGRESS
 # ═══════════════════════════════════════════════════════════════════════════
 
+def _srs_payload(p: Optional[models.Progress]) -> dict:
+    """Wyciągnij stan SM-2 + podgląd interwałów na 4 guziki. Karta nowa
+    (bez postępu) startuje z domyślnym ease i interwałem 0."""
+    ease = p.ease_factor if p and p.ease_factor else srs.EASE_DEFAULT
+    interval = p.interval if p and p.interval else 0
+    lapses = p.lapses if p and p.lapses else 0
+    return {
+        "ease_factor": round(ease, 3),
+        "interval": interval,
+        "lapses": lapses,
+        "preview": srs.preview_intervals(ease, interval),
+    }
+
 @app.get("/rooms/{room_id}/reviews")
 def get_reviews(room_id: int,
                 content_db: Session = Depends(get_content_db),
@@ -376,12 +389,13 @@ def get_reviews(room_id: int,
     ).all()
     items = []
     for p in progs:
+        sr = _srs_payload(p)
         if p.item_type == "word":
             w = content_db.query(models.Word).filter(models.Word.id == p.item_id).first()
             if w:
                 items.append({"type": "word", "id": w.id, "croatian": w.croatian,
                               "polish": w.polish, "category": w.category,
-                              "status": p.status, "progress_id": p.id})
+                              "status": p.status, "progress_id": p.id, **sr})
         else:
             v = content_db.query(models.Verb).filter(models.Verb.id == p.item_id).first()
             if v:
@@ -389,7 +403,7 @@ def get_reviews(room_id: int,
                               "polish": v.polish, "status": p.status, "progress_id": p.id,
                               "conj_ja": v.conj_ja, "conj_ti": v.conj_ti,
                               "conj_on": v.conj_on, "conj_mi": v.conj_mi,
-                              "conj_vi": v.conj_vi, "conj_oni": v.conj_oni})
+                              "conj_vi": v.conj_vi, "conj_oni": v.conj_oni, **sr})
     return {"items": items, "count": len(items)}
 
 
@@ -401,7 +415,8 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
     uczę się → nowe. Per (user, język)."""
     today = date.today()
 
-    def serialize(item_type, item_id, status):
+    def serialize(item_type, item_id, status, prog=None):
+        sr = _srs_payload(prog)
         if item_type == "word":
             w = content_db.query(models.Word).filter(models.Word.id == item_id).first()
             if not w:
@@ -411,6 +426,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
                 "polish": w.polish, "category": w.category, "status": status,
                 "example_hr": w.example_hr,
                 "example_pl": w.example_pl,
+                **sr,
             }
         else:
             v = content_db.query(models.Verb).filter(models.Verb.id == item_id).first()
@@ -423,6 +439,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
                 "conj_mi": v.conj_mi, "conj_vi": v.conj_vi, "conj_oni": v.conj_oni,
                 "example_hr": v.example_hr,
                 "example_pl": v.example_pl,
+                **sr,
             }
 
     items = []
@@ -437,7 +454,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
     ).order_by(models.Progress.next_review).all():
         key = (p.item_type, p.item_id)
         if key in seen: continue
-        s = serialize(p.item_type, p.item_id, p.status)
+        s = serialize(p.item_type, p.item_id, p.status, prog=p)
         if s: seen.add(key); items.append(s)
 
     # 2) trudne (jeszcze nie dodane)
@@ -448,7 +465,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
     ).all():
         key = (p.item_type, p.item_id)
         if key in seen: continue
-        s = serialize(p.item_type, p.item_id, p.status)
+        s = serialize(p.item_type, p.item_id, p.status, prog=p)
         if s: seen.add(key); items.append(s)
 
     # 3) uczę się (jeszcze nie dodane)
@@ -459,7 +476,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
     ).all():
         key = (p.item_type, p.item_id)
         if key in seen: continue
-        s = serialize(p.item_type, p.item_id, p.status)
+        s = serialize(p.item_type, p.item_id, p.status, prog=p)
         if s: seen.add(key); items.append(s)
 
     # 4) nowe — bez progresu lub status=nowe
@@ -482,6 +499,7 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
                 "polish": w.polish, "category": w.category, "status": "nowe",
                 "example_hr": w.example_hr,
                 "example_pl": w.example_pl,
+                **_srs_payload(None),
             })
 
         if len(items) < limit:
@@ -497,25 +515,23 @@ def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
                     "conj_mi": v.conj_mi, "conj_vi": v.conj_vi, "conj_oni": v.conj_oni,
                     "example_hr": v.example_hr,
                     "example_pl": v.example_pl,
+                    **_srs_payload(None),
                 })
 
     items = items[:limit]
     return {"items": items, "count": len(items)}
 
 
-REVIEW_DAYS = {"nie wiem": 1, "prawie": 3, "wiem": 7}
-STATUS_MAP = {"nie wiem": "uczę się", "prawie": "uczę się", "wiem": "znam"}
-
-
 @app.post("/progress", response_model=schemas.ProgressOut)
 def update_progress(payload: schemas.ProgressIn,
                     content_db: Session = Depends(get_content_db),
                     user: models.User = Depends(get_current_user)):
+    """Anki-style SM-2: policz nowy interwał/ease na podstawie odpowiedzi i istniejącego stanu."""
     today = date.today()
-    days = REVIEW_DAYS.get(payload.answer, 1)
-    new_status = STATUS_MAP.get(payload.answer, "uczę się")
-    if payload.answer == "nie wiem":
-        new_status = "trudne"
+    try:
+        answer = srs.normalize_answer(payload.answer)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
     prog = content_db.query(models.Progress).filter(
         models.Progress.user_id == user.id,
@@ -523,9 +539,18 @@ def update_progress(payload: schemas.ProgressIn,
         models.Progress.item_id == payload.item_id,
     ).first()
 
+    cur_ease = prog.ease_factor if prog and prog.ease_factor else srs.EASE_DEFAULT
+    cur_interval = prog.interval if prog and prog.interval else 0
+    cur_lapses = prog.lapses if prog and prog.lapses else 0
+
+    new_state = srs.schedule(answer, cur_ease, cur_interval, cur_lapses)
+
     if prog:
-        prog.status = new_status
-        prog.next_review = today + timedelta(days=days)
+        prog.status = new_state.status
+        prog.ease_factor = new_state.ease_factor
+        prog.interval = new_state.interval
+        prog.lapses = new_state.lapses
+        prog.next_review = today + timedelta(days=max(new_state.interval, 0))
         prog.last_reviewed = today
         prog.review_count += 1
     else:
@@ -534,8 +559,11 @@ def update_progress(payload: schemas.ProgressIn,
             item_type=payload.item_type,
             item_id=payload.item_id,
             room_id=payload.room_id,
-            status=new_status,
-            next_review=today + timedelta(days=days),
+            status=new_state.status,
+            ease_factor=new_state.ease_factor,
+            interval=new_state.interval,
+            lapses=new_state.lapses,
+            next_review=today + timedelta(days=max(new_state.interval, 0)),
             last_reviewed=today,
             review_count=1,
         )

@@ -123,7 +123,9 @@ class ProgressIn(BaseModel):
     item_type: str
     item_id: int
     room_id: int
-    answer: str  # "nie wiem" | "prawie" | "wiem"
+    # Anki-style: "znowu" | "trudne" | "dobrze" | "łatwe"
+    # Stare wartości "nie wiem" | "prawie" | "wiem" są nadal akceptowane (mapowane).
+    answer: str
 
 
 class StartLearning(BaseModel):
@@ -140,6 +142,9 @@ class ProgressOut(BaseModel):
     status: str
     next_review: Optional[date]
     review_count: int
+    ease_factor: float = 2.5
+    interval: int = 0
+    lapses: int = 0
     class Config: from_attributes = True
 
 

@@ -115,7 +115,8 @@ def run_legacy_split_migration() -> dict:
 
 def ensure_user_id_columns_in_lang_db(lang: str) -> None:
     """SQLite ALTER TABLE — dorzuć user_id do progress/sentences w bazie języka,
-    gdyby tabele już istniały z poprzedniej (jeszcze starszej) wersji bez user_id."""
+    gdyby tabele już istniały z poprzedniej (jeszcze starszej) wersji bez user_id.
+    Przy okazji dorzuca kolumny SM-2 (ease_factor/interval/lapses) do progress."""
     from sqlalchemy import inspect, text
     eng = database.get_lang_engine(lang)
     insp = inspect(eng)
@@ -126,6 +127,22 @@ def ensure_user_id_columns_in_lang_db(lang: str) -> None:
         if "user_id" not in cols:
             with eng.begin() as conn:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN user_id INTEGER"))
+
+    if insp.has_table("progress"):
+        cols = {c["name"] for c in insp.get_columns("progress")}
+        with eng.begin() as conn:
+            if "ease_factor" not in cols:
+                conn.execute(text("ALTER TABLE progress ADD COLUMN ease_factor REAL NOT NULL DEFAULT 2.5"))
+            if "interval" not in cols:
+                conn.execute(text("ALTER TABLE progress ADD COLUMN interval INTEGER NOT NULL DEFAULT 0"))
+            if "lapses" not in cols:
+                conn.execute(text("ALTER TABLE progress ADD COLUMN lapses INTEGER NOT NULL DEFAULT 0"))
+            # Backfill: stare wiersze ze statusem != 'nowe' powinny mieć interval > 0,
+            # żeby algorytm SM-2 traktował je jak karty review, a nie wciąż-w-nauce.
+            conn.execute(text(
+                "UPDATE progress SET interval = 1 "
+                "WHERE interval = 0 AND status IN ('uczę się', 'znam', 'trudne', 'do powtórki')"
+            ))
 
 
 def ensure_selected_language_column() -> None:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Float
 from sqlalchemy.sql import func
 from database import AppBase, ContentBase
 
@@ -75,6 +75,10 @@ class Progress(ContentBase):
     next_review = Column(Date)
     last_reviewed = Column(Date)
     review_count = Column(Integer, default=0)
+    # SM-2 (Anki-style spaced repetition)
+    ease_factor = Column(Float, default=2.5)   # mnożnik łatwości, min 1.3
+    interval = Column(Integer, default=0)      # aktualny interwał w dniach (0 = jeszcze nieukończona nauka)
+    lapses = Column(Integer, default=0)        # liczba zapomnień (kliknięć "znowu" po graduacji)
 
 
 class Sentence(ContentBase):
