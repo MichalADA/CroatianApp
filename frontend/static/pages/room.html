@@ -458,18 +458,21 @@
           </div>
           <button class="learn-reveal-btn" id="learn-reveal-btn" onclick="learnReveal()">Pokaż po chorwacku</button>
           <div class="learn-actions hidden review-actions" id="learn-actions">
-            <button class="btn btn-znowu" onclick="learnAnswer('znowu')">
-              <span>✗ Znowu</span><span class="interval-hint" id="learn-hint-znowu">&lt;1d</span>
-            </button>
-            <button class="btn btn-trudne" onclick="learnAnswer('trudne')">
-              <span>~ Trudne</span><span class="interval-hint" id="learn-hint-trudne">1d</span>
+            <button class="btn btn-latwe" onclick="learnAnswer('łatwe')">
+              <span>★ Łatwe</span><span class="interval-hint" id="learn-hint-latwe">4d</span>
             </button>
             <button class="btn btn-dobrze" onclick="learnAnswer('dobrze')">
               <span>✓ Dobrze</span><span class="interval-hint" id="learn-hint-dobrze">1d</span>
             </button>
-            <button class="btn btn-latwe" onclick="learnAnswer('łatwe')">
-              <span>★ Łatwe</span><span class="interval-hint" id="learn-hint-latwe">4d</span>
+            <button class="btn btn-trudne" onclick="learnAnswer('trudne')">
+              <span>~ Trudne</span><span class="interval-hint" id="learn-hint-trudne">1d</span>
             </button>
+            <button class="btn btn-znowu" onclick="learnAnswer('znowu')">
+              <span>✗ Znowu</span><span class="interval-hint" id="learn-hint-znowu">&lt;1d</span>
+            </button>
+          </div>
+          <div class="review-hint-keys hidden" id="learn-keys-hint">
+            <kbd>Spacja</kbd> pokaż &nbsp;·&nbsp; <kbd>1</kbd> Łatwe &nbsp;<kbd>2</kbd> Dobrze &nbsp;<kbd>3</kbd> Trudne &nbsp;<kbd>4</kbd> Znowu
           </div>
         </div>
         <div class="learn-progress-wrap">
@@ -482,12 +485,10 @@
         <div class="big-emoji">🎉</div>
         <h3>Koniec sesji</h3>
         <p>Świetna robota! Oto podsumowanie:</p>
-        <div class="learn-summary-stats">
-          <div class="ls-card"><div class="ls-num" id="ls-total" style="color:var(--text)">0</div><div class="ls-lbl">przerobionych</div></div>
+        <div class="learn-summary-stats" style="grid-template-columns:repeat(5,1fr)">
+          <div class="ls-card"><div class="ls-num" id="ls-total" style="color:var(--text)">0</div><div class="ls-lbl">razem</div></div>
           <div class="ls-card"><div class="ls-num" id="ls-latwe" style="color:#6fb3ff">0</div><div class="ls-lbl">★ Łatwe</div></div>
           <div class="ls-card"><div class="ls-num" id="ls-dobrze" style="color:var(--green)">0</div><div class="ls-lbl">✓ Dobrze</div></div>
-        </div>
-        <div class="learn-summary-stats">
           <div class="ls-card"><div class="ls-num" id="ls-trudne" style="color:var(--accent)">0</div><div class="ls-lbl">~ Trudne</div></div>
           <div class="ls-card"><div class="ls-num" id="ls-znowu" style="color:var(--red)">0</div><div class="ls-lbl">✗ Znowu</div></div>
         </div>
@@ -656,18 +657,21 @@
         <div id="rv-conj" class="review-conj" style="display:none"></div>
         <div id="rv-a" class="answer-reveal hidden" onclick="revealAnswer()">Kliknij, aby zobaczyć odpowiedź</div>
         <div class="review-actions" id="rv-actions" style="display:none">
-          <button class="btn btn-znowu" onclick="answer('znowu')">
-            <span>✗ Znowu</span><span class="interval-hint" id="rv-hint-znowu">&lt;1d</span>
-          </button>
-          <button class="btn btn-trudne" onclick="answer('trudne')">
-            <span>~ Trudne</span><span class="interval-hint" id="rv-hint-trudne">1d</span>
+          <button class="btn btn-latwe" onclick="answer('łatwe')">
+            <span>★ Łatwe</span><span class="interval-hint" id="rv-hint-latwe">4d</span>
           </button>
           <button class="btn btn-dobrze" onclick="answer('dobrze')">
             <span>✓ Dobrze</span><span class="interval-hint" id="rv-hint-dobrze">1d</span>
           </button>
-          <button class="btn btn-latwe" onclick="answer('łatwe')">
-            <span>★ Łatwe</span><span class="interval-hint" id="rv-hint-latwe">4d</span>
+          <button class="btn btn-trudne" onclick="answer('trudne')">
+            <span>~ Trudne</span><span class="interval-hint" id="rv-hint-trudne">1d</span>
           </button>
+          <button class="btn btn-znowu" onclick="answer('znowu')">
+            <span>✗ Znowu</span><span class="interval-hint" id="rv-hint-znowu">&lt;1d</span>
+          </button>
+        </div>
+        <div class="review-hint-keys" id="rv-keys-hint" style="display:none">
+          <kbd>Spacja</kbd> pokaż &nbsp;·&nbsp; <kbd>1</kbd> Łatwe &nbsp;<kbd>2</kbd> Dobrze &nbsp;<kbd>3</kbd> Trudne &nbsp;<kbd>4</kbd> Znowu
         </div>
         <div style="margin-top:1.5rem;color:var(--text3);font-size:12px" id="rv-progress-label"></div>
       </div>
@@ -914,6 +918,7 @@ function showLearnCard() {
 
   document.getElementById('learn-reveal-btn').style.display = 'inline-flex';
   document.getElementById('learn-actions').classList.add('hidden');
+  document.getElementById('learn-keys-hint').classList.add('hidden');
 
   // Pasek postępu
   const pct = (learnIndex / learnQueue.length) * 100;
@@ -930,6 +935,7 @@ function learnReveal() {
   }
   document.getElementById('learn-reveal-btn').style.display = 'none';
   document.getElementById('learn-actions').classList.remove('hidden');
+  document.getElementById('learn-keys-hint').classList.remove('hidden');
 
   // Anki-like: pod każdym guzikiem pokaż za ile dni karta wróci.
   const pv = item.preview || {};
@@ -1138,6 +1144,7 @@ function showCurrentCard() {
   }
 
   document.getElementById('rv-actions').style.display = 'none';
+  document.getElementById('rv-keys-hint').style.display = 'none';
   document.getElementById('rv-progress-label').textContent =
     `${reviewIndex + 1} / ${reviewQueue.length}`;
 }
@@ -1153,6 +1160,7 @@ function revealAnswer() {
     document.getElementById('rv-conj').style.display = 'block';
   }
   document.getElementById('rv-actions').style.display = 'flex';
+  document.getElementById('rv-keys-hint').style.display = 'block';
 
   const pv = item.preview || {};
   document.getElementById('rv-hint-znowu').textContent = fmtInterval(pv['znowu']);
@@ -1277,6 +1285,40 @@ function playAlphabetSound(file) {
   const audio = new Audio(`/static/audio/hr/alphabet/${file}.mp3`);
   audio.play().catch(() => toast('Nie udało się odtworzyć dźwięku'));
 }
+// ─── Skróty klawiszowe (Anki-like) ──────────────────────────────────────────
+// Spacja = pokaż / 1=Łatwe 2=Dobrze 3=Trudne 4=Znowu. Aktywne tylko gdy
+// fokus jest poza polem tekstowym i odpowiednia karta jest widoczna.
+document.addEventListener('keydown', (ev) => {
+  const tag = (ev.target && ev.target.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || ev.target.isContentEditable) return;
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+
+  const learnVisible = document.getElementById('learn-active')?.classList.contains('is-active');
+  const reviewVisible = document.getElementById('review-card')?.style.display !== 'none'
+                        && document.getElementById('tab-powtorki')?.classList.contains('active');
+
+  if (learnVisible) {
+    if (ev.key === ' ' || ev.code === 'Space') {
+      if (!learnRevealed) { ev.preventDefault(); learnReveal(); }
+      return;
+    }
+    if (!learnRevealed) return;
+    const map = { '1': 'łatwe', '2': 'dobrze', '3': 'trudne', '4': 'znowu' };
+    if (map[ev.key]) { ev.preventDefault(); learnAnswer(map[ev.key]); }
+    return;
+  }
+
+  if (reviewVisible) {
+    if (ev.key === ' ' || ev.code === 'Space') {
+      if (!reviewRevealed) { ev.preventDefault(); revealAnswer(); }
+      return;
+    }
+    if (!reviewRevealed) return;
+    const map = { '1': 'łatwe', '2': 'dobrze', '3': 'trudne', '4': 'znowu' };
+    if (map[ev.key]) { ev.preventDefault(); answer(map[ev.key]); }
+  }
+});
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 init();
 </script>

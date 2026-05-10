@@ -239,9 +239,21 @@ textarea::placeholder {
 .review-card .q-type { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2rem; }
 .review-card .answer-reveal { font-size: 1.2rem; color: var(--text); margin-bottom: 1.5rem; min-height: 32px; }
 .review-card .answer-reveal.hidden { filter: blur(12px); cursor: pointer; user-select: none; }
-.review-actions { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
-.review-actions .btn { padding: 10px 18px; font-size: 14px; flex-direction: column; gap: 2px; min-width: 88px; }
+.review-actions { display: flex; gap: 10px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+.review-actions .btn {
+  padding: 12px 18px; font-size: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-width: 96px; font-weight: 600; letter-spacing: 0.01em;
+  transition: transform .12s ease, background .15s ease;
+}
+.review-actions .btn:active { transform: scale(0.96); }
 .review-actions .btn .interval-hint { font-size: 11px; color: var(--text3); font-weight: 400; letter-spacing: 0.02em; }
+.review-hint-keys { text-align: center; font-size: 11px; color: var(--text3); margin-top: 12px; letter-spacing: 0.02em; }
+.review-hint-keys kbd {
+  display: inline-block; min-width: 16px; padding: 1px 5px; margin: 0 2px;
+  border: 1px solid var(--border2); border-radius: 4px; background: var(--surface2);
+  font-family: ui-monospace, monospace; font-size: 10px; color: var(--text2);
+}
 .btn-nie-wiem, .btn-znowu  { border-color: var(--red) !important; color: var(--red) !important; }
 .btn-nie-wiem:hover, .btn-znowu:hover  { background: rgba(232,125,125,0.1) !important; }
 .btn-prawie, .btn-trudne  { border-color: var(--accent) !important; color: var(--accent) !important; }

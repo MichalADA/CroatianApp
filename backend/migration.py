@@ -160,7 +160,7 @@ def ensure_selected_language_column() -> None:
 
 
 def ensure_user_settings_columns() -> None:
-    """ALTER TABLE users ADD COLUMN theme/avatar jeśli brak."""
+    """ALTER TABLE users ADD COLUMN theme/avatar/daily_new_limit jeśli brak."""
     from sqlalchemy import inspect, text
     insp = inspect(database.app_engine)
     if not insp.has_table("users"):
@@ -173,3 +173,7 @@ def ensure_user_settings_columns() -> None:
             ))
         if "avatar" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN avatar VARCHAR(16)"))
+        if "daily_new_limit" not in cols:
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN daily_new_limit INTEGER NOT NULL DEFAULT 10"
+            ))

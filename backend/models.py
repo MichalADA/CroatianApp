@@ -18,6 +18,8 @@ class User(AppBase):
     # personalizacja UI
     theme = Column(String(8), nullable=False, default="dark")  # "dark" | "light"
     avatar = Column(String(64), nullable=True, default=None)   # nazwa pliku avatara albo emoji (back-compat)
+    # ile NOWYCH słów pokazywać dziennie w sesji nauki (Anki: "new cards/day")
+    daily_new_limit = Column(Integer, nullable=False, default=10)
     created_at = Column(DateTime, server_default=func.now())
 
 

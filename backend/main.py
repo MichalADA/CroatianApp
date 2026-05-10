@@ -150,6 +150,7 @@ def me(user: models.User = Depends(get_current_user)):
 # ═══════════════════════════════════════════════════════════════════════════
 
 VALID_THEMES = {"dark", "light"}
+VALID_NEW_LIMITS = {5, 10, 20}
 
 
 @app.patch("/me/settings", response_model=schemas.UserOut)
@@ -170,6 +171,11 @@ def update_settings(payload: schemas.SettingsIn,
         # Limit 16 znaków — wystarczy na pojedynczy emoji (max 4 bajty) albo kilka liter.
         avatar = (payload.avatar or "").strip()[:64]
         fresh.avatar = avatar or None
+
+    if payload.daily_new_limit is not None:
+        if payload.daily_new_limit not in VALID_NEW_LIMITS:
+            raise HTTPException(400, f"Dzienny limit nowych słów: {sorted(VALID_NEW_LIMITS)}")
+        fresh.daily_new_limit = payload.daily_new_limit
 
     db.commit()
     db.refresh(fresh)
@@ -408,12 +414,15 @@ def get_reviews(room_id: int,
 
 
 @app.get("/rooms/{room_id}/learning-session")
-def get_learning_session(room_id: int, limit: int = 20, new_limit: int = 5,
+def get_learning_session(room_id: int, limit: int = 20, new_limit: Optional[int] = None,
                          content_db: Session = Depends(get_content_db),
                          user: models.User = Depends(get_current_user)):
     """Kolejka kart sesji nauki. Priorytet: do powtórki dziś → trudne →
-    uczę się → nowe. Per (user, język)."""
+    uczę się → nowe. Per (user, język). Limit nowych = `new_limit`
+    jeśli podany, w przeciwnym razie ustawienie usera (`daily_new_limit`)."""
     today = date.today()
+    if new_limit is None:
+        new_limit = user.daily_new_limit or 10
 
     def serialize(item_type, item_id, status, prog=None):
         sr = _srs_payload(prog)

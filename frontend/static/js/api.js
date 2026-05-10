@@ -169,6 +169,18 @@ function openSettingsModal(user) {
       </div>
 
       <div class="form-group">
+        <label>Nowe słowa dziennie</label>
+        <div class="theme-toggle" id="set-newlimit-group">
+          <button type="button" class="theme-opt" data-newlimit="5">5</button>
+          <button type="button" class="theme-opt" data-newlimit="10">10</button>
+          <button type="button" class="theme-opt" data-newlimit="20">20</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">
+          Ile NOWYCH kart dorzucać do dziennej sesji nauki (powtórki nie wliczają się).
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>Twój avatar</label>
         <div class="avatar-grid" id="set-avatar-grid">
           ${AVAILABLE_AVATARS.map(name => `
@@ -202,6 +214,7 @@ function openSettingsModal(user) {
   // Stan
   let chosenTheme = user.theme === 'light' ? 'light' : 'dark';
   let chosenAvatar = startAvatar;
+  let chosenNewLimit = [5, 10, 20].indexOf(user.daily_new_limit) >= 0 ? user.daily_new_limit : 10;
 
   const grid = overlay.querySelector('#set-avatar-grid');
 
@@ -220,7 +233,7 @@ function openSettingsModal(user) {
   });
 
   function setActiveTheme() {
-    overlay.querySelectorAll('.theme-opt').forEach(b => {
+    overlay.querySelectorAll('.theme-opt[data-theme]').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === chosenTheme);
     });
     // Live preview motywu
@@ -228,8 +241,21 @@ function openSettingsModal(user) {
   }
   setActiveTheme();
 
-  overlay.querySelectorAll('.theme-opt').forEach(b => {
+  overlay.querySelectorAll('.theme-opt[data-theme]').forEach(b => {
     b.addEventListener('click', () => { chosenTheme = b.dataset.theme; setActiveTheme(); });
+  });
+
+  function setActiveNewLimit() {
+    overlay.querySelectorAll('#set-newlimit-group .theme-opt').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.newlimit, 10) === chosenNewLimit);
+    });
+  }
+  setActiveNewLimit();
+  overlay.querySelectorAll('#set-newlimit-group .theme-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      chosenNewLimit = parseInt(b.dataset.newlimit, 10);
+      setActiveNewLimit();
+    });
   });
 
   overlay.addEventListener('click', e => {
@@ -252,6 +278,7 @@ function openSettingsModal(user) {
       const updated = await api.updateSettings({
         theme: chosenTheme,
         avatar: chosenAvatar,
+        daily_new_limit: chosenNewLimit,
       });
       applyTheme(updated.theme);
       // Zaktualizuj topbar (jeśli istnieje) bez pełnego reloadu — używamy
