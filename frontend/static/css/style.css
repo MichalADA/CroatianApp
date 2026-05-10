@@ -599,8 +599,10 @@ textarea::placeholder {
 .streak-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin: 1.5rem 0;
+  gap: 14px;
+  margin: 1.5rem auto;
+  max-width: 720px;
+  justify-content: center;
 }
 .streak-card, .goal-card {
   flex: 1 1 200px;
