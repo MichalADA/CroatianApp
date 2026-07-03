@@ -15,7 +15,6 @@ dependencies:
 
   # State + DI
   flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
 
   # Routing
   go_router: ^14.2.0
@@ -47,13 +46,10 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
 
-  # Codegen
+  # Codegen (freezed + json_serializable only — nie używamy @riverpod annotations)
   build_runner: ^2.4.11
   freezed: ^2.5.7
   json_serializable: ^6.8.0
-  riverpod_generator: ^2.4.3
-  custom_lint: ^0.6.4
-  riverpod_lint: ^2.3.13
 
   # Testing
   mocktail: ^1.0.4
