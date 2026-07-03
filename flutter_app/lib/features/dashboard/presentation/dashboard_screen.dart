@@ -254,7 +254,41 @@ class _RoomsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      final crossAxisCount = constraints.maxWidth > 700 ? 3 : (constraints.maxWidth > 480 ? 2 : 1);
+      final w = constraints.maxWidth;
+      // 3 kolumny na desktopie/wide, 2 na tablet, 1 na telefon.
+      final crossAxisCount = w > 700 ? 3 : (w > 480 ? 2 : 1);
+
+      void onTap(Room r, bool locked) {
+        if (locked) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('🔒 Ukończ poprzedni pokój, żeby przejść dalej'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return;
+        }
+        context.pushNamed(AppRoutes.room, pathParameters: {'roomId': '${r.id}'});
+      }
+
+      // Na 1 kolumnie użyj Column z auto-height Cards — na telefonie
+      // GridView z fixed aspect ratio wymuszał pustą przestrzeń u dołu karty.
+      if (crossAxisCount == 1) {
+        return Column(
+          children: rooms.map((r) {
+            final locked = lockedIds.contains(r.id);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: RoomCard(
+                room: r,
+                locked: locked,
+                onTap: () => onTap(r, locked),
+              ),
+            );
+          }).toList(),
+        );
+      }
+
       return GridView.count(
         crossAxisCount: crossAxisCount,
         mainAxisSpacing: 12,
@@ -267,18 +301,7 @@ class _RoomsGrid extends StatelessWidget {
           return RoomCard(
             room: r,
             locked: locked,
-            onTap: () {
-              if (locked) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('🔒 Ukończ poprzedni pokój, żeby przejść dalej'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                return;
-              }
-              context.pushNamed(AppRoutes.room, pathParameters: {'roomId': '${r.id}'});
-            },
+            onTap: () => onTap(r, locked),
           );
         }).toList(),
       );
