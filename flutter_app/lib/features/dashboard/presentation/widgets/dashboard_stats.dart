@@ -9,28 +9,34 @@ class DashboardStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 2.2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        _StatTile(value: '${summary.totalWords}', label: 'słów w bazie'),
-        _StatTile(value: '${summary.totalVerbs}', label: 'czasowników'),
-        _StatTile(
-          value: '${summary.known}',
-          label: 'znam',
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        _StatTile(
-          value: '${summary.dueToday}',
-          label: 'do powtórki dziś',
-          color: summary.dueToday > 0 ? Colors.orange : null,
-        ),
-      ],
-    );
+    final tiles = [
+      _StatTile(value: '${summary.totalWords}', label: 'słów w bazie'),
+      _StatTile(value: '${summary.totalVerbs}', label: 'czasowników'),
+      _StatTile(
+        value: '${summary.known}',
+        label: 'znam',
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      _StatTile(
+        value: '${summary.dueToday}',
+        label: 'do powtórki dziś',
+        color: summary.dueToday > 0 ? Colors.orange : null,
+      ),
+    ];
+    // Na wąskich ekranach 2 kolumny, na szerokich 4 w jednej linii.
+    return LayoutBuilder(builder: (context, constraints) {
+      final cols = constraints.maxWidth > 640 ? 4 : 2;
+      return GridView.count(
+        crossAxisCount: cols,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        // Stała wysokość zapobiega rozdymaniu tile'a na wide screenach.
+        childAspectRatio: cols == 4 ? 1.6 : 2.4,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: tiles,
+      );
+    });
   }
 }
 

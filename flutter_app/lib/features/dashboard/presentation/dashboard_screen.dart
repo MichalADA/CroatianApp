@@ -63,8 +63,14 @@ class DashboardScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => _refresh(ref),
         child: ListView(
+          // Zewnętrzny padding zostaje mały; szerokość contentu ograniczamy
+          // na desktopie/tablecie, żeby tile'e i pokoje nie rozjeżdżały się
+          // na 2000px szeroko.
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           children: [
+            Center(child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: Column(children: [
             _Hero(languageFlag: currentLang?.flag ?? '🌍', title: currentLang?.title ?? user.selectedLanguage),
             const SizedBox(height: 24),
             dashboardAsync.when(
@@ -138,6 +144,8 @@ class DashboardScreen extends ConsumerWidget {
                 label: const Text('Wyloguj'),
               ),
             ),
+              ]),
+            )),
           ],
         ),
       ),
