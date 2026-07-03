@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Placeholder — pełna implementacja w Kroku 6.
+import 'review_tab.dart';
+
 class ReviewScreen extends StatelessWidget {
   const ReviewScreen({super.key, required this.roomId});
 
@@ -10,7 +11,7 @@ class ReviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Powtórki')),
-      body: Center(child: Text('Review dla pokoju #$roomId — krok 6.')),
+      body: ReviewTab(roomId: roomId),
     );
   }
 }

@@ -4,7 +4,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: chorwacki-api
+    container_name: memory-palace-api
     environment:
       - DB_PATH=/data/chorwacki.db
       - AUTH_SECRET_KEY=${AUTH_SECRET_KEY:-dev-secret-change-me-please-1234567890abcdef}
@@ -19,14 +19,40 @@ services:
       timeout: 5s
       retries: 5
 
+  # ─── Nowy Flutter web frontend (Docker preview) ──────────────────────────────
+  # Uwaga: mobilne buildy Android/iOS robisz z ./flutter_app przez `flutter build`.
+  # Docker służy TYLKO do preview weba — nie zastępuje natywnej kompilacji.
   frontend:
-    build: ./frontend
-    container_name: chorwacki-ui
+    build:
+      context: ./flutter_app
+      args:
+        # Zmienna wstrzykiwana do Fluttera przy compile. Zmień, jeśli backend
+        # chodzi pod inną domeną (produkcja).
+        API_BASE_URL: "${API_BASE_URL:-http://localhost:8000}"
+    container_name: memory-palace-ui
     ports:
       - "3000:80"
     depends_on:
       - backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/nginx-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Legacy HTML frontend (opcjonalny) ───────────────────────────────────────
+  # Odkomentuj, jeśli chcesz przez chwilę mieć dostępne oba UI równocześnie
+  # (Flutter na 3000, stary HTML na 3001). Do usunięcia gdy Flutter go zastąpi.
+  #
+  # frontend-legacy:
+  #   build: ./frontend
+  #   container_name: memory-palace-ui-legacy
+  #   ports:
+  #     - "3001:80"
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
 volumes:
   db-data:

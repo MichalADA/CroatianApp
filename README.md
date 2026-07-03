@@ -1,4 +1,4 @@
-# 🌍 Pałac Pamięci — wielojęzyczna aplikacja do nauki
+# 🌍 Memory Palace — wielojęzyczna aplikacja do nauki
 
 Aplikacja do nauki języków metodą pałacu pamięci. Obecnie obsługuje:
 
@@ -6,24 +6,59 @@ Aplikacja do nauki języków metodą pałacu pamięci. Obecnie obsługuje:
 - 🇪🇸 **hiszpański (es)** — pusty (do uzupełnienia)
 - 🇬🇷 **grecki (el)** — pusty (do uzupełnienia)
 
+## Stack
+
+- **Backend**: FastAPI + SQLAlchemy + SQLite (hybrydowy model per język)
+- **Frontend**: Flutter (Android + iOS + Web) — architektura Clean, Riverpod, GoRouter, Dio
+- **Legacy frontend**: HTML/CSS/JS (`frontend/`) — zachowany jako referencja, nie serwowany domyślnie
+
 ## Wymagania
 
-- Docker Desktop (lub Docker + Docker Compose)
+- Docker Desktop (lub Docker + Docker Compose) — do uruchomienia lokalnego
+- Flutter SDK 3.19+ — do buildów mobilnych (Android/iOS)
 
-## Uruchomienie
+## Uruchomienie (Docker)
 
 ```bash
 docker compose up -d --build
 docker compose logs -f          # opcjonalnie
 ```
 
-| Serwis   | URL                          |
-|----------|------------------------------|
-| Frontend | http://localhost:3000        |
-| API      | http://localhost:8000        |
-| API docs | http://localhost:8000/docs   |
+| Serwis           | URL                          |
+|------------------|------------------------------|
+| Frontend (Flutter web) | http://localhost:3000        |
+| API              | http://localhost:8000        |
+| API docs         | http://localhost:8000/docs   |
 
 Pierwsze konto testowe: `test` / `test` (auto-tworzone przy starcie).
+
+Aby zmienić adres backendu (np. produkcja):
+
+```bash
+API_BASE_URL=https://api.example.com docker compose up -d --build
+```
+
+## Uruchomienie mobilne (Android/iOS)
+
+Docker służy tylko do preview weba. Buildy mobilne robisz z `flutter_app/`:
+
+```bash
+cd flutter_app
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+
+# Android emulator
+flutter run -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8000
+
+# iOS symulator
+flutter run -d "iPhone 15" --dart-define=API_BASE_URL=http://localhost:8000
+
+# Produkcyjne buildy
+flutter build apk --release --dart-define=API_BASE_URL=https://api.example.com
+flutter build ios --release --dart-define=API_BASE_URL=https://api.example.com
+```
+
+Szczegóły w `flutter_app/README.md`.
 
 ## Architektura baz (model hybrydowy)
 
