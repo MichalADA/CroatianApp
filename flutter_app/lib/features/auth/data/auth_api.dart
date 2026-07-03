@@ -32,9 +32,16 @@ class AuthApi {
   }
 
   Future<AuthUser> updateSettings(SettingsUpdateRequest req) async {
+    // Wysyłamy tylko pola, które zostały ustawione (nie null) — backend
+    // ignoruje pominięte pola. Bezpośrednio budujemy mapę, bo freezed'owe
+    // toJson serializuje wszystkie pola, w tym te null.
+    final payload = <String, dynamic>{
+      if (req.theme != null) 'theme': req.theme,
+      if (req.avatar != null) 'avatar': req.avatar,
+    };
     final res = await _dio.patch<Map<String, dynamic>>(
       '/me/settings',
-      data: req.toJson(includeNulls: false),
+      data: payload,
     );
     return AuthUser.fromJson(_normalizeUser(res.data!));
   }
@@ -51,14 +58,5 @@ class AuthApi {
       'avatar': json['avatar'],
       'createdAt': json['created_at'],
     };
-  }
-}
-
-extension _SettingsToJson on SettingsUpdateRequest {
-  Map<String, dynamic> toJson({bool includeNulls = false}) {
-    final json = <String, dynamic>{};
-    if (theme != null || includeNulls) json['theme'] = theme;
-    if (avatar != null || includeNulls) json['avatar'] = avatar;
-    return json;
   }
 }

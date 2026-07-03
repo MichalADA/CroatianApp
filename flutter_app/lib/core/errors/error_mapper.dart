@@ -15,21 +15,26 @@ class ErrorMapper {
   }
 
   static Failure _fromDio(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return const TimeoutFailure();
-      case DioExceptionType.connectionError:
-        return const NetworkFailure();
-      case DioExceptionType.cancel:
-        return const UnknownFailure('Żądanie anulowane');
-      case DioExceptionType.badCertificate:
-        return const NetworkFailure('Niepoprawny certyfikat');
-      case DioExceptionType.badResponse:
-      case DioExceptionType.unknown:
-        return _fromResponse(e);
+    // Bez `switch` z exhaustive matching — Dio dorzuca nowe typy między
+    // wersjami (np. transformTimeout w 5.10). Domyślnie traktujemy jak
+    // problem z odpowiedzią serwera.
+    final type = e.type;
+    if (type == DioExceptionType.connectionTimeout ||
+        type == DioExceptionType.sendTimeout ||
+        type == DioExceptionType.receiveTimeout) {
+      return const TimeoutFailure();
     }
+    if (type == DioExceptionType.connectionError) {
+      return const NetworkFailure();
+    }
+    if (type == DioExceptionType.cancel) {
+      return const UnknownFailure('Żądanie anulowane');
+    }
+    if (type == DioExceptionType.badCertificate) {
+      return const NetworkFailure('Niepoprawny certyfikat');
+    }
+    // badResponse, unknown i wszystkie nowe typy → mapujemy po status code.
+    return _fromResponse(e);
   }
 
   static Failure _fromResponse(DioException e) {
