@@ -4,18 +4,25 @@ FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG API_BASE_URL=http://localhost:8000
 ENV API_BASE_URL=$API_BASE_URL
 
+# Flutter wymaga zapisu do SDK żeby stworzyć platform folders — daj mu prawa.
+RUN git config --global --add safe.directory /sdks/flutter || true
+
 WORKDIR /app
 
-# Kopiuj pubspec pierwsze — cache warstwy Docker gdy zmienia się tylko kod
+# Kopiuj pubspec i pobierz zależności (cache warstwy jak zmienia się tylko kod)
 COPY pubspec.yaml ./
-# Uwaga: pubspec.lock jest w .gitignore, więc kopiujemy tylko jak istnieje
 COPY pubspec.lock* ./
-RUN flutter pub get
 
-# Kopiuj resztę i buduj
+# Kopiuj resztę kodu
 COPY . .
 
-# Codegen (freezed, json_serializable) — obowiązkowe przed compile
+# `flutter create` regeneruje brakujące platform folders (web/, android/, ios/).
+# Na istniejącym projekcie NIE nadpisuje pubspec.yaml, lib/, ani test/.
+# To rozwiązuje problem "web/index.html not found" przy pierwszym buildzie w Dockerze.
+RUN flutter create --platforms=web --project-name memory_palace --org com.memorypalace . || true
+
+# Pub get + codegen (freezed / json_serializable)
+RUN flutter pub get
 RUN dart run build_runner build --delete-conflicting-outputs
 
 # Build produkcyjny weba z compile-time API_BASE_URL
