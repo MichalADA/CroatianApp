@@ -26,22 +26,39 @@ class AuthController extends StateNotifier<AuthState> {
   final AuthRepository repository;
 
   Future<void> _bootstrap() async {
-    final token = await storage.readToken();
-    if (token == null || token.isEmpty) {
-      state = const AuthUnauthenticated();
-      return;
-    }
+    // Wszystko w jednym try/catch — nie ma opcji zostawić stanu w
+    // AuthUnknown, bo router pokazuje wtedy splash w nieskończoność.
+    // Głównie chodzi o SecureStorage na web (flutter_secure_storage_web
+    // potrafi rzucać PlatformException, jeśli klucz szyfrujący zmienił
+    // się między sesjami przeglądarki albo storage jest zablokowany).
     try {
+      final token = await storage.readToken();
+      if (token == null || token.isEmpty) {
+        state = const AuthUnauthenticated();
+        return;
+      }
       final user = await repository.currentUser();
       state = AuthAuthenticated(user);
     } on UnauthorizedFailure {
-      await storage.clearToken();
+      await _clearTokenSafely();
       state = const AuthUnauthenticated();
     } on Failure catch (e) {
-      // Sieć padła — traktujemy jak niezalogowanego, ale nie kasujemy tokena
-      // (może user wróci online i zadziała).
-      debugPrint('AuthController.bootstrap failed: ${e.message}');
+      debugPrint('AuthController.bootstrap Failure: ${e.message}');
       state = const AuthUnauthenticated();
+    } on Object catch (e, st) {
+      // Nieoczekiwane (secure_storage crypto errors na web, kwoty
+      // storage itd.) — czyścimy token i idziemy na login.
+      debugPrint('AuthController.bootstrap unexpected: $e\n$st');
+      await _clearTokenSafely();
+      state = const AuthUnauthenticated();
+    }
+  }
+
+  Future<void> _clearTokenSafely() async {
+    try {
+      await storage.clearToken();
+    } on Object catch (e) {
+      debugPrint('SecureStorage.clearToken failed: $e');
     }
   }
 
