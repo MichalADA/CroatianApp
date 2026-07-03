@@ -7,6 +7,7 @@ import '../../../core/auth/auth_state.dart';
 import '../../../core/errors/failure.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/widgets/app_error_view.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../../core/widgets/empty_view.dart';
 import '../../../core/widgets/loading_view.dart';
 import '../../languages/data/languages_repository.dart';
@@ -63,14 +64,11 @@ class DashboardScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => _refresh(ref),
         child: ListView(
-          // Zewnętrzny padding zostaje mały; szerokość contentu ograniczamy
-          // na desktopie/tablecie, żeby tile'e i pokoje nie rozjeżdżały się
-          // na 2000px szeroko.
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           children: [
-            Center(child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 900),
-              child: Column(children: [
+            CenteredContent(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
             _Hero(languageFlag: currentLang?.flag ?? '🌍', title: currentLang?.title ?? user.selectedLanguage),
             const SizedBox(height: 24),
             dashboardAsync.when(
@@ -144,7 +142,7 @@ class DashboardScreen extends ConsumerWidget {
                 label: const Text('Wyloguj'),
               ),
             ),
-              ]),
+              ],
             )),
           ],
         ),
