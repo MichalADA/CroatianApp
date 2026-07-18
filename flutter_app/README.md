@@ -15,7 +15,33 @@ Domyślne wartości (fallback w `AppConfig`):
 - Android emulator → `http://10.0.2.2:8000`
 - iOS symulator / desktop / web → `http://localhost:8000`
 
-## Uruchomienie lokalne
+## Uruchomienie lokalne (dev-loop z hot reload)
+
+**Rekomendowany workflow** — scripty w `scripts/` załatwiają całość:
+
+```bash
+# 0. Jednorazowo — sprawdź setup
+./scripts/setup.sh
+
+# 1. Android z emulatorem (najbliższe docelowego doświadczenia)
+./scripts/dev-android.sh
+
+# 2. Chrome (najszybszy do UI iteracji)
+./scripts/dev-web.sh
+```
+
+Skrypty automatycznie:
+- Startują backend w Dockerze (jeśli nie działa)
+- Uruchamiają emulator (jeśli nie działa)
+- Robią `pub get` + codegen
+- Odpalają `flutter run` z odpowiednim `API_BASE_URL`
+
+W terminalu podczas `flutter run`:
+- `r` — **hot reload** (zmiany w kodzie widoczne w ~1s)
+- `R` — hot restart (pełne przeładowanie stanu)
+- `q` — zakończ
+
+**Bez skryptów, ręcznie:**
 
 ```bash
 flutter pub get
@@ -24,12 +50,36 @@ dart run build_runner build --delete-conflicting-outputs
 # Web
 flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
 
-# Android emulator
-flutter run -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8000
+# Android emulator (10.0.2.2 = localhost hosta z wnętrza emulatora)
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 
 # iOS symulator
 flutter run -d "iPhone 15" --dart-define=API_BASE_URL=http://localhost:8000
+
+# Podpięty telefon przez USB
+flutter run --dart-define=API_BASE_URL=http://<LAN-IP>:8000
 ```
+
+## Pierwszy setup Android SDK / emulator (jednorazowo)
+
+Jeśli `./scripts/setup.sh` mówi że brakuje Android toolchain:
+
+1. Pobierz **Android Studio** — https://developer.android.com/studio
+2. Uruchom, w kreatorze wybierz **Standard** (pobierze Android SDK + Emulator)
+3. Zaakceptuj licencje:
+   ```bash
+   flutter doctor --android-licenses
+   ```
+4. Utwórz emulator:
+   - Android Studio → **Tools → Device Manager → Create Virtual Device**
+   - Wybierz **Pixel 7**
+   - System image: **Android 14 (API 34)** — pobierze się przy pierwszym użyciu
+   - Nazwij np. `Pixel_7` (bez spacji!)
+5. Sprawdź:
+   ```bash
+   flutter emulators              # powinno pokazać Pixel_7
+   flutter doctor                 # wszystkie ✓
+   ```
 
 ## Build produkcyjny
 
